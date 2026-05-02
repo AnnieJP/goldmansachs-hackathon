@@ -654,6 +654,32 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
 
       {/* ── Holdings List ── */}
       <div>
+        {holdings.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "64px 24px" }}>
+            <div style={{ fontSize: 17, fontWeight: 700, color: TEXT, fontFamily: FONT_SERIF, marginBottom: 8 }}>
+              No holdings yet
+            </div>
+            <div style={{ fontSize: 13.5, color: TEXT_DIM, marginBottom: 32 }}>
+              Simply upload your brokerage statement and we'll take care of the rest.
+            </div>
+            <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+              <button onClick={() => setImporting(true)} type="button" style={{
+                padding: "13px 24px", border: `1px solid ${BORDER}`, background: "transparent",
+                color: TEXT_DIM, fontWeight: 600, fontSize: 14.5, cursor: "pointer",
+                fontFamily: "inherit", whiteSpace: "nowrap",
+              }}>
+                Import PDF
+              </button>
+              <button onClick={() => setModal("add")} type="button" style={{
+                padding: "13px 26px", border: "none", background: GOLD,
+                color: SURFACE, fontWeight: 700, fontSize: 14.5, cursor: "pointer",
+                fontFamily: "inherit", whiteSpace: "nowrap",
+              }}>
+                + Add holding
+              </button>
+            </div>
+          </div>
+        ) : (<>
         <div style={{ display: "flex", gap: 2, marginBottom: 16 }}>
           {TABS.map((t) => (
             <button key={t} onClick={() => setTab(t)} type="button" style={{
@@ -730,6 +756,7 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
             </tbody>
           </table>
         </div>
+        </>)}
       </div>
 
       {importing && <ImportModal portfolio={portfolio} onImport={async () => { await onPortfolioChange(); setImporting(false); }} onClose={() => setImporting(false)} />}
