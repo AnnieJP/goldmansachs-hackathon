@@ -385,7 +385,6 @@ export default function RebalanceScreen({ portfolio, prices }) {
                             Math.abs(b.current_pct - b.target_pct) - Math.abs(a.current_pct - a.target_pct))[0];
         const sellCount = (data.suggestions || []).filter(s => s.action === "sell").length;
         const buyCount  = (data.suggestions || []).filter(s => s.action === "buy").length;
-        const healthPct = Math.max(0, 100 - parseFloat(data.total_drift || 0) * 2).toFixed(0);
         const labelStyle = { fontSize: 10.5, fontWeight: 700, color: TEXT_DIM,
                              textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 };
         const valueStyle = { fontSize: 26, fontWeight: 700, color: TEXT, fontFamily: FONT_SERIF };
@@ -449,18 +448,6 @@ export default function RebalanceScreen({ portfolio, prices }) {
                     </div>
                   </div>
                 )}
-                <div style={statCard}>
-                  <div style={labelStyle}>Portfolio health</div>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-                    <span style={{ ...valueStyle, color: healthPct >= 70 ? GREEN : healthPct >= 40 ? "#F59E0B" : "#EF4444" }}>{healthPct}</span>
-                    <span style={{ fontSize: 13, color: TEXT_DIM }}>/100</span>
-                  </div>
-                  <div style={{ height: 3, background: BORDER, marginTop: 6 }}>
-                    <div style={{ height: "100%", width: `${healthPct}%`,
-                                  background: healthPct >= 70 ? GREEN : healthPct >= 40 ? "#F59E0B" : "#EF4444",
-                                  transition: "width 0.5s" }} />
-                  </div>
-                </div>
               </div>
             ) : <div />}
           </div>
