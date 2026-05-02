@@ -525,11 +525,19 @@ def calc_scenario(portfolio: dict, prices: dict, scenario_id: str) -> dict:
     delta_pct = delta / total_orig * 100 if total_orig else 0
 
     bond_pct = sum(
+        impacts[i]["original_value"] / total_orig * 100
+        for i in range(len(holdings))
+        if holdings[i].get("type") == "bond"
+    ) if total_orig else 0
+
+    """
+    bond_pct = sum(
         h["current_value"] / total_orig * 100
         for h in [{"current_value": impacts[i]["original_value"], **holdings[i]}
                   for i in range(len(holdings))]
         if holdings[i].get("type") == "bond"
     ) if total_orig else 0
+    """
 
     advice_map = {
         "market_crash": (

@@ -5,26 +5,80 @@ import { GOLD, GOLD_BG, GOLD_BORDER, BORDER, BORDER_MED,
 import { apiFetch } from "../api.js";
 import { ShieldCheck, AlertTriangle, Activity, BarChart3 } from "lucide-react";
 
-/* ─── SVG circular health score ────────────────────────────────── */
+/* ─── Modern circular risk meter ────────────────────────────────── */
 function HealthRing({ score }) {
-  const r = 52, cx = 64, cy = 64;
+  const r = 48, cx = 64, cy = 64;
   const circ = 2 * Math.PI * r;
   const pct  = Math.max(0, Math.min(10, score)) / 10;
   const dash = pct * circ;
   const color = pct >= 0.7 ? GREEN : pct >= 0.45 ? "#F59E0B" : RED;
+  
+  // Create gradient based on score
+  const gradientId = `risk-gradient-${score}`;
+  
   return (
     <div style={{ position: "relative", width: 128, height: 128, margin: "0 auto" }}>
       <svg width={128} height={128}>
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={10} />
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth={10}
+        {/* Define gradient */}
+        <defs>
+          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={color} stopOpacity={0.8} />
+            <stop offset="100%" stopColor={color} stopOpacity={1} />
+          </linearGradient>
+        </defs>
+        
+        {/* Background ring */}
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(176,193,214,0.15)" strokeWidth={12} />
+        
+        {/* Progress ring with gradient */}
+        <circle cx={cx} cy={cy} r={r} fill="none" 
+          stroke={`url(#${gradientId})`} strokeWidth={12}
           strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
           transform={`rotate(-90 ${cx} ${cy})`}
-          style={{ transition: "stroke-dasharray 0.6s ease, stroke 0.4s" }} />
+          style={{ transition: "stroke-dasharray 0.8s ease, stroke 0.4s" }} />
+        
+        {/* Inner decorative ring */}
+        <circle cx={cx} cy={cy} r={r-16} fill="none" stroke="rgba(176,193,214,0.1)" strokeWidth={2} />
       </svg>
+      
+      {/* Center content */}
       <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column",
                     alignItems: "center", justifyContent: "center" }}>
-        <div style={{ fontSize: 24, fontWeight: 900, color, letterSpacing: "-0.03em" }}>{score}</div>
-        <div style={{ fontSize: 10, color: TEXT_DIM, letterSpacing: "0.04em" }}>/ 10</div>
+        {/* Score with shadow effect */}
+        <div style={{ 
+          fontSize: 28, 
+          fontWeight: 900, 
+          color, 
+          letterSpacing: "-0.03em",
+          textShadow: `0 2px 4px ${color}20`,
+          lineHeight: 1
+        }}>{score}</div>
+        <div style={{ fontSize: 10, color: TEXT_DIM, letterSpacing: "0.04em", marginTop: 2 }}>/ 10</div>
+      </div>
+      
+      {/* Decorative dots around the ring */}
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+        {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => {
+          const isActive = (angle / 360) <= pct;
+          const x = 64 + 60 * Math.cos((angle - 90) * Math.PI / 180);
+          const y = 64 + 60 * Math.sin((angle - 90) * Math.PI / 180);
+          return (
+            <div
+              key={i}
+              style={{
+                position: "absolute",
+                left: x,
+                top: y,
+                width: 4,
+                height: 4,
+                borderRadius: "50%",
+                background: isActive ? color : "rgba(176,193,214,0.3)",
+                transform: "translate(-50%, -50%)",
+                transition: "background 0.3s ease"
+              }}
+            />
+          );
+        })}
       </div>
     </div>
   );
@@ -44,7 +98,7 @@ function RiskGauge({ score }) {
     ctx.clearRect(0, 0, W, H);
 
     ctx.beginPath(); ctx.arc(cx, cy, R, Math.PI, 0);
-    ctx.lineWidth = 14; ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.stroke();
+    ctx.lineWidth = 14; ctx.strokeStyle = "rgba(176,193,214,0.15)"; ctx.stroke();
 
     const stops = [[0,"#10B981"],[0.25,"#84cc16"],[0.5,"#F59E0B"],[0.75,"#f97316"],[1,"#EF4444"]];
     for (let i = 0; i < stops.length - 1; i++) {
@@ -62,9 +116,9 @@ function RiskGauge({ score }) {
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.lineTo(cx + Math.cos(angle) * (R - 6), cy + Math.sin(angle) * (R - 6));
-    ctx.strokeStyle = "#fff"; ctx.lineWidth = 2.5; ctx.lineCap = "round"; ctx.stroke();
+    ctx.strokeStyle = TEXT; ctx.lineWidth = 2.5; ctx.lineCap = "round"; ctx.stroke();
     ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI * 2);
-    ctx.fillStyle = "#fff"; ctx.fill();
+    ctx.fillStyle = TEXT; ctx.fill();
   }, [score]);
   return <canvas ref={ref} style={{ width: "100%", maxWidth: 300, height: 160, display: "block", margin: "0 auto" }} />;
 }
@@ -111,47 +165,124 @@ export default function RiskScreen({ portfolio, prices }) {
   const riskColor = data.risk_score <= 3 ? GREEN : data.risk_score <= 6 ? "#F59E0B" : RED;
 
   return (
-    <div style={{ padding: "32px 36px", color: TEXT, maxWidth: 900 }}>
+<div style={{ padding: "32px 36px", color: TEXT }}>
       <h1 style={{ margin: "0 0 4px", fontSize: 22, fontWeight: 700, letterSpacing: "-0.01em", fontFamily: FONT_SERIF }}>Risk Check</h1>
       <p style={{ margin: "0 0 28px", fontSize: 13, color: TEXT_DIM }}>
         How much volatility is hiding in your portfolio?
       </p>
 
-      {/* Top cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: 20, marginBottom: 24 }}>
+      {/* ── 3-Box Visual Section ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, marginBottom: 32 }}>
 
-        {/* Health score */}
-        <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 16,
-                      padding: "24px 20px", textAlign: "center",
-                      boxShadow: "0 2px 12px rgba(0,0,0,0.2)" }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: TEXT_DIM, marginBottom: 16,
-                        textTransform: "uppercase", letterSpacing: "0.06em" }}>Health Score</div>
-          <HealthRing score={data.risk_score} />
-          <div style={{ marginTop: 14, display: "inline-block", padding: "4px 14px", borderRadius: 99,
-                        background: riskColor + "18", border: `1px solid ${riskColor}30`,
-                        fontSize: 12, fontWeight: 700, color: riskColor, letterSpacing: "0.04em" }}>
-            {data.risk_level} risk
+        {/* Box 1 — Risk Analysis */}
+        <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: "16px 20px" }}>
+          <h3 style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 700, color: TEXT, textAlign: "center", fontFamily: FONT_SERIF }}>
+            Risk Analysis
+          </h3>
+          <div style={{ fontSize: 11, color: TEXT_DIM, textAlign: "center", marginBottom: 12, lineHeight: 1.4 }}>
+            Portfolio risk assessment
+          </div>
+          <div style={{ height: 140, display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <div style={{ width: 140, height: 140 }}>
+              <RiskGauge score={data.risk_score} />
+            </div>
+          </div>
+          <div style={{ marginTop: 12, textAlign: "center" }}>
+            <div style={{ fontSize: 17, fontWeight: 700, color: TEXT, fontFamily: FONT_SERIF }}>{data.risk_score}/10</div>
+            <div style={{ fontSize: 12, color: TEXT_DIM }}>Risk Score</div>
           </div>
         </div>
 
-        {/* Risk gauge + explanation */}
-        <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 16,
-                      padding: "24px 24px", boxShadow: "0 2px 12px rgba(0,0,0,0.2)" }}>
-          <RiskGauge score={data.risk_score} />
-          <div style={{ marginTop: 10 }}>
-            <p style={{ margin: "0 0 16px", fontSize: 14, lineHeight: 1.75, color: TEXT }}>
-              {data.plain_english}
-            </p>
-            <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
-              <StatPill label="Risk Score"       value={`${data.risk_score} / 10`}   />
-              <StatPill label="Portfolio Beta"   value={data.portfolio_beta}
-                         hint="vs. S&P 500"      />
-              <StatPill label="Diversification"  value={`${data.diversification_score} / 10`} />
+        {/* Box 2 — Risk Metrics */}
+        <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: "16px 20px" }}>
+          <h3 style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 700, color: TEXT, fontFamily: FONT_SERIF }}>
+            Risk Metrics
+          </h3>
+          <div style={{ fontSize: 11, color: TEXT_DIM, marginBottom: 12, lineHeight: 1.4 }}>
+            Key portfolio indicators
+          </div>
+          <div style={{ maxHeight: 200, overflowY: "auto" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8,
+                               padding: "6px",
+                               background: "transparent" }}>
+                <div style={{ width: 10, height: 10, flexShrink: 0,
+                              background: GOLD }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{data.portfolio_beta.toFixed(2)}</div>
+                  <div style={{ fontSize: 11, color: TEXT_DIM }}>Market Sensitivity</div>
+                </div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8,
+                               padding: "6px",
+                               background: "transparent" }}>
+                <div style={{ width: 10, height: 10, flexShrink: 0,
+                              background: GREEN }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{data.diversification_score}/10</div>
+                  <div style={{ fontSize: 11, color: TEXT_DIM }}>Diversification Score</div>
+                </div>
+              </div>
+              <div style={{ padding: "6px", borderRadius: 6, background: `${riskColor}15` }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: TEXT, marginBottom: 3 }}>
+                  What This Means
+                </div>
+                <div style={{ fontSize: 11, color: TEXT_DIM, lineHeight: 1.4 }}>
+                  {data.plain_english}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Box 3 — Risk Tips */}
+        <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: "16px 20px" }}>
+          <h3 style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 700, color: TEXT, fontFamily: FONT_SERIF }}>
+            Risk Tips
+          </h3>
+          <div style={{ fontSize: 11, color: TEXT_DIM, marginBottom: 12, lineHeight: 1.4 }}>
+            Ways to manage your investment risk
+          </div>
+          <div style={{ maxHeight: 200, overflowY: "auto" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8,
+                               padding: "6px",
+                               background: `${GREEN}15` }}>
+                <div style={{ fontSize: 14, flexShrink: 0 }}>🥚</div>
+                <div style={{ fontSize: 11, color: TEXT_DIM }}>
+                  Diversify across different companies and industries
+                </div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8,
+                               padding: "6px",
+                               background: `${GOLD}15` }}>
+                <div style={{ fontSize: 14, flexShrink: 0 }}>🛡️</div>
+                <div style={{ fontSize: 11, color: TEXT_DIM }}>
+                  Include bonds and stable investments
+                </div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8,
+                               padding: "6px",
+                               background: `${RED}15` }}>
+                <div style={{ fontSize: 14, flexShrink: 0 }}>⏰</div>
+                <div style={{ fontSize: 11, color: TEXT_DIM }}>
+                  Focus on long-term investment goals
+                </div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8,
+                               padding: "6px",
+                               background: `${GOLD}15` }}>
+                <div style={{ fontSize: 14, flexShrink: 0 }}>📊</div>
+                <div style={{ fontSize: 11, color: TEXT_DIM }}>
+                  Check portfolio balance quarterly
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
+      
       {/* Concentration warnings */}
       {data.concentration_warnings?.length > 0 && (
         <div style={{ marginBottom: 22 }}>
