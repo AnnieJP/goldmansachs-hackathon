@@ -1028,11 +1028,15 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
-    def _json(self, data, status=200):
+    def _json(self, data, status=200, set_cookie=None, clear_cookie=False):
         body = json.dumps(data, default=str).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json")
         self._cors()
+        if set_cookie:
+            self.send_header("Set-Cookie", f"folio_session={set_cookie}; Path=/; SameSite=Strict; HttpOnly")
+        elif clear_cookie:
+            self.send_header("Set-Cookie", "folio_session=; Path=/; SameSite=Strict; HttpOnly; Max-Age=0")
         self.end_headers()
         self.wfile.write(body)
 
@@ -1044,6 +1048,11 @@ class Handler(BaseHTTPRequestHandler):
         auth = self.headers.get("Authorization", "")
         if auth.startswith("Bearer "):
             return auth[7:].strip() or None
+        # Fallback: session cookie for requests that can't inject custom headers (e.g. raw fetch())
+        for crumb in self.headers.get("Cookie", "").split(";"):
+            name, _, value = crumb.strip().partition("=")
+            if name == "folio_session":
+                return value.strip() or None
         return None
 
     def _require_auth(self) -> str | None:
@@ -1139,7 +1148,7 @@ class Handler(BaseHTTPRequestHandler):
                 user_payload = public_user(users, email)
             load_portfolio(email)   # seed default portfolio file
             token = create_session(email)
-            return self._json({"token": token, "user": user_payload})
+            return self._json({"token": token, "user": user_payload}, set_cookie=token)
 
         if p == "/api/auth/login":
             email    = (body.get("email") or "").strip().lower()
@@ -1151,11 +1160,11 @@ class Handler(BaseHTTPRequestHandler):
                     return self._json({"error": "Invalid email or password."}, 401)
                 user_payload = public_user(users, email)
             token = create_session(email)
-            return self._json({"token": token, "user": user_payload})
+            return self._json({"token": token, "user": user_payload}, set_cookie=token)
 
         if p == "/api/auth/logout":
             destroy_session(self._bearer_token())
-            return self._json({"ok": True})
+            return self._json({"ok": True}, clear_cookie=True)
 
         # ── Authed endpoints ──────────────────────────────────────────────
         email = self._require_auth()
