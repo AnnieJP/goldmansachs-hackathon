@@ -64,7 +64,7 @@ export default function ScenariosHistoryScreen({ onNavigate }) {
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em",
                           textTransform: "uppercase", color: TEXT_DIM, marginBottom: 6 }}>
-              Ask Folio
+              Ask Meridian
             </div>
             <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700,
                          letterSpacing: "-0.02em", color: TEXT, fontFamily: FONT_SERIF }}>
@@ -110,7 +110,7 @@ export default function ScenariosHistoryScreen({ onNavigate }) {
                 color: BG, fontSize: 13, fontWeight: 600,
               }}
             >
-              Ask Folio something
+              Ask Meridian something
             </button>
           </div>
         )}

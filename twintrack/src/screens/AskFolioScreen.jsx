@@ -502,19 +502,19 @@ export default function AskFolioScreen({ portfolio, prices, onNavigate, initialR
         <div style={{ marginBottom: 36 }}>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em",
                         textTransform: "uppercase", color: TEXT_DIM, marginBottom: 8 }}>
-            Ask Folio
+            Ask Meridian
           </div>
           <h1 style={{ margin: "0 0 10px", fontSize: 30, fontWeight: 700,
                        letterSpacing: "-0.02em", color: TEXT, fontFamily: FONT_SERIF }}>
             What-If Scenario Planner
-            <InfoTip title="Ask Folio">
-              Describe any market situation in plain English. Folio simulates
+            <InfoTip title="Ask Meridian">
+              Describe any market situation in plain English. Meridian simulates
               the impact on your portfolio, produces a full rebalance plan, and
               gives a verdict: proceed, proceed with caution, or do not proceed.
             </InfoTip>
           </h1>
           <p style={{ margin: 0, fontSize: 14, color: TEXT_DIM, lineHeight: 1.6 }}>
-            Describe any scenario in plain English. Folio will run the math and show you
+            Describe any scenario in plain English. Meridian will run the math and show you
             exactly what to buy and sell to rebalance your portfolio.
           </p>
         </div>

@@ -56,7 +56,7 @@ const NAV = [
   { id: "portfolio", Icon: BarChart3,     label: "My Holdings"  },
   { id: "risk",      Icon: ShieldCheck,   label: "Risk Check"   },
   { id: "rebalance", Icon: ArrowUpDown,   label: "Rebalance"    },
-  { id: "askfolio",  Icon: MessageSquare, label: "Ask Folio"    },
+  { id: "askfolio",  Icon: MessageSquare, label: "Ask Meridian" },
   { id: "history",   Icon: History,       label: "My Scenarios" },
 ];
 
@@ -81,8 +81,8 @@ function Sidebar({ screen, onNavigate, enriched, pricesLoading, onRefresh, curre
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: 28, color: TEXT, lineHeight: 1 }}>◈</span>
           <div>
-            <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-0.01em", color: TEXT, fontFamily: FONT_SERIF }}>Folio</div>
-            <div style={{ fontSize: 10.5, color: TEXT_DIM, letterSpacing: "0.02em" }}>Portfolio Dashboard</div>
+            <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-0.01em", color: TEXT, fontFamily: FONT_SERIF }}>Meridian</div>
+            <div style={{ fontSize: 10.5, color: TEXT_DIM, letterSpacing: "0.02em" }}>Your financial north star</div>
           </div>
         </div>
       </div>
@@ -195,7 +195,7 @@ function HubScreen({ enriched, setScreen, currentUser, onLogout }) {
     { id: "portfolio", Icon: BarChart3,     title: "My Holdings",  desc: "Live prices, cost basis, gain & loss per position.", color: "#F59E0B" },
     { id: "risk",      Icon: ShieldCheck,   title: "Risk Check",   desc: "Beta analysis and plain-English risk rating.",        color: "#10B981" },
     { id: "rebalance", Icon: ArrowUpDown,   title: "Rebalance",    desc: "Drift from targets — exactly what to buy or sell.",  color: "#6366F1" },
-    { id: "askfolio",  Icon: MessageSquare, title: "Ask Folio",    desc: "Describe a scenario and get a full rebalance plan.", color: "#0891B2" },
+    { id: "askfolio",  Icon: MessageSquare, title: "Ask Meridian", desc: "Describe a scenario and get a full rebalance plan.", color: "#0891B2" },
   ];
 
   return (
@@ -245,7 +245,7 @@ function HubScreen({ enriched, setScreen, currentUser, onLogout }) {
         }}>
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: GOLD, display: "inline-block" }} />
           <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: GOLD }}>
-            Folio · Portfolio Dashboard
+            Meridian · Your financial north star
           </span>
         </div>
 
