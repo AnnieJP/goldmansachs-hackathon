@@ -1,14 +1,13 @@
 ﻿import { useState, useEffect, useRef, useMemo } from "react";
 import { GOLD, GOLD_BG, GOLD_BORDER, BORDER, BORDER_MED,
-         SURFACE, SURFACE_2, BG, TEXT, TEXT_SEC, TEXT_DIM,
+         SURFACE, SURFACE_2, BG, TEXT, TEXT_DIM,
          GREEN, RED, FONT_SERIF, fmt$, fmtPct, enrichPortfolio } from "./theme.js";
 import PortfolioScreen  from "./screens/PortfolioScreen.jsx";
 import RiskScreen       from "./screens/RiskScreen.jsx";
 import RebalanceScreen  from "./screens/RebalanceScreen.jsx";
-import ScenarioScreen   from "./screens/ScenarioScreen.jsx";
 import { apiFetch }     from "./api.js";
-import { LayoutDashboard, BarChart3, ShieldCheck, ArrowUpDown,
-         Sparkles, RefreshCw, LogOut, TrendingUp, TrendingDown } from "lucide-react";
+import { BarChart3, ShieldCheck, ArrowUpDown,
+         RefreshCw, LogOut, TrendingUp, TrendingDown } from "lucide-react";
 
 /* ─── Ambient background canvas ────────────────────────────────── */
 function AmbientCanvas() {
@@ -52,11 +51,9 @@ function AmbientCanvas() {
 
 /* ─── Sidebar nav config ────────────────────────────────────────── */
 const NAV = [
-  { id: "hub",       Icon: LayoutDashboard, label: "Overview"    },
-  { id: "portfolio", Icon: BarChart3,        label: "My Holdings" },
-  { id: "risk",      Icon: ShieldCheck,      label: "Risk Check"  },
-  { id: "rebalance", Icon: ArrowUpDown,      label: "Rebalance"   },
-  { id: "scenario",  Icon: Sparkles,         label: "What-If"     },
+  { id: "portfolio", Icon: BarChart3,   label: "My Holdings" },
+  { id: "risk",      Icon: ShieldCheck, label: "Risk Check"  },
+  { id: "rebalance", Icon: ArrowUpDown, label: "Rebalance"   },
 ];
 
 /* ─── Sidebar ───────────────────────────────────────────────────── */
@@ -334,7 +331,7 @@ function PageHeader({ title, subtitle, actions }) {
 
 /* ─── Main component ────────────────────────────────────────────── */
 export default function TwinTrack({ currentUser, onLogout }) {
-  const [screen,        setScreen]        = useState("hub");
+  const [screen,        setScreen]        = useState("portfolio");
   const [portfolio,     setPortfolio]     = useState(null);
   const [prices,        setPrices]        = useState({});
   const [loading,       setLoading]       = useState(true);
@@ -399,10 +396,6 @@ export default function TwinTrack({ currentUser, onLogout }) {
     </div>
   );
 
-  if (screen === "hub") return (
-    <HubScreen enriched={enriched} setScreen={setScreen} currentUser={currentUser} onLogout={onLogout} />
-  );
-
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: BG }}>
       <Sidebar screen={screen} setScreen={setScreen} enriched={enriched}
@@ -415,7 +408,6 @@ export default function TwinTrack({ currentUser, onLogout }) {
         )}
         {screen === "risk"      && <RiskScreen      portfolio={portfolio} prices={prices} />}
         {screen === "rebalance" && <RebalanceScreen portfolio={portfolio} prices={prices} />}
-        {screen === "scenario"  && <ScenarioScreen  portfolio={portfolio} prices={prices} />}
       </main>
     </div>
   );
