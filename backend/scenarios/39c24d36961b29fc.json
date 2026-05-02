@@ -1,0 +1,2408 @@
+[
+  {
+    "id": "3abb643e-362f-4681-b1be-0628c309bd7c",
+    "timestamp": "2026-05-02T06:20:50",
+    "scenario_text": "Healthcare is going down; what do I do?",
+    "parsed_intent": {
+      "crash_sector": "healthcare"
+    },
+    "verdict": "do_not_proceed",
+    "verdict_label": "Do Not Proceed",
+    "verdict_color": "red",
+    "trade_count": 8,
+    "narrative": "I'd recommend holding off on any major rebalancing right now. Your portfolio beta is 0.91, and with today's 4.3% risk-free rate (FRED 10-yr Treasury), CAPM puts your expected annual return at about 9.4%. A single asset class exceeds 60% of your portfolio \u2014 diversification is limited.",
+    "reasoning": "Based on your current allocation and your moderate risk profile, this plan realigns your portfolio toward your target allocation. Add: BSV (buy 4 shares), BND (buy 5 shares), CGDG (buy 20 shares). Biggest overweight: US Growth Equity at 36% vs 15% target \u2014 trimming here frees up capital. The risk engine flagged serious concerns \u2014 review the signals before executing any trades.",
+    "rebalance": {
+      "target_allocation": {
+        "us_equity_broad": 30.0,
+        "us_equity_growth": 15.0,
+        "us_equity_value": 5.0,
+        "dividend": 10.0,
+        "international": 10.0,
+        "bonds_medium": 10.0,
+        "bonds_short": 5.0,
+        "defensive": 5.0,
+        "real_estate": 5.0,
+        "commodities": 5.0
+      },
+      "gap_analysis": {
+        "commodities": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Commodities & Gold"
+        },
+        "bonds_short": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Short-Term Bonds"
+        },
+        "dividend": {
+          "current_pct": 0,
+          "target_pct": 10.0,
+          "gap_pct": 10.0,
+          "label": "Dividend / Income"
+        },
+        "cash": {
+          "current_pct": 2.0,
+          "target_pct": 0,
+          "gap_pct": -2.0,
+          "label": "Cash"
+        },
+        "us_equity_broad": {
+          "current_pct": 49.2,
+          "target_pct": 30.0,
+          "gap_pct": -19.2,
+          "label": "US Broad Market"
+        },
+        "bonds_medium": {
+          "current_pct": 4.6,
+          "target_pct": 10.0,
+          "gap_pct": 5.4,
+          "label": "Core Bonds"
+        },
+        "real_estate": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Real Estate (REITs)"
+        },
+        "international": {
+          "current_pct": 3.7,
+          "target_pct": 10.0,
+          "gap_pct": 6.3,
+          "label": "International Equity"
+        },
+        "us_equity_value": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "US Value Equity"
+        },
+        "financials": {
+          "current_pct": 4.5,
+          "target_pct": 0,
+          "gap_pct": -4.5,
+          "label": "Financials"
+        },
+        "defensive": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Defensive / Low-Vol"
+        },
+        "us_equity_growth": {
+          "current_pct": 35.9,
+          "target_pct": 15.0,
+          "gap_pct": -20.9,
+          "label": "US Growth Equity"
+        }
+      },
+      "trades": [
+        {
+          "action": "buy",
+          "ticker": "BSV",
+          "name": "Short-Term Bonds",
+          "shares": 4,
+          "price": 78.08,
+          "value": 312.32,
+          "bucket": "bonds_short",
+          "reason": "You're 5% underweight in Short-Term Bonds. BSV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "BND",
+          "name": "Core Bonds",
+          "shares": 5,
+          "price": 73.36,
+          "value": 366.8,
+          "bucket": "bonds_medium",
+          "reason": "You're 5% underweight in Core Bonds. BND is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "CGDG",
+          "name": "Dividend / Income",
+          "shares": 20,
+          "price": 37.23,
+          "value": 744.6,
+          "bucket": "dividend",
+          "reason": "You're 10% underweight in Dividend / Income. CGDG is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AAAU",
+          "name": "Commodities & Gold",
+          "shares": 8,
+          "price": 45.46,
+          "value": 363.68,
+          "bucket": "commodities",
+          "reason": "You're 5% underweight in Commodities & Gold. AAAU is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AVUV",
+          "name": "US Value Equity",
+          "shares": 3,
+          "price": 119.96,
+          "value": 359.88,
+          "bucket": "us_equity_value",
+          "reason": "You're 5% underweight in US Value Equity. AVUV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AVEM",
+          "name": "International Equity",
+          "shares": 5,
+          "price": 90.53,
+          "value": 452.65,
+          "bucket": "international",
+          "reason": "You're 6% underweight in International Equity. AVEM is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "DFGR",
+          "name": "Real Estate (REITs)",
+          "shares": 13,
+          "price": 28.8,
+          "value": 374.4,
+          "bucket": "real_estate",
+          "reason": "You're 5% underweight in Real Estate (REITs). DFGR is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "ACWV",
+          "name": "Defensive / Low-Vol",
+          "shares": 3,
+          "price": 120.9,
+          "value": 362.7,
+          "bucket": "defensive",
+          "reason": "You're 5% underweight in Defensive / Low-Vol. ACWV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        }
+      ],
+      "before": {
+        "holdings": [
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "value": 2801.4,
+            "pct": 1.6,
+            "bucket": "us_equity_growth",
+            "price": 280.14,
+            "shares": 10
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "value": 2072.2,
+            "pct": 1.2,
+            "bucket": "us_equity_growth",
+            "price": 414.44,
+            "shares": 5
+          },
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "value": 5300.16,
+            "pct": 3.0,
+            "bucket": "us_equity_broad",
+            "price": 662.52,
+            "shares": 8
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond Market ETF",
+            "value": 2200.8,
+            "pct": 1.3,
+            "bucket": "bonds_medium",
+            "price": 73.36,
+            "shares": 30
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc.",
+            "value": 1157.07,
+            "pct": 0.7,
+            "bucket": "us_equity_growth",
+            "price": 385.69,
+            "shares": 3
+          },
+          {
+            "ticker": "VTI",
+            "name": "Vanguard Total Stock Market ETF",
+            "value": 2131.74,
+            "pct": 1.2,
+            "bucket": "us_equity_broad",
+            "price": 355.29,
+            "shares": 6
+          },
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "value": 12606.3,
+            "pct": 7.2,
+            "bucket": "us_equity_growth",
+            "price": 280.14,
+            "shares": 45
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "value": 8288.8,
+            "pct": 4.8,
+            "bucket": "us_equity_growth",
+            "price": 414.44,
+            "shares": 20
+          },
+          {
+            "ticker": "NVDA",
+            "name": "NVIDIA Corp.",
+            "value": 2976.75,
+            "pct": 1.7,
+            "bucket": "us_equity_growth",
+            "price": 198.45,
+            "shares": 15
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc. (Class A)",
+            "value": 3856.9,
+            "pct": 2.2,
+            "bucket": "us_equity_growth",
+            "price": 385.69,
+            "shares": 10
+          },
+          {
+            "ticker": "AMZN",
+            "name": "Amazon.com Inc.",
+            "value": 2146.08,
+            "pct": 1.2,
+            "bucket": "us_equity_growth",
+            "price": 268.26,
+            "shares": 8
+          },
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "value": 36438.6,
+            "pct": 20.9,
+            "bucket": "us_equity_broad",
+            "price": 662.52,
+            "shares": 55
+          },
+          {
+            "ticker": "EEM",
+            "name": "iShares MSCI Emerg. Mkts",
+            "value": 6413.0,
+            "pct": 3.7,
+            "bucket": "international",
+            "price": 64.13,
+            "shares": 100
+          },
+          {
+            "ticker": "FSKAX",
+            "name": "Fidelity Total Mkt Index",
+            "value": 39708.0,
+            "pct": 22.8,
+            "bucket": "us_equity_broad",
+            "price": 198.54,
+            "shares": 200
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond ETF",
+            "value": 5868.8,
+            "pct": 3.4,
+            "bucket": "bonds_medium",
+            "price": 73.36,
+            "shares": 80
+          },
+          {
+            "ticker": "JPM",
+            "name": "JPMorgan Chase & Co.",
+            "value": 7811.75,
+            "pct": 4.5,
+            "bucket": "financials",
+            "price": 312.47,
+            "shares": 25
+          },
+          {
+            "ticker": "TSLA",
+            "name": "Tesla Inc.",
+            "value": 4689.84,
+            "pct": 2.7,
+            "bucket": "us_equity_growth",
+            "price": 390.82,
+            "shares": 12
+          },
+          {
+            "ticker": "XVL",
+            "name": "Health Care Select Sector SPDR ETF",
+            "value": 2175.0,
+            "pct": 1.2,
+            "bucket": "us_equity_broad",
+            "price": 145.0,
+            "shares": 15
+          },
+          {
+            "ticker": "JNJ",
+            "name": "Johnson & Johnson",
+            "value": 18175.2,
+            "pct": 10.4,
+            "bucket": "us_equity_growth",
+            "price": 227.19,
+            "shares": 80
+          },
+          {
+            "ticker": "UNH",
+            "name": "UnitedHealth Group",
+            "value": 1106.34,
+            "pct": 0.6,
+            "bucket": "us_equity_growth",
+            "price": 368.78,
+            "shares": 3
+          },
+          {
+            "ticker": "ABBV",
+            "name": "AbbVie Inc",
+            "value": 2066.0,
+            "pct": 1.2,
+            "bucket": "us_equity_growth",
+            "price": 206.6,
+            "shares": 10
+          },
+          {
+            "ticker": "PFE",
+            "name": "Pfizer Inc.",
+            "value": 658.25,
+            "pct": 0.4,
+            "bucket": "us_equity_growth",
+            "price": 26.33,
+            "shares": 25
+          }
+        ],
+        "total_value": 174148.98,
+        "cash": 3500.0
+      },
+      "after": {
+        "holdings": [
+          {
+            "ticker": "FSKAX",
+            "name": "Fidelity Total Mkt Index",
+            "shares": 200.0,
+            "price": 198.54,
+            "value": 39708.0,
+            "pct": 24.7,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "shares": 55.0,
+            "price": 662.52,
+            "value": 36438.6,
+            "pct": 22.7,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "JNJ",
+            "name": "Johnson & Johnson",
+            "shares": 80.0,
+            "price": 227.19,
+            "value": 18175.2,
+            "pct": 11.3,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "shares": 45.0,
+            "price": 280.14,
+            "value": 12606.3,
+            "pct": 7.9,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "shares": 20.0,
+            "price": 414.44,
+            "value": 8288.8,
+            "pct": 5.2,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "JPM",
+            "name": "JPMorgan Chase & Co.",
+            "shares": 25.0,
+            "price": 312.47,
+            "value": 7811.75,
+            "pct": 4.9,
+            "bucket": "financials"
+          },
+          {
+            "ticker": "EEM",
+            "name": "iShares MSCI Emerg. Mkts",
+            "shares": 100.0,
+            "price": 64.13,
+            "value": 6413.0,
+            "pct": 4.0,
+            "bucket": "international"
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond ETF",
+            "shares": 85.0,
+            "price": 73.36,
+            "value": 6235.6,
+            "pct": 3.9,
+            "bucket": "bonds_medium"
+          },
+          {
+            "ticker": "TSLA",
+            "name": "Tesla Inc.",
+            "shares": 12.0,
+            "price": 390.82,
+            "value": 4689.84,
+            "pct": 2.9,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc. (Class A)",
+            "shares": 10.0,
+            "price": 385.69,
+            "value": 3856.9,
+            "pct": 2.4,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "NVDA",
+            "name": "NVIDIA Corp.",
+            "shares": 15.0,
+            "price": 198.45,
+            "value": 2976.75,
+            "pct": 1.9,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "XVL",
+            "name": "Health Care Select Sector SPDR ETF",
+            "shares": 15.0,
+            "price": 145.0,
+            "value": 2175.0,
+            "pct": 1.4,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AMZN",
+            "name": "Amazon.com Inc.",
+            "shares": 8.0,
+            "price": 268.26,
+            "value": 2146.08,
+            "pct": 1.3,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "VTI",
+            "name": "Vanguard Total Stock Market ETF",
+            "shares": 6.0,
+            "price": 355.29,
+            "value": 2131.74,
+            "pct": 1.3,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "ABBV",
+            "name": "AbbVie Inc",
+            "shares": 10.0,
+            "price": 206.6,
+            "value": 2066.0,
+            "pct": 1.3,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "UNH",
+            "name": "UnitedHealth Group",
+            "shares": 3.0,
+            "price": 368.78,
+            "value": 1106.34,
+            "pct": 0.7,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "CGDG",
+            "name": "Dividend / Income",
+            "shares": 20.0,
+            "price": 37.23,
+            "value": 744.6,
+            "pct": 0.5,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "PFE",
+            "name": "Pfizer Inc.",
+            "shares": 25.0,
+            "price": 26.33,
+            "value": 658.25,
+            "pct": 0.4,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "AVEM",
+            "name": "International Equity",
+            "shares": 5.0,
+            "price": 90.53,
+            "value": 452.65,
+            "pct": 0.3,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "DFGR",
+            "name": "Real Estate (REITs)",
+            "shares": 13.0,
+            "price": 28.8,
+            "value": 374.4,
+            "pct": 0.2,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AAAU",
+            "name": "Commodities & Gold",
+            "shares": 8.0,
+            "price": 45.46,
+            "value": 363.68,
+            "pct": 0.2,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "ACWV",
+            "name": "Defensive / Low-Vol",
+            "shares": 3.0,
+            "price": 120.9,
+            "value": 362.7,
+            "pct": 0.2,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AVUV",
+            "name": "US Value Equity",
+            "shares": 3.0,
+            "price": 119.96,
+            "value": 359.88,
+            "pct": 0.2,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "BSV",
+            "name": "Short-Term Bonds",
+            "shares": 4.0,
+            "price": 78.08,
+            "value": 312.32,
+            "pct": 0.2,
+            "bucket": "us_equity_broad"
+          }
+        ],
+        "total_value": 160617.35
+      }
+    },
+    "flags": [
+      {
+        "type": "review_holding",
+        "detail": "nvda",
+        "message": "This position is down more than 20% \u2014 review whether the original investment thesis still holds. (nvda)"
+      },
+      {
+        "type": "stop_loss_review",
+        "detail": "nvda",
+        "message": "This position is down over 30% \u2014 a stop-loss review is strongly recommended. (nvda)"
+      },
+      {
+        "type": "caution",
+        "detail": "equity_ceiling_breach",
+        "message": "Your equity allocation exceeds the typical ceiling for your risk profile \u2014 consider rebalancing toward bonds or cash."
+      },
+      {
+        "type": "caution",
+        "detail": "buffer_too_low_breach",
+        "message": "Your bond + cash buffer is thin for your risk profile \u2014 you'd have limited dry powder in a downturn."
+      }
+    ],
+    "violations": [
+      {
+        "type": "type_concentration",
+        "detail": "etf",
+        "message": "A single asset class exceeds 60% of your portfolio \u2014 diversification is limited."
+      },
+      {
+        "type": "equity_ceiling",
+        "detail": "moderate",
+        "message": "Your equity exposure exceeds the recommended ceiling for your risk profile."
+      },
+      {
+        "type": "buffer_too_low",
+        "detail": "moderate",
+        "message": "Your bond + cash buffer is below the minimum for your risk profile \u2014 you lack a safety net."
+      }
+    ],
+    "recommendations": [],
+    "math": {
+      "portfolio_beta": 0.912,
+      "risk_free_rate": 0.0432,
+      "portfolio_expected_annual": 0.0939,
+      "return_gap": "achievable",
+      "target_value": null,
+      "timeline_months": null,
+      "capm_source": "CAPM: Rf=FRED GS10, Rm=SPY long-run 10%"
+    },
+    "scenario_result": null,
+    "planner_engine": "clingo",
+    "profile_used": {}
+  },
+  {
+    "id": "dd2c8f19-d3b9-476d-9028-08c778a6c861",
+    "timestamp": "2026-05-02T06:18:56",
+    "scenario_text": "What if healtcare industry crashes",
+    "parsed_intent": {
+      "scenario": "market_crash",
+      "crash_sector": "broad"
+    },
+    "verdict": "do_not_proceed",
+    "verdict_label": "Do Not Proceed",
+    "verdict_color": "red",
+    "trade_count": 25,
+    "narrative": "I'd recommend holding off on any major rebalancing right now. Your portfolio beta is 0.97, and with today's 4.3% risk-free rate (FRED 10-yr Treasury), CAPM puts your expected annual return at about 9.7%. A single asset class exceeds 60% of your portfolio \u2014 diversification is limited. Suggested moves: \u2191 CASH, \u2191 BOND.",
+    "reasoning": "Given a Market Crash scenario and your moderate risk profile, this plan realigns your portfolio toward your target allocation. Trim: AAPL (sell 5 shares), MSFT (sell 3 shares), VOO (sell 4 shares). Add: BSV (buy 169 shares), BND (buy 259 shares), AAAU (buy 290 shares). Biggest overweight: US Broad Market at 54% vs 18% target \u2014 trimming here frees up capital. The risk engine flagged serious concerns \u2014 review the signals before executing any trades.",
+    "rebalance": {
+      "target_allocation": {
+        "us_equity_broad": 18.2,
+        "us_equity_growth": 4.5,
+        "us_equity_value": 4.5,
+        "dividend": 13.6,
+        "international": 4.5,
+        "bonds_medium": 18.2,
+        "bonds_short": 9.1,
+        "defensive": 9.1,
+        "commodities": 9.1,
+        "cash": 9.1
+      },
+      "gap_analysis": {
+        "commodities": {
+          "current_pct": 0,
+          "target_pct": 9.1,
+          "gap_pct": 9.1,
+          "label": "Commodities & Gold"
+        },
+        "bonds_short": {
+          "current_pct": 0,
+          "target_pct": 9.1,
+          "gap_pct": 9.1,
+          "label": "Short-Term Bonds"
+        },
+        "dividend": {
+          "current_pct": 0,
+          "target_pct": 13.6,
+          "gap_pct": 13.6,
+          "label": "Dividend / Income"
+        },
+        "cash": {
+          "current_pct": 2.2,
+          "target_pct": 9.1,
+          "gap_pct": 6.9,
+          "label": "Cash"
+        },
+        "us_equity_broad": {
+          "current_pct": 54.3,
+          "target_pct": 18.2,
+          "gap_pct": -36.1,
+          "label": "US Broad Market"
+        },
+        "bonds_medium": {
+          "current_pct": 5.1,
+          "target_pct": 18.2,
+          "gap_pct": 13.1,
+          "label": "Core Bonds"
+        },
+        "international": {
+          "current_pct": 4.1,
+          "target_pct": 4.5,
+          "gap_pct": 0.4,
+          "label": "International Equity"
+        },
+        "us_equity_value": {
+          "current_pct": 0,
+          "target_pct": 4.5,
+          "gap_pct": 4.5,
+          "label": "US Value Equity"
+        },
+        "financials": {
+          "current_pct": 5.0,
+          "target_pct": 0,
+          "gap_pct": -5.0,
+          "label": "Financials"
+        },
+        "defensive": {
+          "current_pct": 0,
+          "target_pct": 9.1,
+          "gap_pct": 9.1,
+          "label": "Defensive / Low-Vol"
+        },
+        "us_equity_growth": {
+          "current_pct": 29.3,
+          "target_pct": 4.5,
+          "gap_pct": -24.8,
+          "label": "US Growth Equity"
+        }
+      },
+      "trades": [
+        {
+          "action": "sell",
+          "ticker": "AAPL",
+          "name": "Apple Inc.",
+          "shares": 5,
+          "price": 280.14,
+          "value": 1400.7,
+          "bucket": "us_equity_growth",
+          "reason": "In a market crash, growth stocks drop the most. Reducing AAPL from 29% toward the 4% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "MSFT",
+          "name": "Microsoft Corp.",
+          "shares": 3,
+          "price": 414.44,
+          "value": 1243.32,
+          "bucket": "us_equity_growth",
+          "reason": "In a market crash, growth stocks drop the most. Reducing MSFT from 29% toward the 4% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "VOO",
+          "name": "Vanguard S&P 500 ETF",
+          "shares": 4,
+          "price": 662.52,
+          "value": 2650.08,
+          "bucket": "us_equity_broad",
+          "reason": "In a market crash, growth stocks drop the most. Reducing VOO from 54% toward the 18% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "GOOGL",
+          "name": "Alphabet Inc.",
+          "shares": 1,
+          "price": 385.69,
+          "value": 385.69,
+          "bucket": "us_equity_growth",
+          "reason": "In a market crash, growth stocks drop the most. Reducing GOOGL from 29% toward the 4% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "VTI",
+          "name": "Vanguard Total Stock Market ETF",
+          "shares": 3,
+          "price": 355.29,
+          "value": 1065.87,
+          "bucket": "us_equity_broad",
+          "reason": "In a market crash, growth stocks drop the most. Reducing VTI from 54% toward the 18% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "AAPL",
+          "name": "Apple Inc.",
+          "shares": 26,
+          "price": 280.14,
+          "value": 7283.64,
+          "bucket": "us_equity_growth",
+          "reason": "In a market crash, growth stocks drop the most. Reducing AAPL from 29% toward the 4% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "MSFT",
+          "name": "Microsoft Corp.",
+          "shares": 12,
+          "price": 414.44,
+          "value": 4973.28,
+          "bucket": "us_equity_growth",
+          "reason": "In a market crash, growth stocks drop the most. Reducing MSFT from 29% toward the 4% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "NVDA",
+          "name": "NVIDIA Corp.",
+          "shares": 9,
+          "price": 198.45,
+          "value": 1786.05,
+          "bucket": "us_equity_growth",
+          "reason": "NVDA has a high beta of 2.33 \u2014 highly volatile in downturns. Trimming reduces how much your portfolio swings when markets fall.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "GOOGL",
+          "name": "Alphabet Inc. (Class A)",
+          "shares": 6,
+          "price": 385.69,
+          "value": 2314.14,
+          "bucket": "us_equity_growth",
+          "reason": "In a market crash, growth stocks drop the most. Reducing GOOGL from 29% toward the 4% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "AMZN",
+          "name": "Amazon.com Inc.",
+          "shares": 4,
+          "price": 268.26,
+          "value": 1073.04,
+          "bucket": "us_equity_growth",
+          "reason": "In a market crash, growth stocks drop the most. Reducing AMZN from 29% toward the 4% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "VOO",
+          "name": "Vanguard S&P 500 ETF",
+          "shares": 33,
+          "price": 662.52,
+          "value": 21863.16,
+          "bucket": "us_equity_broad",
+          "reason": "In a market crash, growth stocks drop the most. Reducing VOO from 54% toward the 18% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "FSKAX",
+          "name": "Fidelity Total Mkt Index",
+          "shares": 120,
+          "price": 198.54,
+          "value": 23824.8,
+          "bucket": "us_equity_broad",
+          "reason": "In a market crash, growth stocks drop the most. Reducing FSKAX from 54% toward the 18% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "JPM",
+          "name": "JPMorgan Chase & Co.",
+          "shares": 15,
+          "price": 312.47,
+          "value": 4687.05,
+          "bucket": "financials",
+          "reason": "JPM makes up 5% of your portfolio \u2014 5% above your 0% target. Selling some locks in gains and brings your Financials exposure back in line.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "TSLA",
+          "name": "Tesla Inc.",
+          "shares": 7,
+          "price": 390.82,
+          "value": 2735.74,
+          "bucket": "us_equity_growth",
+          "reason": "TSLA has a high beta of 1.92 \u2014 highly volatile in downturns. Trimming reduces how much your portfolio swings when markets fall.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "XVL",
+          "name": "Health Care Select Sector SPDR ETF",
+          "shares": 9,
+          "price": 145.0,
+          "value": 1305.0,
+          "bucket": "us_equity_broad",
+          "reason": "In a market crash, growth stocks drop the most. Reducing XVL from 54% toward the 18% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "JNJ",
+          "name": "Johnson & Johnson",
+          "shares": 4,
+          "price": 227.19,
+          "value": 908.76,
+          "bucket": "us_equity_growth",
+          "reason": "In a market crash, growth stocks drop the most. Reducing JNJ from 29% toward the 4% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "UNH",
+          "name": "UnitedHealth Group",
+          "shares": 1,
+          "price": 368.78,
+          "value": 368.78,
+          "bucket": "us_equity_growth",
+          "reason": "In a market crash, growth stocks drop the most. Reducing UNH from 29% toward the 4% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "ABBV",
+          "name": "AbbVie Inc",
+          "shares": 6,
+          "price": 206.6,
+          "value": 1239.6,
+          "bucket": "us_equity_growth",
+          "reason": "In a market crash, growth stocks drop the most. Reducing ABBV from 29% toward the 4% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "PFE",
+          "name": "Pfizer Inc.",
+          "shares": 15,
+          "price": 26.33,
+          "value": 394.95,
+          "bucket": "us_equity_growth",
+          "reason": "In a market crash, growth stocks drop the most. Reducing PFE from 29% toward the 4% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "buy",
+          "ticker": "BSV",
+          "name": "Short-Term Bonds",
+          "shares": 169,
+          "price": 78.08,
+          "value": 13195.52,
+          "bucket": "bonds_short",
+          "reason": "Bonds act as a shock absorber when stocks fall. Your Short-Term Bonds is only 0% vs the 9% target \u2014 BSV closes that gap and cushions the portfolio.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "BND",
+          "name": "Core Bonds",
+          "shares": 259,
+          "price": 73.36,
+          "value": 19000.24,
+          "bucket": "bonds_medium",
+          "reason": "Bonds act as a shock absorber when stocks fall. Your Core Bonds is only 5% vs the 18% target \u2014 BND closes that gap and cushions the portfolio.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AAAU",
+          "name": "Commodities & Gold",
+          "shares": 290,
+          "price": 45.46,
+          "value": 13183.4,
+          "bucket": "commodities",
+          "reason": "Gold and commodities often rise when stocks fall or inflation picks up. AAAU adds that hedge \u2014 you currently have 0% vs 9% target.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "ACWV",
+          "name": "Defensive / Low-Vol",
+          "shares": 109,
+          "price": 120.9,
+          "value": 13178.1,
+          "bucket": "defensive",
+          "reason": "Utilities, healthcare, and staples hold their value when markets drop. ACWV fills your Defensive / Low-Vol gap (0% \u2192 9%).",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "CGDG",
+          "name": "Dividend / Income",
+          "shares": 530,
+          "price": 37.23,
+          "value": 19731.9,
+          "bucket": "dividend",
+          "reason": "You're 14% underweight in Dividend / Income. CGDG is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AVUV",
+          "name": "US Value Equity",
+          "shares": 54,
+          "price": 119.96,
+          "value": 6477.84,
+          "bucket": "us_equity_value",
+          "reason": "You're 4% underweight in US Value Equity. AVUV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        }
+      ],
+      "before": {
+        "holdings": [
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "value": 2801.4,
+            "pct": 1.8,
+            "bucket": "us_equity_growth",
+            "price": 280.14,
+            "shares": 10
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "value": 2072.2,
+            "pct": 1.3,
+            "bucket": "us_equity_growth",
+            "price": 414.44,
+            "shares": 5
+          },
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "value": 5300.16,
+            "pct": 3.4,
+            "bucket": "us_equity_broad",
+            "price": 662.52,
+            "shares": 8
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond Market ETF",
+            "value": 2200.8,
+            "pct": 1.4,
+            "bucket": "bonds_medium",
+            "price": 73.36,
+            "shares": 30
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc.",
+            "value": 1157.07,
+            "pct": 0.7,
+            "bucket": "us_equity_growth",
+            "price": 385.69,
+            "shares": 3
+          },
+          {
+            "ticker": "VTI",
+            "name": "Vanguard Total Stock Market ETF",
+            "value": 2131.74,
+            "pct": 1.4,
+            "bucket": "us_equity_broad",
+            "price": 355.29,
+            "shares": 6
+          },
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "value": 12606.3,
+            "pct": 8.0,
+            "bucket": "us_equity_growth",
+            "price": 280.14,
+            "shares": 45
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "value": 8288.8,
+            "pct": 5.3,
+            "bucket": "us_equity_growth",
+            "price": 414.44,
+            "shares": 20
+          },
+          {
+            "ticker": "NVDA",
+            "name": "NVIDIA Corp.",
+            "value": 2976.75,
+            "pct": 1.9,
+            "bucket": "us_equity_growth",
+            "price": 198.45,
+            "shares": 15
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc. (Class A)",
+            "value": 3856.9,
+            "pct": 2.4,
+            "bucket": "us_equity_growth",
+            "price": 385.69,
+            "shares": 10
+          },
+          {
+            "ticker": "AMZN",
+            "name": "Amazon.com Inc.",
+            "value": 2146.08,
+            "pct": 1.4,
+            "bucket": "us_equity_growth",
+            "price": 268.26,
+            "shares": 8
+          },
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "value": 36438.6,
+            "pct": 23.1,
+            "bucket": "us_equity_broad",
+            "price": 662.52,
+            "shares": 55
+          },
+          {
+            "ticker": "EEM",
+            "name": "iShares MSCI Emerg. Mkts",
+            "value": 6413.0,
+            "pct": 4.1,
+            "bucket": "international",
+            "price": 64.13,
+            "shares": 100
+          },
+          {
+            "ticker": "FSKAX",
+            "name": "Fidelity Total Mkt Index",
+            "value": 39708.0,
+            "pct": 25.2,
+            "bucket": "us_equity_broad",
+            "price": 198.54,
+            "shares": 200
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond ETF",
+            "value": 5868.8,
+            "pct": 3.7,
+            "bucket": "bonds_medium",
+            "price": 73.36,
+            "shares": 80
+          },
+          {
+            "ticker": "JPM",
+            "name": "JPMorgan Chase & Co.",
+            "value": 7811.75,
+            "pct": 5.0,
+            "bucket": "financials",
+            "price": 312.47,
+            "shares": 25
+          },
+          {
+            "ticker": "TSLA",
+            "name": "Tesla Inc.",
+            "value": 4689.84,
+            "pct": 3.0,
+            "bucket": "us_equity_growth",
+            "price": 390.82,
+            "shares": 12
+          },
+          {
+            "ticker": "XVL",
+            "name": "Health Care Select Sector SPDR ETF",
+            "value": 2175.0,
+            "pct": 1.4,
+            "bucket": "us_equity_broad",
+            "price": 145.0,
+            "shares": 15
+          },
+          {
+            "ticker": "JNJ",
+            "name": "Johnson & Johnson",
+            "value": 1817.52,
+            "pct": 1.2,
+            "bucket": "us_equity_growth",
+            "price": 227.19,
+            "shares": 8
+          },
+          {
+            "ticker": "UNH",
+            "name": "UnitedHealth Group",
+            "value": 1106.34,
+            "pct": 0.7,
+            "bucket": "us_equity_growth",
+            "price": 368.78,
+            "shares": 3
+          },
+          {
+            "ticker": "ABBV",
+            "name": "AbbVie Inc",
+            "value": 2066.0,
+            "pct": 1.3,
+            "bucket": "us_equity_growth",
+            "price": 206.6,
+            "shares": 10
+          },
+          {
+            "ticker": "PFE",
+            "name": "Pfizer Inc.",
+            "value": 658.25,
+            "pct": 0.4,
+            "bucket": "us_equity_growth",
+            "price": 26.33,
+            "shares": 25
+          }
+        ],
+        "total_value": 157791.3,
+        "cash": 3500.0
+      },
+      "after": {
+        "holdings": [
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond ETF",
+            "shares": 339.0,
+            "price": 73.36,
+            "value": 24869.04,
+            "pct": 17.3,
+            "bucket": "bonds_medium"
+          },
+          {
+            "ticker": "CGDG",
+            "name": "Dividend / Income",
+            "shares": 530.0,
+            "price": 37.23,
+            "value": 19731.9,
+            "pct": 13.7,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "FSKAX",
+            "name": "Fidelity Total Mkt Index",
+            "shares": 80.0,
+            "price": 198.54,
+            "value": 15883.2,
+            "pct": 11.0,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "BSV",
+            "name": "Short-Term Bonds",
+            "shares": 169.0,
+            "price": 78.08,
+            "value": 13195.52,
+            "pct": 9.2,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AAAU",
+            "name": "Commodities & Gold",
+            "shares": 290.0,
+            "price": 45.46,
+            "value": 13183.4,
+            "pct": 9.2,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "ACWV",
+            "name": "Defensive / Low-Vol",
+            "shares": 109.0,
+            "price": 120.9,
+            "value": 13178.1,
+            "pct": 9.1,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "shares": 18.0,
+            "price": 662.52,
+            "value": 11925.36,
+            "pct": 8.3,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AVUV",
+            "name": "US Value Equity",
+            "shares": 54.0,
+            "price": 119.96,
+            "value": 6477.84,
+            "pct": 4.5,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "EEM",
+            "name": "iShares MSCI Emerg. Mkts",
+            "shares": 100.0,
+            "price": 64.13,
+            "value": 6413.0,
+            "pct": 4.5,
+            "bucket": "international"
+          },
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "shares": 14.0,
+            "price": 280.14,
+            "value": 3921.96,
+            "pct": 2.7,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "JPM",
+            "name": "JPMorgan Chase & Co.",
+            "shares": 10.0,
+            "price": 312.47,
+            "value": 3124.7,
+            "pct": 2.2,
+            "bucket": "financials"
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "shares": 5.0,
+            "price": 414.44,
+            "value": 2072.2,
+            "pct": 1.4,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "TSLA",
+            "name": "Tesla Inc.",
+            "shares": 5.0,
+            "price": 390.82,
+            "value": 1954.1,
+            "pct": 1.4,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "NVDA",
+            "name": "NVIDIA Corp.",
+            "shares": 6.0,
+            "price": 198.45,
+            "value": 1190.7,
+            "pct": 0.8,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc. (Class A)",
+            "shares": 3.0,
+            "price": 385.69,
+            "value": 1157.07,
+            "pct": 0.8,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "AMZN",
+            "name": "Amazon.com Inc.",
+            "shares": 4.0,
+            "price": 268.26,
+            "value": 1073.04,
+            "pct": 0.7,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "VTI",
+            "name": "Vanguard Total Stock Market ETF",
+            "shares": 3.0,
+            "price": 355.29,
+            "value": 1065.87,
+            "pct": 0.7,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "JNJ",
+            "name": "Johnson & Johnson",
+            "shares": 4.0,
+            "price": 227.19,
+            "value": 908.76,
+            "pct": 0.6,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "XVL",
+            "name": "Health Care Select Sector SPDR ETF",
+            "shares": 6.0,
+            "price": 145.0,
+            "value": 870.0,
+            "pct": 0.6,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "ABBV",
+            "name": "AbbVie Inc",
+            "shares": 4.0,
+            "price": 206.6,
+            "value": 826.4,
+            "pct": 0.6,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "UNH",
+            "name": "UnitedHealth Group",
+            "shares": 2.0,
+            "price": 368.78,
+            "value": 737.56,
+            "pct": 0.5,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "PFE",
+            "name": "Pfizer Inc.",
+            "shares": 10.0,
+            "price": 26.33,
+            "value": 263.3,
+            "pct": 0.2,
+            "bucket": "us_equity_growth"
+          }
+        ],
+        "total_value": 144259.67
+      }
+    },
+    "flags": [
+      {
+        "type": "conflict",
+        "detail": "crash_vs_growth",
+        "message": "Your growth goal conflicts with a market crash \u2014 growth assets take the biggest hit in downturns."
+      },
+      {
+        "type": "conflict",
+        "detail": "recession_vs_equity",
+        "message": "High equity exposure during a recession is risky \u2014 stocks historically drop 30\u201350% in prolonged downturns."
+      },
+      {
+        "type": "review_holding",
+        "detail": "nvda",
+        "message": "This position is down more than 20% \u2014 review whether the original investment thesis still holds. (nvda)"
+      },
+      {
+        "type": "stop_loss_review",
+        "detail": "nvda",
+        "message": "This position is down over 30% \u2014 a stop-loss review is strongly recommended. (nvda)"
+      },
+      {
+        "type": "caution",
+        "detail": "equity_ceiling_breach",
+        "message": "Your equity allocation exceeds the typical ceiling for your risk profile \u2014 consider rebalancing toward bonds or cash."
+      },
+      {
+        "type": "caution",
+        "detail": "buffer_too_low_breach",
+        "message": "Your bond + cash buffer is thin for your risk profile \u2014 you'd have limited dry powder in a downturn."
+      }
+    ],
+    "violations": [
+      {
+        "type": "type_concentration",
+        "detail": "etf",
+        "message": "A single asset class exceeds 60% of your portfolio \u2014 diversification is limited."
+      },
+      {
+        "type": "equity_ceiling",
+        "detail": "moderate",
+        "message": "Your equity exposure exceeds the recommended ceiling for your risk profile."
+      },
+      {
+        "type": "buffer_too_low",
+        "detail": "moderate",
+        "message": "Your bond + cash buffer is below the minimum for your risk profile \u2014 you lack a safety net."
+      }
+    ],
+    "recommendations": [
+      {
+        "action": "increase",
+        "target": "cash",
+        "scope": "type",
+        "message": "Move more of your portfolio into cash or money-market funds as a defensive buffer."
+      },
+      {
+        "action": "increase",
+        "target": "bond",
+        "scope": "type",
+        "message": "Add more bonds to your portfolio for stability and recession protection."
+      }
+    ],
+    "math": {
+      "portfolio_beta": 0.972,
+      "risk_free_rate": 0.0432,
+      "portfolio_expected_annual": 0.0972,
+      "return_gap": "achievable",
+      "target_value": null,
+      "timeline_months": null,
+      "capm_source": "CAPM: Rf=FRED GS10, Rm=SPY long-run 10%"
+    },
+    "scenario_result": {
+      "scenario_id": "market_crash",
+      "scenario_name": "Market Crash",
+      "scenario_description": "A sudden sharp drop across all markets \u2014 like 2008 or early 2020.",
+      "original_value": 157791.3,
+      "simulated_value": 128840.9,
+      "change": -28950.4,
+      "change_pct": -18.3,
+      "holdings_impact": [
+        {
+          "symbol": "FSKAX",
+          "name": "Fidelity Total Mkt Index",
+          "type": "etf",
+          "original_value": 39708.0,
+          "simulated_value": 32560.56,
+          "change": -7147.44,
+          "change_pct": -18.0
+        },
+        {
+          "symbol": "VOO",
+          "name": "Vanguard S&P 500 ETF",
+          "type": "etf",
+          "original_value": 36438.6,
+          "simulated_value": 29879.65,
+          "change": -6558.95,
+          "change_pct": -18.0
+        },
+        {
+          "symbol": "AAPL",
+          "name": "Apple Inc.",
+          "type": "stock",
+          "original_value": 12606.3,
+          "simulated_value": 9832.91,
+          "change": -2773.39,
+          "change_pct": -22.0
+        },
+        {
+          "symbol": "MSFT",
+          "name": "Microsoft Corp.",
+          "type": "stock",
+          "original_value": 8288.8,
+          "simulated_value": 6465.26,
+          "change": -1823.54,
+          "change_pct": -22.0
+        },
+        {
+          "symbol": "JPM",
+          "name": "JPMorgan Chase & Co.",
+          "type": "etf",
+          "original_value": 7811.75,
+          "simulated_value": 6405.64,
+          "change": -1406.11,
+          "change_pct": -18.0
+        },
+        {
+          "symbol": "EEM",
+          "name": "iShares MSCI Emerg. Mkts",
+          "type": "etf",
+          "original_value": 6413.0,
+          "simulated_value": 5258.66,
+          "change": -1154.34,
+          "change_pct": -18.0
+        },
+        {
+          "symbol": "BND",
+          "name": "Vanguard Total Bond ETF",
+          "type": "etf",
+          "original_value": 5868.8,
+          "simulated_value": 4812.42,
+          "change": -1056.38,
+          "change_pct": -18.0
+        },
+        {
+          "symbol": "VOO",
+          "name": "Vanguard S&P 500 ETF",
+          "type": "etf",
+          "original_value": 5300.16,
+          "simulated_value": 4346.13,
+          "change": -954.03,
+          "change_pct": -18.0
+        },
+        {
+          "symbol": "GOOGL",
+          "name": "Alphabet Inc. (Class A)",
+          "type": "stock",
+          "original_value": 3856.9,
+          "simulated_value": 3008.38,
+          "change": -848.52,
+          "change_pct": -22.0
+        },
+        {
+          "symbol": "TSLA",
+          "name": "Tesla Inc.",
+          "type": "etf",
+          "original_value": 4689.84,
+          "simulated_value": 3845.67,
+          "change": -844.17,
+          "change_pct": -18.0
+        },
+        {
+          "symbol": "NVDA",
+          "name": "NVIDIA Corp.",
+          "type": "stock",
+          "original_value": 2976.75,
+          "simulated_value": 2321.87,
+          "change": -654.88,
+          "change_pct": -22.0
+        },
+        {
+          "symbol": "AAPL",
+          "name": "Apple Inc.",
+          "type": "stock",
+          "original_value": 2801.4,
+          "simulated_value": 2185.09,
+          "change": -616.31,
+          "change_pct": -22.0
+        },
+        {
+          "symbol": "AMZN",
+          "name": "Amazon.com Inc.",
+          "type": "stock",
+          "original_value": 2146.08,
+          "simulated_value": 1673.94,
+          "change": -472.14,
+          "change_pct": -22.0
+        },
+        {
+          "symbol": "MSFT",
+          "name": "Microsoft Corp.",
+          "type": "stock",
+          "original_value": 2072.2,
+          "simulated_value": 1616.32,
+          "change": -455.88,
+          "change_pct": -22.0
+        },
+        {
+          "symbol": "ABBV",
+          "name": "AbbVie Inc",
+          "type": "stock",
+          "original_value": 2066.0,
+          "simulated_value": 1611.48,
+          "change": -454.52,
+          "change_pct": -22.0
+        },
+        {
+          "symbol": "JNJ",
+          "name": "Johnson & Johnson",
+          "type": "stock",
+          "original_value": 1817.52,
+          "simulated_value": 1417.67,
+          "change": -399.85,
+          "change_pct": -22.0
+        },
+        {
+          "symbol": "XVL",
+          "name": "Health Care Select Sector SPDR ETF",
+          "type": "etf",
+          "original_value": 2175,
+          "simulated_value": 1783.5,
+          "change": -391.5,
+          "change_pct": -18.0
+        },
+        {
+          "symbol": "VTI",
+          "name": "Vanguard Total Stock Market ETF",
+          "type": "etf",
+          "original_value": 2131.74,
+          "simulated_value": 1748.03,
+          "change": -383.71,
+          "change_pct": -18.0
+        },
+        {
+          "symbol": "GOOGL",
+          "name": "Alphabet Inc.",
+          "type": "stock",
+          "original_value": 1157.07,
+          "simulated_value": 902.51,
+          "change": -254.56,
+          "change_pct": -22.0
+        },
+        {
+          "symbol": "UNH",
+          "name": "UnitedHealth Group",
+          "type": "stock",
+          "original_value": 1106.34,
+          "simulated_value": 862.95,
+          "change": -243.39,
+          "change_pct": -22.0
+        },
+        {
+          "symbol": "PFE",
+          "name": "Pfizer Inc.",
+          "type": "stock",
+          "original_value": 658.25,
+          "simulated_value": 513.44,
+          "change": -144.81,
+          "change_pct": -22.0
+        },
+        {
+          "symbol": "BND",
+          "name": "Vanguard Total Bond Market ETF",
+          "type": "bond",
+          "original_value": 2200.8,
+          "simulated_value": 2288.83,
+          "change": 88.03,
+          "change_pct": 4.0
+        }
+      ],
+      "advice": "Adding more bonds (target ~25%) would make your portfolio more resilient to sudden crashes."
+    },
+    "planner_engine": "clingo",
+    "profile_used": {}
+  },
+  {
+    "id": "539d47b8-7dfe-4399-914c-ccf20dd1af7b",
+    "timestamp": "2026-05-02T06:17:28",
+    "scenario_text": "What if Healtcare markets go down by like 30-40% in next month? WHat do I do?",
+    "parsed_intent": {
+      "scenario": "crash_sector",
+      "crash_sector": "healthcare",
+      "market_trend": "bearish",
+      "timeline_months": 1
+    },
+    "verdict": "do_not_proceed",
+    "verdict_label": "Do Not Proceed",
+    "verdict_color": "red",
+    "trade_count": 8,
+    "narrative": "I'd recommend holding off on any major rebalancing right now. Your portfolio beta is 0.97, and with today's 4.3% risk-free rate (FRED 10-yr Treasury), CAPM puts your expected annual return at about 9.7%. A single asset class exceeds 60% of your portfolio \u2014 diversification is limited.",
+    "reasoning": "Given a Crash Sector scenario and your moderate risk profile, this plan realigns your portfolio toward your target allocation. Add: BSV (buy 4 shares), BND (buy 5 shares), CGDG (buy 20 shares). Biggest overweight: US Broad Market at 54% vs 30% target \u2014 trimming here frees up capital. The risk engine flagged serious concerns \u2014 review the signals before executing any trades.",
+    "rebalance": {
+      "target_allocation": {
+        "us_equity_broad": 30.0,
+        "us_equity_growth": 15.0,
+        "us_equity_value": 5.0,
+        "dividend": 10.0,
+        "international": 10.0,
+        "bonds_medium": 10.0,
+        "bonds_short": 5.0,
+        "defensive": 5.0,
+        "real_estate": 5.0,
+        "commodities": 5.0
+      },
+      "gap_analysis": {
+        "commodities": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Commodities & Gold"
+        },
+        "bonds_short": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Short-Term Bonds"
+        },
+        "dividend": {
+          "current_pct": 0,
+          "target_pct": 10.0,
+          "gap_pct": 10.0,
+          "label": "Dividend / Income"
+        },
+        "cash": {
+          "current_pct": 2.2,
+          "target_pct": 0,
+          "gap_pct": -2.2,
+          "label": "Cash"
+        },
+        "us_equity_broad": {
+          "current_pct": 54.3,
+          "target_pct": 30.0,
+          "gap_pct": -24.3,
+          "label": "US Broad Market"
+        },
+        "bonds_medium": {
+          "current_pct": 5.1,
+          "target_pct": 10.0,
+          "gap_pct": 4.9,
+          "label": "Core Bonds"
+        },
+        "real_estate": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Real Estate (REITs)"
+        },
+        "international": {
+          "current_pct": 4.1,
+          "target_pct": 10.0,
+          "gap_pct": 5.9,
+          "label": "International Equity"
+        },
+        "us_equity_value": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "US Value Equity"
+        },
+        "financials": {
+          "current_pct": 5.0,
+          "target_pct": 0,
+          "gap_pct": -5.0,
+          "label": "Financials"
+        },
+        "defensive": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Defensive / Low-Vol"
+        },
+        "us_equity_growth": {
+          "current_pct": 29.3,
+          "target_pct": 15.0,
+          "gap_pct": -14.3,
+          "label": "US Growth Equity"
+        }
+      },
+      "trades": [
+        {
+          "action": "buy",
+          "ticker": "BSV",
+          "name": "Short-Term Bonds",
+          "shares": 4,
+          "price": 78.08,
+          "value": 312.32,
+          "bucket": "bonds_short",
+          "reason": "You're 5% underweight in Short-Term Bonds. BSV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "BND",
+          "name": "Core Bonds",
+          "shares": 5,
+          "price": 73.36,
+          "value": 366.8,
+          "bucket": "bonds_medium",
+          "reason": "You're 5% underweight in Core Bonds. BND is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "CGDG",
+          "name": "Dividend / Income",
+          "shares": 20,
+          "price": 37.23,
+          "value": 744.6,
+          "bucket": "dividend",
+          "reason": "You're 10% underweight in Dividend / Income. CGDG is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AAAU",
+          "name": "Commodities & Gold",
+          "shares": 8,
+          "price": 45.46,
+          "value": 363.68,
+          "bucket": "commodities",
+          "reason": "You're 5% underweight in Commodities & Gold. AAAU is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AVUV",
+          "name": "US Value Equity",
+          "shares": 3,
+          "price": 119.96,
+          "value": 359.88,
+          "bucket": "us_equity_value",
+          "reason": "You're 5% underweight in US Value Equity. AVUV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AVEM",
+          "name": "International Equity",
+          "shares": 4,
+          "price": 90.53,
+          "value": 362.12,
+          "bucket": "international",
+          "reason": "You're 6% underweight in International Equity. AVEM is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "DFGR",
+          "name": "Real Estate (REITs)",
+          "shares": 13,
+          "price": 28.8,
+          "value": 374.4,
+          "bucket": "real_estate",
+          "reason": "You're 5% underweight in Real Estate (REITs). DFGR is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "ACWV",
+          "name": "Defensive / Low-Vol",
+          "shares": 3,
+          "price": 120.9,
+          "value": 362.7,
+          "bucket": "defensive",
+          "reason": "You're 5% underweight in Defensive / Low-Vol. ACWV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        }
+      ],
+      "before": {
+        "holdings": [
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "value": 2801.4,
+            "pct": 1.8,
+            "bucket": "us_equity_growth",
+            "price": 280.14,
+            "shares": 10
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "value": 2072.2,
+            "pct": 1.3,
+            "bucket": "us_equity_growth",
+            "price": 414.44,
+            "shares": 5
+          },
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "value": 5300.16,
+            "pct": 3.4,
+            "bucket": "us_equity_broad",
+            "price": 662.52,
+            "shares": 8
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond Market ETF",
+            "value": 2200.8,
+            "pct": 1.4,
+            "bucket": "bonds_medium",
+            "price": 73.36,
+            "shares": 30
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc.",
+            "value": 1157.07,
+            "pct": 0.7,
+            "bucket": "us_equity_growth",
+            "price": 385.69,
+            "shares": 3
+          },
+          {
+            "ticker": "VTI",
+            "name": "Vanguard Total Stock Market ETF",
+            "value": 2131.74,
+            "pct": 1.4,
+            "bucket": "us_equity_broad",
+            "price": 355.29,
+            "shares": 6
+          },
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "value": 12606.3,
+            "pct": 8.0,
+            "bucket": "us_equity_growth",
+            "price": 280.14,
+            "shares": 45
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "value": 8288.8,
+            "pct": 5.3,
+            "bucket": "us_equity_growth",
+            "price": 414.44,
+            "shares": 20
+          },
+          {
+            "ticker": "NVDA",
+            "name": "NVIDIA Corp.",
+            "value": 2976.75,
+            "pct": 1.9,
+            "bucket": "us_equity_growth",
+            "price": 198.45,
+            "shares": 15
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc. (Class A)",
+            "value": 3856.9,
+            "pct": 2.4,
+            "bucket": "us_equity_growth",
+            "price": 385.69,
+            "shares": 10
+          },
+          {
+            "ticker": "AMZN",
+            "name": "Amazon.com Inc.",
+            "value": 2146.08,
+            "pct": 1.4,
+            "bucket": "us_equity_growth",
+            "price": 268.26,
+            "shares": 8
+          },
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "value": 36438.6,
+            "pct": 23.1,
+            "bucket": "us_equity_broad",
+            "price": 662.52,
+            "shares": 55
+          },
+          {
+            "ticker": "EEM",
+            "name": "iShares MSCI Emerg. Mkts",
+            "value": 6413.0,
+            "pct": 4.1,
+            "bucket": "international",
+            "price": 64.13,
+            "shares": 100
+          },
+          {
+            "ticker": "FSKAX",
+            "name": "Fidelity Total Mkt Index",
+            "value": 39708.0,
+            "pct": 25.2,
+            "bucket": "us_equity_broad",
+            "price": 198.54,
+            "shares": 200
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond ETF",
+            "value": 5868.8,
+            "pct": 3.7,
+            "bucket": "bonds_medium",
+            "price": 73.36,
+            "shares": 80
+          },
+          {
+            "ticker": "JPM",
+            "name": "JPMorgan Chase & Co.",
+            "value": 7811.75,
+            "pct": 5.0,
+            "bucket": "financials",
+            "price": 312.47,
+            "shares": 25
+          },
+          {
+            "ticker": "TSLA",
+            "name": "Tesla Inc.",
+            "value": 4689.84,
+            "pct": 3.0,
+            "bucket": "us_equity_growth",
+            "price": 390.82,
+            "shares": 12
+          },
+          {
+            "ticker": "XVL",
+            "name": "Health Care Select Sector SPDR ETF",
+            "value": 2175.0,
+            "pct": 1.4,
+            "bucket": "us_equity_broad",
+            "price": 145.0,
+            "shares": 15
+          },
+          {
+            "ticker": "JNJ",
+            "name": "Johnson & Johnson",
+            "value": 1817.52,
+            "pct": 1.2,
+            "bucket": "us_equity_growth",
+            "price": 227.19,
+            "shares": 8
+          },
+          {
+            "ticker": "UNH",
+            "name": "UnitedHealth Group",
+            "value": 1106.34,
+            "pct": 0.7,
+            "bucket": "us_equity_growth",
+            "price": 368.78,
+            "shares": 3
+          },
+          {
+            "ticker": "ABBV",
+            "name": "AbbVie Inc",
+            "value": 2066.0,
+            "pct": 1.3,
+            "bucket": "us_equity_growth",
+            "price": 206.6,
+            "shares": 10
+          },
+          {
+            "ticker": "PFE",
+            "name": "Pfizer Inc.",
+            "value": 658.25,
+            "pct": 0.4,
+            "bucket": "us_equity_growth",
+            "price": 26.33,
+            "shares": 25
+          }
+        ],
+        "total_value": 157791.3,
+        "cash": 3500.0
+      },
+      "after": {
+        "holdings": [
+          {
+            "ticker": "FSKAX",
+            "name": "Fidelity Total Mkt Index",
+            "shares": 200.0,
+            "price": 198.54,
+            "value": 39708.0,
+            "pct": 27.6,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "shares": 55.0,
+            "price": 662.52,
+            "value": 36438.6,
+            "pct": 25.3,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "shares": 45.0,
+            "price": 280.14,
+            "value": 12606.3,
+            "pct": 8.8,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "shares": 20.0,
+            "price": 414.44,
+            "value": 8288.8,
+            "pct": 5.8,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "JPM",
+            "name": "JPMorgan Chase & Co.",
+            "shares": 25.0,
+            "price": 312.47,
+            "value": 7811.75,
+            "pct": 5.4,
+            "bucket": "financials"
+          },
+          {
+            "ticker": "EEM",
+            "name": "iShares MSCI Emerg. Mkts",
+            "shares": 100.0,
+            "price": 64.13,
+            "value": 6413.0,
+            "pct": 4.5,
+            "bucket": "international"
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond ETF",
+            "shares": 85.0,
+            "price": 73.36,
+            "value": 6235.6,
+            "pct": 4.3,
+            "bucket": "bonds_medium"
+          },
+          {
+            "ticker": "TSLA",
+            "name": "Tesla Inc.",
+            "shares": 12.0,
+            "price": 390.82,
+            "value": 4689.84,
+            "pct": 3.3,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc. (Class A)",
+            "shares": 10.0,
+            "price": 385.69,
+            "value": 3856.9,
+            "pct": 2.7,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "NVDA",
+            "name": "NVIDIA Corp.",
+            "shares": 15.0,
+            "price": 198.45,
+            "value": 2976.75,
+            "pct": 2.1,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "XVL",
+            "name": "Health Care Select Sector SPDR ETF",
+            "shares": 15.0,
+            "price": 145.0,
+            "value": 2175.0,
+            "pct": 1.5,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AMZN",
+            "name": "Amazon.com Inc.",
+            "shares": 8.0,
+            "price": 268.26,
+            "value": 2146.08,
+            "pct": 1.5,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "VTI",
+            "name": "Vanguard Total Stock Market ETF",
+            "shares": 6.0,
+            "price": 355.29,
+            "value": 2131.74,
+            "pct": 1.5,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "ABBV",
+            "name": "AbbVie Inc",
+            "shares": 10.0,
+            "price": 206.6,
+            "value": 2066.0,
+            "pct": 1.4,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "JNJ",
+            "name": "Johnson & Johnson",
+            "shares": 8.0,
+            "price": 227.19,
+            "value": 1817.52,
+            "pct": 1.3,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "UNH",
+            "name": "UnitedHealth Group",
+            "shares": 3.0,
+            "price": 368.78,
+            "value": 1106.34,
+            "pct": 0.8,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "CGDG",
+            "name": "Dividend / Income",
+            "shares": 20.0,
+            "price": 37.23,
+            "value": 744.6,
+            "pct": 0.5,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "PFE",
+            "name": "Pfizer Inc.",
+            "shares": 25.0,
+            "price": 26.33,
+            "value": 658.25,
+            "pct": 0.5,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "DFGR",
+            "name": "Real Estate (REITs)",
+            "shares": 13.0,
+            "price": 28.8,
+            "value": 374.4,
+            "pct": 0.3,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AAAU",
+            "name": "Commodities & Gold",
+            "shares": 8.0,
+            "price": 45.46,
+            "value": 363.68,
+            "pct": 0.3,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "ACWV",
+            "name": "Defensive / Low-Vol",
+            "shares": 3.0,
+            "price": 120.9,
+            "value": 362.7,
+            "pct": 0.3,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AVEM",
+            "name": "International Equity",
+            "shares": 4.0,
+            "price": 90.53,
+            "value": 362.12,
+            "pct": 0.3,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AVUV",
+            "name": "US Value Equity",
+            "shares": 3.0,
+            "price": 119.96,
+            "value": 359.88,
+            "pct": 0.2,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "BSV",
+            "name": "Short-Term Bonds",
+            "shares": 4.0,
+            "price": 78.08,
+            "value": 312.32,
+            "pct": 0.2,
+            "bucket": "us_equity_broad"
+          }
+        ],
+        "total_value": 144259.67
+      }
+    },
+    "flags": [
+      {
+        "type": "review_holding",
+        "detail": "nvda",
+        "message": "This position is down more than 20% \u2014 review whether the original investment thesis still holds. (nvda)"
+      },
+      {
+        "type": "stop_loss_review",
+        "detail": "nvda",
+        "message": "This position is down over 30% \u2014 a stop-loss review is strongly recommended. (nvda)"
+      },
+      {
+        "type": "caution",
+        "detail": "equity_ceiling_breach",
+        "message": "Your equity allocation exceeds the typical ceiling for your risk profile \u2014 consider rebalancing toward bonds or cash."
+      },
+      {
+        "type": "caution",
+        "detail": "buffer_too_low_breach",
+        "message": "Your bond + cash buffer is thin for your risk profile \u2014 you'd have limited dry powder in a downturn."
+      }
+    ],
+    "violations": [
+      {
+        "type": "type_concentration",
+        "detail": "etf",
+        "message": "A single asset class exceeds 60% of your portfolio \u2014 diversification is limited."
+      },
+      {
+        "type": "equity_ceiling",
+        "detail": "moderate",
+        "message": "Your equity exposure exceeds the recommended ceiling for your risk profile."
+      },
+      {
+        "type": "buffer_too_low",
+        "detail": "moderate",
+        "message": "Your bond + cash buffer is below the minimum for your risk profile \u2014 you lack a safety net."
+      }
+    ],
+    "recommendations": [],
+    "math": {
+      "portfolio_beta": 0.972,
+      "risk_free_rate": 0.0432,
+      "portfolio_expected_annual": 0.0972,
+      "return_gap": "achievable",
+      "target_value": null,
+      "timeline_months": 1,
+      "capm_source": "CAPM: Rf=FRED GS10, Rm=SPY long-run 10%"
+    },
+    "scenario_result": null,
+    "planner_engine": "clingo",
+    "profile_used": {}
+  }
+]
