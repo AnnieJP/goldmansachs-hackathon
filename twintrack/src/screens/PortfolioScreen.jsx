@@ -113,13 +113,211 @@ function TypeBadge({ type }) {
   );
 }
 
+/* ─── PDF import modal ─────────────────────────────────────────── */
+const TYPE_LABELS = { stock: "Stock", etf: "ETF", bond: "Bond", fund: "Fund" };
+
+function ImportModal({ onImport, onClose }) {
+  const [stage,    setStage]    = useState("idle"); // idle | parsing | preview | importing | done
+  const [parsed,   setParsed]   = useState([]);
+  const [selected, setSelected] = useState(new Set());
+  const [error,    setError]    = useState(null);
+  const [filename, setFilename] = useState("");
+
+  const handleFile = (file) => {
+    if (!file || !file.name.toLowerCase().endsWith(".pdf")) {
+      setError("Please select a PDF file."); return;
+    }
+    setFilename(file.name);
+    setError(null);
+    setStage("parsing");
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const b64 = e.target.result.split(",")[1];
+        const res = await fetch("/api/portfolio/import-pdf", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ pdf_b64: b64 }),
+        });
+        if (!res.ok) { setError(`Server error ${res.status} — is the backend running?`); setStage("idle"); return; }
+        const data = await res.json();
+        if (data.error) { setError(data.error); setStage("idle"); return; }
+        if (!data.holdings?.length) { setError("No holdings found in this PDF. Make sure it contains a holdings table."); setStage("idle"); return; }
+        setParsed(data.holdings);
+        setSelected(new Set(data.holdings.map((h) => h.id)));
+        setStage("preview");
+      } catch (err) {
+        setError(`Could not reach backend — make sure the server is running on port 8765. (${err.message})`);
+        setStage("idle");
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const toggleAll = () =>
+    setSelected(selected.size === parsed.length ? new Set() : new Set(parsed.map((h) => h.id)));
+
+  const toggle = (id) => {
+    const s = new Set(selected);
+    s.has(id) ? s.delete(id) : s.add(id);
+    setSelected(s);
+  };
+
+  const confirmImport = async () => {
+    setStage("importing");
+    const toAdd = parsed.filter((h) => selected.has(h.id));
+    for (const h of toAdd) {
+      await fetch("/api/portfolio/add", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(h),
+      });
+    }
+    setStage("done");
+    onImport();
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 100,
+                  display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <div style={{ background: SURFACE, border: `1px solid ${ACCENT_DIM}`, borderRadius: 16,
+                    width: "100%", maxWidth: 680, maxHeight: "85vh", display: "flex",
+                    flexDirection: "column" }}>
+
+        {/* Header */}
+        <div style={{ padding: "22px 24px 16px", borderBottom: `1px solid ${ACCENT_DIM}`,
+                      display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <div style={{ fontWeight: 800, fontSize: 16, color: TEXT }}>Import from Brokerage PDF</div>
+            <div style={{ fontSize: 12, color: TEXT_DIM, marginTop: 3 }}>
+              Upload an account statement or holdings export PDF
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background: "none", border: "none", color: TEXT_DIM,
+                                             fontSize: 20, cursor: "pointer", lineHeight: 1 }}>✕</button>
+        </div>
+
+        <div style={{ padding: "20px 24px", overflowY: "auto", flex: 1 }}>
+
+          {/* Drop zone */}
+          {(stage === "idle" || stage === "parsing") && (
+            <label style={{ display: "block", border: `2px dashed ${ACCENT_DIM}`, borderRadius: 12,
+                            padding: "36px 20px", textAlign: "center", cursor: "pointer",
+                            transition: "border-color 0.15s" }}
+                   onDragOver={(e) => e.preventDefault()}
+                   onDrop={(e) => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); }}>
+              <input type="file" accept=".pdf" style={{ display: "none" }}
+                     onChange={(e) => handleFile(e.target.files[0])} />
+              <div style={{ fontSize: 32, marginBottom: 10 }}>📂</div>
+              {stage === "parsing" ? (
+                <div style={{ color: GOLD, fontWeight: 600, fontSize: 14 }}>Parsing {filename}…</div>
+              ) : (
+                <>
+                  <div style={{ fontWeight: 600, fontSize: 14, color: TEXT }}>Drop your PDF here, or click to browse</div>
+                  <div style={{ fontSize: 12, color: TEXT_DIM, marginTop: 6 }}>
+                    Supports account statements &amp; holdings exports from most brokerages
+                  </div>
+                </>
+              )}
+            </label>
+          )}
+
+          {error && (
+            <div style={{ marginTop: 14, padding: "10px 14px", borderRadius: 8,
+                          background: "#f8717118", border: "1px solid #f8717140",
+                          fontSize: 13, color: "#f87171" }}>{error}</div>
+          )}
+
+          {/* Preview table */}
+          {stage === "preview" && (
+            <>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center",
+                            marginBottom: 12 }}>
+                <div style={{ fontSize: 13, color: TEXT }}>
+                  Found <b style={{ color: GOLD }}>{parsed.length}</b> holding{parsed.length !== 1 ? "s" : ""} in <b>{filename}</b>
+                </div>
+                <button onClick={toggleAll} style={{ fontSize: 11.5, color: TEXT_DIM, background: "none",
+                                                     border: "none", cursor: "pointer", textDecoration: "underline" }}>
+                  {selected.size === parsed.length ? "Deselect all" : "Select all"}
+                </button>
+              </div>
+              <div style={{ border: `1px solid ${ACCENT_DIM}`, borderRadius: 10, overflow: "hidden" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+                  <thead>
+                    <tr style={{ background: BG }}>
+                      <th style={{ padding: "8px 12px", textAlign: "left", width: 28 }}>
+                        <input type="checkbox" checked={selected.size === parsed.length}
+                               onChange={toggleAll} /></th>
+                      {["Ticker","Name","Type","Shares","Avg Cost"].map((h) => (
+                        <th key={h} style={{ padding: "8px 12px", textAlign: "left",
+                                             fontWeight: 600, color: TEXT_DIM,
+                                             textTransform: "uppercase", fontSize: 10.5,
+                                             letterSpacing: "0.06em" }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {parsed.map((h) => (
+                      <tr key={h.id} style={{ borderTop: `1px solid ${ACCENT_DIM}`,
+                                              opacity: selected.has(h.id) ? 1 : 0.4 }}>
+                        <td style={{ padding: "8px 12px" }}>
+                          <input type="checkbox" checked={selected.has(h.id)}
+                                 onChange={() => toggle(h.id)} /></td>
+                        <td style={{ padding: "8px 12px", fontWeight: 700 }}>{h.symbol}</td>
+                        <td style={{ padding: "8px 12px", color: TEXT_DIM, maxWidth: 180,
+                                     overflow: "hidden", textOverflow: "ellipsis",
+                                     whiteSpace: "nowrap" }}>{h.name}</td>
+                        <td style={{ padding: "8px 12px" }}><TypeBadge type={h.type} /></td>
+                        <td style={{ padding: "8px 12px" }}>{h.shares}</td>
+                        <td style={{ padding: "8px 12px" }}>{fmt$(h.avg_cost)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
+          {stage === "done" && (
+            <div style={{ textAlign: "center", padding: "32px 0" }}>
+              <div style={{ fontSize: 40, marginBottom: 12 }}>✅</div>
+              <div style={{ fontWeight: 700, fontSize: 16, color: TEXT }}>Import complete</div>
+              <div style={{ fontSize: 13, color: TEXT_DIM, marginTop: 6 }}>
+                {selected.size} holding{selected.size !== 1 ? "s" : ""} added to your portfolio.
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer actions */}
+        {stage === "preview" && (
+          <div style={{ padding: "14px 24px", borderTop: `1px solid ${ACCENT_DIM}`,
+                        display: "flex", gap: 10, justifyContent: "flex-end" }}>
+            <button onClick={onClose} style={ghostBtn}>Cancel</button>
+            <button onClick={confirmImport} disabled={selected.size === 0}
+                    style={{ ...goldBtn, flex: "unset", padding: "10px 24px",
+                              opacity: selected.size === 0 ? 0.4 : 1 }}>
+              Import {selected.size} holding{selected.size !== 1 ? "s" : ""}
+            </button>
+          </div>
+        )}
+        {stage === "done" && (
+          <div style={{ padding: "14px 24px", borderTop: `1px solid ${ACCENT_DIM}`,
+                        display: "flex", justifyContent: "flex-end" }}>
+            <button onClick={onClose} style={{ ...goldBtn, flex: "unset", padding: "10px 24px" }}>Done</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main screen ───────────────────────────────────────────────── */
 const TABS = ["all", "stock", "etf", "bond", "fund"];
 
 export default function PortfolioScreen({ portfolio, prices, enriched, onPortfolioChange }) {
-  const [tab,     setTab]     = useState("all");
-  const [modal,   setModal]   = useState(null); // null | "add" | holding-object
-  const [saving,  setSaving]  = useState(false);
+  const [tab,       setTab]       = useState("all");
+  const [modal,     setModal]     = useState(null); // null | "add" | holding-object
+  const [importing, setImporting] = useState(false);
+  const [saving,    setSaving]    = useState(false);
 
   const holdings = enriched?.holdings || [];
   const filtered = tab === "all" ? holdings : holdings.filter((h) => h.type === tab);
@@ -170,12 +368,20 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
             Includes {fmt$(enriched?.cash || 0)} cash · {holdings.length} position{holdings.length !== 1 ? "s" : ""}
           </div>
         </div>
-        <button onClick={() => setModal("add")} type="button"
-                style={{ padding: "10px 20px", borderRadius: 9, border: "none", background: GOLD,
-                         color: BG, fontWeight: 700, fontSize: 13.5, cursor: "pointer", fontFamily: "inherit",
-                         whiteSpace: "nowrap" }}>
-          + Add holding
-        </button>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={() => setImporting(true)} type="button"
+                  style={{ padding: "10px 18px", borderRadius: 9, border: `1px solid ${ACCENT_DIM}`,
+                           background: "transparent", color: TEXT_DIM, fontWeight: 600, fontSize: 13.5,
+                           cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>
+            📂 Import PDF
+          </button>
+          <button onClick={() => setModal("add")} type="button"
+                  style={{ padding: "10px 20px", borderRadius: 9, border: "none", background: GOLD,
+                           color: BG, fontWeight: 700, fontSize: 13.5, cursor: "pointer", fontFamily: "inherit",
+                           whiteSpace: "nowrap" }}>
+            + Add holding
+          </button>
+        </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 220px", gap: 24, alignItems: "start" }}>
@@ -293,6 +499,12 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
         </div>
       </div>
 
+      {importing && (
+        <ImportModal
+          onImport={async () => { await onPortfolioChange(); }}
+          onClose={() => setImporting(false)}
+        />
+      )}
       {modal && (
         <HoldingModal
           initial={modal === "add" ? null : modal}
