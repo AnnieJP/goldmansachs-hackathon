@@ -63,8 +63,8 @@ export default function LoginScreen({ onLogin }) {
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
           <span style={{ fontSize: 30, color: TEXT, lineHeight: 1 }}>◈</span>
           <div>
-            <div style={{ fontSize: 17, fontWeight: 800, color: TEXT, letterSpacing: "-0.02em" }}>Folio</div>
-            <div style={{ fontSize: 11, color: TEXT_DIM }}>Portfolio Dashboard</div>
+            <div style={{ fontSize: 17, fontWeight: 800, color: TEXT, letterSpacing: "-0.02em" }}>Meridian</div>
+            <div style={{ fontSize: 11, color: TEXT_DIM }}>Your financial north star</div>
           </div>
         </div>
 
