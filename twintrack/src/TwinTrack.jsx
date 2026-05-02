@@ -1,14 +1,17 @@
 ﻿import { useState, useEffect, useRef, useMemo } from "react";
-import { GOLD, GOLD_BG, GOLD_BORDER, ACCENT, ACCENT_SOFT, ACCENT_DIM,
-         SURFACE, BG, TEXT, TEXT_DIM, fmt$, fmtPct, enrichPortfolio } from "./theme.js";
+import { GOLD, GOLD_BG, GOLD_BORDER, BORDER, BORDER_MED,
+         SURFACE, SURFACE_2, BG, TEXT, TEXT_SEC, TEXT_DIM,
+         GREEN, RED, FONT_SERIF, fmt$, fmtPct, enrichPortfolio } from "./theme.js";
 import PortfolioScreen  from "./screens/PortfolioScreen.jsx";
 import RiskScreen       from "./screens/RiskScreen.jsx";
 import RebalanceScreen  from "./screens/RebalanceScreen.jsx";
 import ScenarioScreen   from "./screens/ScenarioScreen.jsx";
 import { apiFetch }     from "./api.js";
+import { LayoutDashboard, BarChart3, ShieldCheck, ArrowUpDown,
+         Sparkles, RefreshCw, LogOut, TrendingUp, TrendingDown } from "lucide-react";
 
-/* ─── Hero canvas (hub background) ─────────────────────────────── */
-function HeroCanvas() {
+/* ─── Ambient background canvas ────────────────────────────────── */
+function AmbientCanvas() {
   const ref = useRef(null);
   useEffect(() => {
     const canvas = ref.current;
@@ -18,76 +21,27 @@ function HeroCanvas() {
     const resize = () => { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; };
     resize();
     window.addEventListener("resize", resize);
-
-    const W = () => canvas.width, H = () => canvas.height;
-    const N_SAT = 9;
     let t = 0;
-    const sats = Array.from({ length: N_SAT }, (_, i) => ({
-      angle: (i / N_SAT) * Math.PI * 2,
-      r: 0.28 + Math.random() * 0.08,
-      speed: (0.0003 + Math.random() * 0.0004) * (Math.random() < 0.5 ? 1 : -1),
-      size: 3 + Math.random() * 4,
-    }));
-    const sparks = Array.from({ length: 55 }, () => ({
-      x: Math.random(), y: Math.random(), vx: (Math.random() - 0.5) * 0.0003,
-      vy: (Math.random() - 0.5) * 0.0003, life: Math.random(), decay: 0.004 + Math.random() * 0.006,
-    }));
-    const pulses = Array.from({ length: N_SAT }, (_, i) => ({ sat: i, progress: Math.random(), speed: 0.003 + Math.random() * 0.003 }));
-
+    const orbs = [
+      { x: 0.15, y: 0.3, r: 0.35, color: "245,158,11", speed: 0.0004 },
+      { x: 0.85, y: 0.7, r: 0.30, color: "16,185,129", speed: 0.0003 },
+      { x: 0.5,  y: 0.1, r: 0.25, color: "99,102,241", speed: 0.0005 },
+    ];
     const draw = () => {
-      const w = W(), h = H(), cx = w / 2, cy = h / 2;
       t += 0.016;
+      const w = canvas.width, h = canvas.height;
       ctx.clearRect(0, 0, w, h);
-      const baseR = Math.min(w, h) * 0.32;
-
-      sats.forEach((s) => { s.angle += s.speed; });
-
-      sats.forEach((s) => {
-        const sx = cx + Math.cos(s.angle) * baseR * s.r * 3.3;
-        const sy = cy + Math.sin(s.angle) * baseR * s.r * 3.3;
-        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(sx, sy);
-        ctx.strokeStyle = "rgba(42,100,150,0.12)"; ctx.lineWidth = 0.7; ctx.stroke();
+      orbs.forEach((o) => {
+        const ox = o.x + Math.sin(t * o.speed * 1000) * 0.06;
+        const oy = o.y + Math.cos(t * o.speed * 800) * 0.04;
+        const g = ctx.createRadialGradient(ox * w, oy * h, 0, ox * w, oy * h, o.r * Math.min(w, h));
+        g.addColorStop(0, `rgba(${o.color},0.08)`);
+        g.addColorStop(1, `rgba(${o.color},0)`);
+        ctx.beginPath();
+        ctx.arc(ox * w, oy * h, o.r * Math.min(w, h), 0, Math.PI * 2);
+        ctx.fillStyle = g;
+        ctx.fill();
       });
-
-      pulses.forEach((p) => {
-        p.progress += p.speed;
-        if (p.progress > 1) p.progress = 0;
-        const s = sats[p.sat];
-        const sx = cx + Math.cos(s.angle) * baseR * s.r * 3.3;
-        const sy = cy + Math.sin(s.angle) * baseR * s.r * 3.3;
-        const px = cx + (sx - cx) * p.progress, py = cy + (sy - cy) * p.progress;
-        const a = Math.sin(p.progress * Math.PI) * 0.7;
-        const g = ctx.createRadialGradient(px, py, 0, px, py, 6);
-        g.addColorStop(0, `rgba(201,162,39,${a})`); g.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
-      });
-
-      const pulse = 1 + 0.12 * Math.sin(t * 2.5);
-      [baseR * 2.1 * pulse, baseR * 1.5 * pulse, baseR * 0.9 * pulse].forEach((r, i) => {
-        const alpha = [0.04, 0.07, 0.12][i];
-        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-        g.addColorStop(0, `rgba(201,162,39,${alpha * pulse})`); g.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
-      });
-      ctx.beginPath(); ctx.arc(cx, cy, 10 * pulse, 0, Math.PI * 2); ctx.fillStyle = GOLD; ctx.fill();
-      ctx.beginPath(); ctx.arc(cx, cy, 4 * pulse, 0, Math.PI * 2); ctx.fillStyle = "#fff8"; ctx.fill();
-
-      sats.forEach((s) => {
-        const sx = cx + Math.cos(s.angle) * baseR * s.r * 3.3;
-        const sy = cy + Math.sin(s.angle) * baseR * s.r * 3.3;
-        ctx.beginPath(); ctx.arc(sx, sy, s.size, 0, Math.PI * 2);
-        ctx.fillStyle = ACCENT; ctx.fill();
-        ctx.beginPath(); ctx.arc(sx, sy, s.size * 0.45, 0, Math.PI * 2);
-        ctx.fillStyle = ACCENT_SOFT; ctx.fill();
-      });
-
-      sparks.forEach((s) => {
-        s.x += s.vx; s.y += s.vy; s.life -= s.decay;
-        if (s.life <= 0) { s.x = Math.random(); s.y = Math.random(); s.life = 0.6 + Math.random() * 0.4; }
-        ctx.beginPath(); ctx.arc(s.x * w, s.y * h, 1.2, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(201,162,39,${s.life * 0.5})`; ctx.fill();
-      });
-
       raf = requestAnimationFrame(draw);
     };
     draw();
@@ -96,88 +50,139 @@ function HeroCanvas() {
   return <canvas ref={ref} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }} />;
 }
 
-/* ─── Sidebar ───────────────────────────────────────────────────── */
+/* ─── Sidebar nav config ────────────────────────────────────────── */
 const NAV = [
-  { id: "hub",       icon: "◈", label: "Overview"       },
-  { id: "portfolio", icon: "◉", label: "My Holdings"    },
-  { id: "risk",      icon: "◎", label: "Risk Check"     },
-  { id: "rebalance", icon: "⊞", label: "Rebalance"      },
-  { id: "scenario",  icon: "◇", label: "What-If"        },
+  { id: "hub",       Icon: LayoutDashboard, label: "Overview"    },
+  { id: "portfolio", Icon: BarChart3,        label: "My Holdings" },
+  { id: "risk",      Icon: ShieldCheck,      label: "Risk Check"  },
+  { id: "rebalance", Icon: ArrowUpDown,      label: "Rebalance"   },
+  { id: "scenario",  Icon: Sparkles,         label: "What-If"     },
 ];
 
+/* ─── Sidebar ───────────────────────────────────────────────────── */
 function Sidebar({ screen, setScreen, enriched, pricesLoading, onRefresh, currentUser, onLogout }) {
-  const gain  = enriched?.gainLoss ?? 0;
-  const total = enriched?.totalValue ?? 0;
+  const gain     = enriched?.gainLoss    ?? 0;
+  const total    = enriched?.totalValue  ?? 0;
+  const gainPct  = enriched?.gainLossPct ?? 0;
+  const isPos    = gain >= 0;
+
   return (
-    <aside style={{ width: 220, flexShrink: 0, background: SURFACE, borderRight: `1px solid ${ACCENT_DIM}`,
-                    display: "flex", flexDirection: "column", height: "100vh", position: "sticky", top: 0 }}>
-      <div style={{ padding: "24px 20px 16px" }}>
-        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", color: GOLD,
-                      textTransform: "uppercase", marginBottom: 4 }}>Folio</div>
-        <div style={{ fontSize: 11, color: TEXT_DIM }}>Your wealth, made clear.</div>
+    <aside style={{
+      width: 248, flexShrink: 0,
+      background: SURFACE,
+      borderRight: `1px solid ${BORDER}`,
+      display: "flex", flexDirection: "column",
+      height: "100vh", position: "sticky", top: 0,
+      boxShadow: "4px 0 24px rgba(0,0,0,0.2)",
+    }}>
+      {/* Logo */}
+      <div style={{ padding: "28px 24px 20px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: 9, background: GOLD_BG,
+            border: `1px solid ${GOLD_BORDER}`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <span style={{ fontSize: 16 }}>◈</span>
+          </div>
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-0.01em", color: TEXT, fontFamily: FONT_SERIF }}>Folio</div>
+            <div style={{ fontSize: 10.5, color: TEXT_DIM, letterSpacing: "0.02em" }}>Portfolio Dashboard</div>
+          </div>
+        </div>
       </div>
 
+      {/* Portfolio value card */}
       {enriched && (
-        <div style={{ margin: "0 14px 4px", padding: "14px 14px", borderRadius: 10,
-                      background: GOLD_BG, border: `1px solid ${GOLD_BORDER}` }}>
-          <div style={{ fontSize: 10.5, color: TEXT_DIM, marginBottom: 4 }}>Total value</div>
-          <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em", color: TEXT }}>{fmt$(total)}</div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: gain >= 0 ? "#34d399" : "#f87171", marginTop: 3 }}>
-            {gain >= 0 ? "▲" : "▼"} {fmt$(Math.abs(gain))} ({fmtPct(enriched.gainLossPct)})
+        <div style={{
+          margin: "0 16px 8px",
+          padding: "16px",
+          borderRadius: 12,
+          background: "linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(245,158,11,0.06) 100%)",
+          border: `1px solid ${GOLD_BORDER}`,
+        }}>
+          <div style={{ fontSize: 10.5, fontWeight: 500, color: TEXT_DIM, marginBottom: 6, letterSpacing: "0.04em", textTransform: "uppercase" }}>
+            Net Worth
+          </div>
+          <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", color: TEXT, marginBottom: 6, fontFamily: FONT_SERIF }}>
+            {fmt$(total)}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+            {isPos
+              ? <TrendingUp size={13} color={GREEN} />
+              : <TrendingDown size={13} color={RED} />}
+            <span style={{ fontSize: 12, fontWeight: 600, color: isPos ? GREEN : RED }}>
+              {fmt$(Math.abs(gain))} ({fmtPct(gainPct)})
+            </span>
           </div>
         </div>
       )}
 
-      <nav style={{ padding: "10px 10px", flex: 1 }}>
-        {NAV.map((n) => {
-          const active = screen === n.id;
+      {/* Navigation */}
+      <nav style={{ padding: "8px 12px", flex: 1 }}>
+        {NAV.map(({ id, Icon, label }) => {
+          const active = screen === id;
           return (
-            <button key={n.id} onClick={() => setScreen(n.id)} type="button" style={{
-              display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "9px 12px",
-              borderRadius: 8, border: "none", cursor: "pointer", marginBottom: 2, textAlign: "left",
+            <button key={id} onClick={() => setScreen(id)} type="button" style={{
+              display: "flex", alignItems: "center", gap: 11, width: "100%",
+              padding: "10px 12px", borderRadius: 10, border: "none",
+              cursor: "pointer", marginBottom: 2, textAlign: "left",
               background: active ? GOLD_BG : "transparent",
               color: active ? GOLD : TEXT_DIM,
-              fontWeight: active ? 700 : 400, fontSize: 13.5,
-            }}>
-              <span style={{ fontSize: 14, opacity: active ? 1 : 0.55 }}>{n.icon}</span>
-              {n.label}
-              {active && <span style={{ marginLeft: "auto", width: 4, height: 4, borderRadius: "50%", background: GOLD }} />}
+              fontWeight: active ? 600 : 400, fontSize: 13.5,
+              transition: "background 0.15s, color 0.15s",
+            }}
+            onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
+            onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = "transparent"; }}>
+              <Icon size={16} strokeWidth={active ? 2.2 : 1.8} />
+              {label}
+              {active && <span style={{ marginLeft: "auto", width: 5, height: 5, borderRadius: "50%", background: GOLD }} />}
             </button>
           );
         })}
       </nav>
 
+      {/* Refresh */}
       <button onClick={onRefresh} disabled={pricesLoading} type="button" style={{
-        margin: "0 14px 10px", padding: "9px 0", borderRadius: 8,
-        border: `1px solid ${ACCENT_DIM}`, background: "transparent", cursor: "pointer",
-        color: TEXT_DIM, fontSize: 11.5, fontFamily: "inherit",
-      }}>
-        {pricesLoading ? "Refreshing…" : "⟳  Refresh prices"}
+        margin: "0 16px 8px", padding: "9px 0", borderRadius: 9,
+        border: `1px solid ${BORDER}`, background: "transparent", cursor: "pointer",
+        color: TEXT_DIM, fontSize: 12, display: "flex", alignItems: "center",
+        justifyContent: "center", gap: 7, transition: "border-color 0.15s, color 0.15s",
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.borderColor = BORDER_MED; e.currentTarget.style.color = TEXT; }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = TEXT_DIM; }}>
+        <RefreshCw size={13} style={{ animation: pricesLoading ? "spin 1s linear infinite" : "none" }} />
+        {pricesLoading ? "Refreshing…" : "Refresh prices"}
       </button>
 
+      {/* User */}
       {currentUser && (
         <div style={{
-          margin: "0 14px 16px", padding: "10px 12px", borderRadius: 8,
-          border: `1px solid ${ACCENT_DIM}`, background: "rgba(13,31,60,0.6)",
+          margin: "0 16px 20px", padding: "12px 14px", borderRadius: 10,
+          border: `1px solid ${BORDER}`, background: "rgba(255,255,255,0.03)",
           display: "flex", alignItems: "center", gap: 10,
         }}>
           <div style={{
-            width: 28, height: 28, borderRadius: "50%", background: GOLD_BG,
-            border: `1px solid ${GOLD_BORDER}`, color: GOLD,
+            width: 30, height: 30, borderRadius: "50%",
+            background: "linear-gradient(135deg, #F59E0B, #D97706)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontWeight: 700, fontSize: 12, flexShrink: 0,
+            fontWeight: 700, fontSize: 13, color: BG, flexShrink: 0,
           }}>
             {(currentUser.displayName || currentUser.email || "?").slice(0, 1).toUpperCase()}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: TEXT, lineHeight: 1.2,
+            <div style={{ fontSize: 12.5, fontWeight: 600, color: TEXT, lineHeight: 1.3,
                           overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {currentUser.displayName || currentUser.email}
             </div>
             <button onClick={onLogout} type="button" style={{
               background: "none", border: "none", padding: 0, marginTop: 2,
-              color: TEXT_DIM, fontSize: 10.5, cursor: "pointer", fontFamily: "inherit",
-            }}>
+              color: TEXT_DIM, fontSize: 11, cursor: "pointer", display: "flex",
+              alignItems: "center", gap: 4, transition: "color 0.15s",
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = RED}
+            onMouseLeave={(e) => e.currentTarget.style.color = TEXT_DIM}>
+              <LogOut size={11} />
               Sign out
             </button>
           </div>
@@ -189,91 +194,140 @@ function Sidebar({ screen, setScreen, enriched, pricesLoading, onRefresh, curren
 
 /* ─── Hub screen ────────────────────────────────────────────────── */
 function HubScreen({ enriched, setScreen, currentUser, onLogout }) {
-  const total   = enriched?.totalValue ?? 0;
-  const gain    = enriched?.gainLoss   ?? 0;
+  const total   = enriched?.totalValue  ?? 0;
+  const gain    = enriched?.gainLoss    ?? 0;
   const gainPct = enriched?.gainLossPct ?? 0;
+  const isPos   = gain >= 0;
 
-  const cards = [
-    { id: "portfolio", icon: "📊", title: "My Holdings",  desc: "See everything you own at a glance, with live prices." },
-    { id: "risk",      icon: "🛡️", title: "Risk Check",   desc: "Find out how risky your portfolio is in plain English." },
-    { id: "rebalance", icon: "⚖️", title: "Rebalance",    desc: "Get told exactly what to buy or sell to stay on track." },
-    { id: "scenario",  icon: "🔮", title: "What-If",      desc: "See what happens to your money in a market crash, boom, or more." },
+  const features = [
+    { id: "portfolio", Icon: BarChart3,   title: "My Holdings",  desc: "Live prices, cost basis, gain & loss per position.", color: "#F59E0B" },
+    { id: "risk",      Icon: ShieldCheck, title: "Risk Check",   desc: "Beta analysis and plain-English risk rating.",        color: "#10B981" },
+    { id: "rebalance", Icon: ArrowUpDown, title: "Rebalance",    desc: "Drift from targets — exactly what to buy or sell.",  color: "#6366F1" },
+    { id: "scenario",  Icon: Sparkles,    title: "What-If",      desc: "Simulate crashes, rate hikes, bull runs and more.",  color: "#EC4899" },
   ];
 
   return (
     <div style={{ position: "relative", flex: 1, minHeight: "100vh", display: "flex",
-                  alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-      <HeroCanvas />
+                  alignItems: "center", justifyContent: "center", overflow: "hidden", background: BG }}>
+      <AmbientCanvas />
 
+      {/* Top-right user pill */}
       {currentUser && (
         <div style={{
-          position: "absolute", top: 20, right: 24, zIndex: 3,
+          position: "absolute", top: 24, right: 28, zIndex: 3,
           display: "flex", alignItems: "center", gap: 10,
-          padding: "6px 12px 6px 8px", borderRadius: 99,
-          background: "rgba(13,31,60,0.75)", backdropFilter: "blur(12px)",
-          border: `1px solid ${ACCENT_DIM}`,
+          padding: "6px 14px 6px 8px", borderRadius: 99,
+          background: "rgba(15,31,61,0.8)", backdropFilter: "blur(12px)",
+          border: `1px solid ${BORDER}`,
         }}>
           <div style={{
-            width: 24, height: 24, borderRadius: "50%", background: GOLD_BG,
-            border: `1px solid ${GOLD_BORDER}`, color: GOLD,
+            width: 26, height: 26, borderRadius: "50%",
+            background: "linear-gradient(135deg, #F59E0B, #D97706)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontWeight: 700, fontSize: 11,
+            fontWeight: 700, fontSize: 11, color: BG,
           }}>
             {(currentUser.displayName || currentUser.email || "?").slice(0, 1).toUpperCase()}
           </div>
-          <span style={{ fontSize: 12, color: TEXT, fontWeight: 600 }}>
+          <span style={{ fontSize: 12.5, color: TEXT, fontWeight: 500 }}>
             {currentUser.displayName || currentUser.email}
           </span>
-          <span style={{ width: 1, height: 14, background: ACCENT_DIM }} />
+          <span style={{ width: 1, height: 14, background: BORDER_MED }} />
           <button onClick={onLogout} type="button" style={{
-            background: "none", border: "none", padding: 0,
-            color: TEXT_DIM, fontSize: 11.5, cursor: "pointer", fontFamily: "inherit",
+            background: "none", border: "none", padding: 0, display: "flex",
+            alignItems: "center", gap: 4, color: TEXT_DIM, fontSize: 11.5,
+            cursor: "pointer",
           }}>
+            <LogOut size={12} />
             Sign out
           </button>
         </div>
       )}
 
-      <div style={{ position: "relative", zIndex: 2, textAlign: "center", padding: "0 32px",
-                    maxWidth: 620, width: "100%" }}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 16px",
-                      borderRadius: 99, background: GOLD_BG, border: `1px solid ${GOLD_BORDER}`,
-                      marginBottom: 28 }}>
+      {/* Center content */}
+      <div style={{ position: "relative", zIndex: 2, textAlign: "center", padding: "0 32px", maxWidth: 680, width: "100%" }}>
+
+        {/* Brand badge */}
+        <div style={{
+          display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 18px",
+          borderRadius: 99, background: GOLD_BG, border: `1px solid ${GOLD_BORDER}`, marginBottom: 32,
+        }}>
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: GOLD, display: "inline-block" }} />
-          <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.14em",
-                         textTransform: "uppercase", color: GOLD }}>Folio</span>
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: GOLD }}>
+            Folio · Portfolio Dashboard
+          </span>
         </div>
 
+        {/* Value display */}
         {enriched ? (
           <>
-            <div style={{ fontSize: 13, color: TEXT_DIM, marginBottom: 6 }}>Your portfolio is worth</div>
-            <div style={{ fontSize: 56, fontWeight: 900, letterSpacing: "-0.05em", color: TEXT,
-                          lineHeight: 1, marginBottom: 10 }}>{fmt$(total)}</div>
-            <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 32,
-                          color: gain >= 0 ? "#34d399" : "#f87171" }}>
-              {gain >= 0 ? "▲" : "▼"} {fmt$(Math.abs(gain))} total ({fmtPct(gainPct)}) since you bought in
+            <div style={{ fontSize: 13, color: TEXT_DIM, marginBottom: 8, letterSpacing: "0.04em" }}>
+              Total Portfolio Value
+            </div>
+            <div style={{ fontSize: 64, fontWeight: 700, letterSpacing: "-0.03em", color: TEXT,
+                          lineHeight: 1, marginBottom: 14, fontFamily: FONT_SERIF }}>
+              {fmt$(total)}
+            </div>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8,
+                          padding: "6px 14px", borderRadius: 99, marginBottom: 48,
+                          background: isPos ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)",
+                          border: `1px solid ${isPos ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}` }}>
+              {isPos ? <TrendingUp size={15} color={GREEN} /> : <TrendingDown size={15} color={RED} />}
+              <span style={{ fontSize: 13.5, fontWeight: 600, color: isPos ? GREEN : RED }}>
+                {fmt$(Math.abs(gain))} ({fmtPct(gainPct)}) all-time
+              </span>
             </div>
           </>
         ) : (
-          <div style={{ fontSize: 18, color: TEXT_DIM, marginBottom: 40 }}>Loading your portfolio…</div>
+          <div style={{ fontSize: 16, color: TEXT_DIM, marginBottom: 48 }}>Loading your portfolio…</div>
         )}
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, maxWidth: 520, margin: "0 auto" }}>
-          {cards.map((c) => (
-            <button key={c.id} type="button" onClick={() => setScreen(c.id)} style={{
-              padding: "18px 16px", borderRadius: 12, textAlign: "left", cursor: "pointer",
-              background: "rgba(13,31,60,0.75)", backdropFilter: "blur(12px)",
-              border: `1px solid ${ACCENT_DIM}`, transition: "border-color 0.2s",
+        {/* Feature cards */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, maxWidth: 560, margin: "0 auto" }}>
+          {features.map(({ id, Icon, title, desc, color }) => (
+            <button key={id} type="button" onClick={() => setScreen(id)} style={{
+              padding: "20px 18px", borderRadius: 14, textAlign: "left", cursor: "pointer",
+              background: "rgba(15,31,61,0.7)", backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
+              border: "1px solid rgba(255,255,255,0.07)",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.25)",
+              transition: "transform 0.2s, box-shadow 0.2s, border-color 0.2s",
             }}
-            onMouseEnter={(e) => e.currentTarget.style.borderColor = GOLD_BORDER}
-            onMouseLeave={(e) => e.currentTarget.style.borderColor = ACCENT_DIM}>
-              <div style={{ fontSize: 22, marginBottom: 8 }}>{c.icon}</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: TEXT, marginBottom: 4 }}>{c.title}</div>
-              <div style={{ fontSize: 11.5, color: TEXT_DIM, lineHeight: 1.5 }}>{c.desc}</div>
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.4)";
+              e.currentTarget.style.borderColor = `${color}40`;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "none";
+              e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.25)";
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)";
+            }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 10, marginBottom: 12,
+                background: `${color}18`, border: `1px solid ${color}30`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <Icon size={17} color={color} />
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: TEXT, marginBottom: 5 }}>{title}</div>
+              <div style={{ fontSize: 12, color: TEXT_DIM, lineHeight: 1.55 }}>{desc}</div>
             </button>
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ─── Page header ───────────────────────────────────────────────── */
+function PageHeader({ title, subtitle, actions }) {
+  return (
+    <div style={{ padding: "32px 36px 0", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+      <div>
+        <h1 style={{ margin: "0 0 4px", fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em", color: TEXT }}>{title}</h1>
+        {subtitle && <p style={{ margin: 0, fontSize: 13, color: TEXT_DIM }}>{subtitle}</p>}
+      </div>
+      {actions && <div style={{ display: "flex", gap: 10 }}>{actions}</div>}
     </div>
   );
 }
@@ -325,29 +379,32 @@ export default function TwinTrack({ currentUser, onLogout }) {
 
   if (loading) return (
     <div style={{ minHeight: "100vh", background: BG, display: "flex", alignItems: "center",
-                  justifyContent: "center", color: TEXT_DIM, fontSize: 15 }}>
-      Loading your portfolio…
+                  justifyContent: "center", color: TEXT_DIM, fontSize: 14 }}>
+      <div style={{ textAlign: "center" }}>
+        <div style={{ fontSize: 28, marginBottom: 12 }}>◈</div>
+        Loading your portfolio…
+      </div>
     </div>
   );
 
   if (error) return (
     <div style={{ minHeight: "100vh", background: BG, display: "flex", alignItems: "center",
                   justifyContent: "center", flexDirection: "column", gap: 12 }}>
-      <div style={{ color: "#f87171", fontSize: 15 }}>Could not connect to backend</div>
+      <div style={{ color: RED, fontSize: 14 }}>Could not connect to backend</div>
       <div style={{ color: TEXT_DIM, fontSize: 12 }}>{error}</div>
-      <button onClick={init} style={{ marginTop: 8, padding: "8px 20px", borderRadius: 8,
-        background: GOLD, color: BG, border: "none", cursor: "pointer", fontWeight: 700 }}>Retry</button>
+      <button onClick={init} style={{ marginTop: 8, padding: "9px 22px", borderRadius: 9,
+        background: GOLD, color: BG, border: "none", cursor: "pointer", fontWeight: 700, fontSize: 13 }}>
+        Retry
+      </button>
     </div>
   );
 
   if (screen === "hub") return (
-    <div style={{ display: "flex", minHeight: "100vh", background: BG }}>
-      <HubScreen enriched={enriched} setScreen={setScreen} currentUser={currentUser} onLogout={onLogout} />
-    </div>
+    <HubScreen enriched={enriched} setScreen={setScreen} currentUser={currentUser} onLogout={onLogout} />
   );
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: BG, fontFamily: "'DM Sans','Segoe UI',sans-serif" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: BG }}>
       <Sidebar screen={screen} setScreen={setScreen} enriched={enriched}
                pricesLoading={pricesLoading} onRefresh={() => loadPrices()}
                currentUser={currentUser} onLogout={onLogout} />
@@ -356,17 +413,10 @@ export default function TwinTrack({ currentUser, onLogout }) {
           <PortfolioScreen portfolio={portfolio} prices={prices} enriched={enriched}
                            onPortfolioChange={refreshPortfolio} />
         )}
-        {screen === "risk" && (
-          <RiskScreen portfolio={portfolio} prices={prices} />
-        )}
-        {screen === "rebalance" && (
-          <RebalanceScreen portfolio={portfolio} prices={prices} />
-        )}
-        {screen === "scenario" && (
-          <ScenarioScreen portfolio={portfolio} prices={prices} />
-        )}
+        {screen === "risk"      && <RiskScreen      portfolio={portfolio} prices={prices} />}
+        {screen === "rebalance" && <RebalanceScreen portfolio={portfolio} prices={prices} />}
+        {screen === "scenario"  && <ScenarioScreen  portfolio={portfolio} prices={prices} />}
       </main>
     </div>
   );
 }
-

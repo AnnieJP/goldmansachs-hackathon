@@ -1,20 +1,21 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
-  font-family: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  font-family: 'Playfair Display', Georgia, serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html, body {
   margin: 0;
   padding: 0;
-  background: #06101F;
-  color: #D6E8FA;
+  background: #F5F0EA;
+  color: #0A1628;
   min-height: 100vh;
+  font-family: 'Playfair Display', Georgia, serif;
 }
 
 #root {
@@ -22,12 +23,14 @@ html, body {
   min-height: 100vh;
 }
 
-* {
-  font-family: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+*, *::before, *::after {
+  font-family: 'Playfair Display', Georgia, serif;
 }
 
-/* Thin scrollbar */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: #06101F; }
-::-webkit-scrollbar-thumb { background: #152B52; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #2A6496; }
+::-webkit-scrollbar-track { background: #F5F0EA; }
+::-webkit-scrollbar-thumb { background: rgba(10,22,40,0.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(10,22,40,0.28); }
+
+button { font-family: inherit; }
+input, select, textarea { font-family: inherit; }

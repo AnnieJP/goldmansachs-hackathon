@@ -1,22 +1,57 @@
-/* ─── Color tokens ──────────────────────────────────────────────── */
-export const GOLD        = "#C9A227";
-export const GOLD_LIGHT  = "#F0CE6A";
-export const GOLD_BG     = "#C9A22718";
-export const GOLD_BORDER = "#C9A22745";
-export const ACCENT      = "#2A6496";
-export const ACCENT_SOFT = "#D6E8FA";
-export const ACCENT_DIM  = "#152B52";
-export const SURFACE     = "#0D1F3C";
-export const BG          = "#06101F";
-export const TEXT        = "#D6E8FA";
-export const TEXT_DIM    = "#6E96C0";
+/* ─── Typography ────────────────────────────────────────────────── */
+export const FONT_SERIF = "'Playfair Display', Georgia, serif";
+export const FONT_SANS  = "'Playfair Display', Georgia, serif";
+
+/* ─── Background layers ─────────────────────────────────────────── */
+export const BG        = "#F5F0EA";  /* warm cream page bg          */
+export const SURFACE   = "#FFFFFF";  /* white card surface          */
+export const SURFACE_2 = "#EDE8E1";  /* warm off-white, nested      */
+export const SURFACE_3 = "#E5DED5";  /* warm medium, hover states   */
+
+/* ─── Borders ───────────────────────────────────────────────────── */
+export const BORDER     = "rgba(10,22,40,0.10)";
+export const BORDER_MED = "rgba(10,22,40,0.20)";
+
+/* ─── Text ──────────────────────────────────────────────────────── */
+export const TEXT     = "#0A1628";  /* midnight navy               */
+export const TEXT_SEC = "#2A4165";  /* medium navy                 */
+export const TEXT_DIM = "#7B8FA6";  /* muted blue-gray             */
+
+/* ─── Gold accent ───────────────────────────────────────────────── */
+export const GOLD        = "#B45309";  /* amber-700, contrast on white */
+export const GOLD_LIGHT  = "#D97706";
+export const GOLD_BG     = "rgba(180,83,9,0.08)";
+export const GOLD_BORDER = "rgba(180,83,9,0.22)";
+
+/* ─── Semantic colors ───────────────────────────────────────────── */
+export const GREEN        = "#047857";  /* emerald-700 */
+export const GREEN_BG     = "rgba(4,120,87,0.08)";
+export const GREEN_BORDER = "rgba(4,120,87,0.25)";
+export const RED          = "#B91C1C";  /* red-700     */
+export const RED_BG       = "rgba(185,28,28,0.08)";
+export const RED_BORDER   = "rgba(185,28,28,0.25)";
+
+/* ─── Backward-compat aliases ───────────────────────────────────── */
+export const ACCENT      = "#1E40AF";
+export const ACCENT_SOFT = "#DBEAFE";
+export const ACCENT_DIM  = "rgba(10,22,40,0.06)";
 
 /* ─── Holding palette ───────────────────────────────────────────── */
 export const HOLDING_COLORS = [
-  "#C9A227","#2A6496","#059669","#7C3AED",
-  "#DC2626","#EA580C","#0891B2","#4F46E5",
-  "#16A34A","#DB2777",
+  "#F59E0B", "#10B981", "#6366F1", "#EC4899",
+  "#14B8A6", "#F97316", "#8B5CF6", "#06B6D4",
+  "#EF4444", "#84CC16",
 ];
+
+/* ─── Glass card style object ───────────────────────────────────── */
+export const glass = {
+  background: "rgba(255,255,255,0.80)",
+  backdropFilter: "blur(16px)",
+  WebkitBackdropFilter: "blur(16px)",
+  border: "1px solid rgba(10,22,40,0.10)",
+  borderRadius: 16,
+  boxShadow: "0 8px 32px rgba(10,22,40,0.10), inset 0 1px 0 rgba(255,255,255,0.8)",
+};
 
 /* ─── Formatters ────────────────────────────────────────────────── */
 export const fmt$ = (n) =>

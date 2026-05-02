@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import TwinTrack from "./TwinTrack.jsx";
 import LoginScreen from "./screens/LoginScreen.jsx";
 import { fetchCurrentUser, logout, setUnauthorizedHandler } from "./api.js";
-import { BG, TEXT_DIM } from "./theme.js";
+import { BG, TEXT_DIM, TEXT } from "./theme.js";
 
 export default function App() {
   const [user, setUser]       = useState(null);
@@ -33,7 +33,7 @@ export default function App() {
         minHeight: "100vh", background: BG, display: "flex",
         alignItems: "center", justifyContent: "center",
         color: TEXT_DIM, fontSize: 14,
-        fontFamily: "'DM Sans','Segoe UI',sans-serif",
+        fontFamily: "'Playfair Display', Georgia, serif",
       }}>
         Loading…
       </div>

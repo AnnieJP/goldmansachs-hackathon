@@ -1,184 +1,182 @@
-import { useState, useEffect } from "react";
-import { GOLD, GOLD_BG, GOLD_BORDER, ACCENT, ACCENT_DIM,
-         SURFACE, BG, TEXT, TEXT_DIM, fmt$, fmtPct } from "../theme.js";
+import { useState } from "react";
+import { GOLD, GOLD_BG, GOLD_BORDER, BORDER, BORDER_MED,
+         SURFACE, BG, TEXT, TEXT_DIM,
+         GREEN, RED, RED_BG, RED_BORDER,
+         FONT_SERIF, fmt$, fmtPct } from "../theme.js";
 import { apiFetch } from "../api.js";
+import { TrendingUp, TrendingDown, Sparkles, ChevronRight } from "lucide-react";
 
 const SCENARIOS = [
-  { id: "market_crash",  icon: "📉", label: "Market Crash",         desc: "Sudden sharp drop — like 2008 or early 2020" },
-  { id: "recession",     icon: "🌧️", label: "Prolonged Recession",  desc: "Slow downturn lasting 12–18 months" },
-  { id: "tech_selloff",  icon: "💻", label: "Tech Selloff",         desc: "Tech stocks crash while other sectors hold" },
-  { id: "rate_hike",     icon: "🏦", label: "Rate Hike",            desc: "Central bank raises interest rates sharply" },
-  { id: "bull_market",   icon: "🚀", label: "Bull Market Boom",     desc: "Strong growth — markets hit new highs" },
+  { id: "market_crash",   label: "Market Crash",   icon: "💥", desc: "Markets fall 20%",      color: "#EF4444" },
+  { id: "high_inflation", label: "High Inflation",  icon: "📈", desc: "Inflation hits 6%+",    color: "#F97316" },
+  { id: "need_cash",      label: "Need Cash",       icon: "💸", desc: "Liquidate in 3 months", color: "#F59E0B" },
+  { id: "bull_run",       label: "Bull Run",        icon: "🚀", desc: "Markets surge 30%",     color: "#10B981" },
+  { id: "rate_hike",      label: "Rate Hike",       icon: "🏦", desc: "Fed raises rates 2%",   color: "#6366F1" },
+  { id: "recession",      label: "Recession",       icon: "📉", desc: "GDP contracts 2 qtrs",  color: "#EC4899" },
 ];
 
-/* ─── Impact row ────────────────────────────────────────────────── */
-function ImpactRow({ h }) {
-  const isPos = h.change >= 0;
-  return (
-    <tr style={{ borderTop: `1px solid ${ACCENT_DIM}` }}>
-      <td style={{ padding: "11px 16px" }}>
-        <div style={{ fontWeight: 700, fontSize: 13.5 }}>{h.symbol}</div>
-        <div style={{ fontSize: 11, color: TEXT_DIM, marginTop: 2 }}>{h.name}</div>
-      </td>
-      <td style={{ padding: "11px 16px", fontSize: 13 }}>{fmt$(h.original_value)}</td>
-      <td style={{ padding: "11px 16px", fontSize: 13, fontWeight: 600 }}>{fmt$(h.simulated_value)}</td>
-      <td style={{ padding: "11px 16px" }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: isPos ? "#34d399" : "#f87171" }}>
-          {isPos ? "+" : ""}{fmt$(h.change)}
-        </div>
-        <div style={{ fontSize: 11, color: isPos ? "#34d399" : "#f87171" }}>
-          {fmtPct(h.change_pct)}
-        </div>
-      </td>
-      <td style={{ padding: "11px 16px" }}>
-        <div style={{ height: 6, borderRadius: 3, background: ACCENT_DIM, width: 80, overflow: "hidden" }}>
-          <div style={{
-            height: "100%", borderRadius: 3,
-            width: `${Math.min(100, Math.abs(h.change_pct))}%`,
-            background: isPos ? "#34d399" : "#f87171",
-          }} />
-        </div>
-      </td>
-    </tr>
-  );
-}
-
-/* ─── Main screen ───────────────────────────────────────────────── */
 export default function ScenarioScreen({ portfolio, prices }) {
-  const [selected, setSelected] = useState("market_crash");
+  const [selected, setSelected] = useState(null);
   const [data,     setData]     = useState(null);
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState(null);
 
-  useEffect(() => {
-    if (!portfolio || !prices) return;
-    setLoading(true);
-    setError(null);
-    apiFetch("/api/scenario", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ portfolio, prices, scenario_id: selected }),
-    })
-      .then((r) => r.json())
-      .then((d) => { setData(d); setLoading(false); })
-      .catch((e) => { setError(e.message); setLoading(false); });
-  }, [selected, portfolio, prices]);
+  const runScenario = async (id) => {
+    setSelected(id); setLoading(true); setError(null); setData(null);
+    try {
+      const res = await apiFetch("/api/scenario", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scenario: id, portfolio, prices }),
+      }).then((r) => r.json());
+      setData(res);
+    } catch (e) { setError(e.message); }
+    finally { setLoading(false); }
+  };
 
-  const isPos = (data?.change || 0) >= 0;
+  const sc = SCENARIOS.find((s) => s.id === selected);
 
   return (
-    <div style={{ padding: "32px 36px", fontFamily: "'DM Sans','Segoe UI',sans-serif", color: TEXT, maxWidth: 860 }}>
-      <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800, letterSpacing: "-0.03em" }}>What-If Simulator</h1>
-      <p style={{ margin: "0 0 24px", fontSize: 13, color: TEXT_DIM }}>
-        Pick a market event below to see how it would affect your portfolio today.
+    <div style={{ padding: "32px 36px", color: TEXT, maxWidth: 920 }}>
+      <h1 style={{ margin: "0 0 4px", fontSize: 22, fontWeight: 700, letterSpacing: "-0.01em", fontFamily: FONT_SERIF }}>What-If Simulator</h1>
+      <p style={{ margin: "0 0 26px", fontSize: 13, color: TEXT_DIM }}>
+        Pick a scenario and see exactly how your portfolio would react.
       </p>
 
-      {/* Scenario selector */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 32, flexWrap: "wrap" }}>
-        {SCENARIOS.map((s) => (
-          <button key={s.id} onClick={() => setSelected(s.id)} type="button" style={{
-            flex: "1 1 140px", padding: "14px 14px", borderRadius: 11, textAlign: "left", cursor: "pointer",
-            border: `1px solid ${selected === s.id ? GOLD : ACCENT_DIM}`,
-            background: selected === s.id ? GOLD_BG : SURFACE,
-            transition: "border-color 0.15s, background 0.15s",
-          }}>
-            <div style={{ fontSize: 22, marginBottom: 6 }}>{s.icon}</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: selected === s.id ? GOLD : TEXT,
-                          marginBottom: 4 }}>{s.label}</div>
-            <div style={{ fontSize: 11, color: TEXT_DIM, lineHeight: 1.4 }}>{s.desc}</div>
-          </button>
-        ))}
+      {/* Scenario card deck */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 28 }}>
+        {SCENARIOS.map((s) => {
+          const active = selected === s.id;
+          return (
+            <button key={s.id} onClick={() => runScenario(s.id)} type="button" style={{
+              padding: "20px 18px", borderRadius: 14, textAlign: "left", cursor: "pointer",
+              background: active ? s.color + "12" : SURFACE,
+              border: `1px solid ${active ? s.color + "50" : BORDER}`,
+              boxShadow: active ? `0 0 0 1px ${s.color}30` : "none",
+              transition: "all 0.2s",
+              display: "flex", flexDirection: "column", gap: 10,
+            }}
+            onMouseEnter={(e) => { if (!active) { e.currentTarget.style.borderColor = s.color + "30"; e.currentTarget.style.background = s.color + "08"; } }}
+            onMouseLeave={(e) => { if (!active) { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.background = SURFACE; } }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontSize: 28 }}>{s.icon}</span>
+                {active && loading && <span style={{ fontSize: 11, color: s.color }}>Running…</span>}
+                {active && !loading && data && <ChevronRight size={14} color={s.color} />}
+              </div>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 14, color: active ? s.color : TEXT, marginBottom: 3 }}>{s.label}</div>
+                <div style={{ fontSize: 12, color: TEXT_DIM }}>{s.desc}</div>
+              </div>
+            </button>
+          );
+        })}
       </div>
 
-      {loading && <Center>Running the simulation…</Center>}
-      {error   && <Center>Could not run simulation</Center>}
+      {error && (
+        <div style={{ padding: "13px 16px", borderRadius: 11, background: RED_BG, border: `1px solid ${RED_BORDER}`,
+                      color: "#FC8181", fontSize: 13, marginBottom: 20 }}>{error}</div>
+      )}
 
-      {data && !loading && (
+      {loading && (
+        <div style={{ textAlign: "center", padding: "48px 0", color: TEXT_DIM, fontSize: 14 }}>
+          <div style={{ fontSize: 28, marginBottom: 10 }}>{sc?.icon}</div>
+          Simulating {sc?.label}…
+        </div>
+      )}
+
+      {data && !loading && sc && (
         <>
-          {/* Impact summary */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 28 }}>
-            <SummaryCard
-              label="Your portfolio today"
-              value={fmt$(data.original_value)}
-              sub="Before this event"
-            />
-            <SummaryCard
-              label="Your portfolio after"
-              value={fmt$(data.simulated_value)}
-              sub={`If "${data.scenario_name}" happened`}
-              highlight
-              isPos={isPos}
-            />
-            <SummaryCard
-              label="Estimated impact"
-              value={`${isPos ? "+" : ""}${fmt$(data.change)}`}
-              sub={`${fmtPct(data.change_pct)} change`}
-              isPos={isPos}
-              colored
-            />
+          {/* Summary row */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 20 }}>
+            {[
+              { label: "Portfolio now",   value: fmt$(data.current_value),   sub: null },
+              { label: "Projected value", value: fmt$(data.projected_value),
+                sub: `${fmt$(data.projected_value - data.current_value)} (${fmtPct(data.impact_pct)})`,
+                pos: data.projected_value >= data.current_value },
+              { label: "Max drawdown",    value: data.max_drawdown,          sub: null },
+            ].map(({ label, value, sub, pos }) => (
+              <div key={label} style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 14,
+                                         padding: "18px 20px", boxShadow: "0 2px 12px rgba(0,0,0,0.2)" }}>
+                <div style={{ fontSize: 11.5, color: TEXT_DIM, marginBottom: 8, letterSpacing: "0.03em" }}>{label}</div>
+                <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.02em", color: TEXT }}>{value}</div>
+                {sub && (
+                  <div style={{ fontSize: 12.5, fontWeight: 600, marginTop: 5,
+                                color: pos ? GREEN : RED, display: "flex", alignItems: "center", gap: 4 }}>
+                    {pos ? <TrendingUp size={13} /> : <TrendingDown size={13} />}
+                    {sub}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
 
-          {/* Advice */}
-          {data.advice && (
-            <div style={{ padding: "16px 20px", borderRadius: 12, marginBottom: 24,
-                          background: GOLD_BG, border: `1px solid ${GOLD_BORDER}`,
-                          display: "flex", gap: 12, alignItems: "flex-start" }}>
-              <span style={{ fontSize: 18 }}>💡</span>
-              <div style={{ fontSize: 13.5, color: TEXT, lineHeight: 1.6 }}>{data.advice}</div>
+          {/* AI explanation */}
+          {data.explanation && (
+            <div style={{ marginBottom: 20, padding: "20px 22px", borderRadius: 16,
+                          background: "linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.04))",
+                          border: `1px solid ${GOLD_BORDER}`,
+                          boxShadow: "0 2px 16px rgba(245,158,11,0.08)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                <Sparkles size={14} color={GOLD} />
+                <span style={{ fontSize: 11.5, fontWeight: 700, color: GOLD, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  What this means for you
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: 14, color: TEXT, lineHeight: 1.75 }}>{data.explanation}</p>
             </div>
           )}
 
           {/* Per-holding impact table */}
-          <div style={{ background: SURFACE, border: `1px solid ${ACCENT_DIM}`,
-                        borderRadius: 12, overflow: "hidden" }}>
-            <div style={{ padding: "14px 18px", borderBottom: `1px solid ${ACCENT_DIM}` }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>Impact per holding</div>
-              <div style={{ fontSize: 11.5, color: TEXT_DIM, marginTop: 2 }}>
-                How each position would be affected under this scenario
-              </div>
+          <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 16, overflow: "hidden",
+                        boxShadow: "0 2px 12px rgba(0,0,0,0.2)" }}>
+            <div style={{ padding: "16px 20px", borderBottom: `1px solid ${BORDER}` }}>
+              <div style={{ fontSize: 13.5, fontWeight: 700, color: TEXT }}>Impact per holding</div>
             </div>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
-                <tr>
-                  {["Holding", "Current value", "Simulated value", "Change", "Magnitude"].map((h) => (
-                    <th key={h} style={{ padding: "10px 16px", textAlign: "left", fontSize: 11,
+                <tr style={{ background: "rgba(255,255,255,0.02)" }}>
+                  {["Holding", "Current Value", "Projected Value", "Impact ($)", "Impact (%)"].map((h) => (
+                    <th key={h} style={{ padding: "10px 18px", textAlign: "left", fontSize: 11,
                                           fontWeight: 600, color: TEXT_DIM, textTransform: "uppercase",
-                                          letterSpacing: "0.06em" }}>{h}</th>
+                                          letterSpacing: "0.06em", borderBottom: `1px solid ${BORDER}` }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {[...data.holdings_impact].sort((a, b) => a.change - b.change).map((h) => (
-                  <ImpactRow key={h.symbol} h={h} />
-                ))}
+                {data.holdings_impact.map((h) => {
+                  const delta = h.projected_value - h.current_value;
+                  const pos   = delta >= 0;
+                  return (
+                    <tr key={h.symbol} style={{ borderTop: `1px solid ${BORDER}`, transition: "background 0.12s" }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.02)"}
+                        onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
+                      <td style={{ padding: "12px 18px" }}>
+                        <div style={{ fontWeight: 700, fontSize: 13.5 }}>{h.symbol}</div>
+                        <div style={{ fontSize: 11, color: TEXT_DIM, marginTop: 2 }}>{h.name}</div>
+                      </td>
+                      <td style={{ padding: "12px 18px", fontSize: 13, fontVariantNumeric: "tabular-nums" }}>{fmt$(h.current_value)}</td>
+                      <td style={{ padding: "12px 18px", fontSize: 13, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>{fmt$(h.projected_value)}</td>
+                      <td style={{ padding: "12px 18px", fontSize: 13, fontWeight: 600, fontVariantNumeric: "tabular-nums",
+                                   color: pos ? GREEN : RED }}>
+                        {pos ? "+" : ""}{fmt$(delta)}
+                      </td>
+                      <td style={{ padding: "12px 18px", fontSize: 13, fontVariantNumeric: "tabular-nums",
+                                   color: pos ? GREEN : RED }}>
+                        {fmtPct(h.impact_pct)}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
-
-          <div style={{ marginTop: 18, fontSize: 11.5, color: TEXT_DIM, lineHeight: 1.6 }}>
-            ⚠️ These numbers are estimates based on historical patterns for each asset type.
-            Real markets are unpredictable. This tool is for education only — not financial advice.
-          </div>
         </>
       )}
-    </div>
-  );
-}
 
-function Center({ children }) {
-  return (
-    <div style={{ padding: 40, textAlign: "center", color: TEXT_DIM, fontSize: 14 }}>{children}</div>
-  );
-}
-
-function SummaryCard({ label, value, sub, highlight, isPos, colored }) {
-  return (
-    <div style={{ background: SURFACE, border: `1px solid ${highlight ? GOLD : ACCENT_DIM}`,
-                  borderRadius: 12, padding: "18px 20px" }}>
-      <div style={{ fontSize: 11, color: TEXT_DIM, marginBottom: 8, textTransform: "uppercase",
-                    letterSpacing: "0.06em" }}>{label}</div>
-      <div style={{ fontSize: 24, fontWeight: 900, letterSpacing: "-0.04em",
-                    color: colored ? (isPos ? "#34d399" : "#f87171") : TEXT }}>{value}</div>
-      <div style={{ fontSize: 12, color: TEXT_DIM, marginTop: 6 }}>{sub}</div>
+      {!selected && (
+        <div style={{ padding: "56px 0", textAlign: "center", color: TEXT_DIM, fontSize: 13 }}>
+          Select a scenario above to see how your portfolio would react.
+        </div>
+      )}
     </div>
   );
 }
