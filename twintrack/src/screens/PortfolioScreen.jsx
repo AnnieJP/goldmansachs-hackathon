@@ -69,12 +69,6 @@ function DonutChart({ slices, total }) {
     ctx.arc(cx, cy, inner, 0, Math.PI * 2);
     ctx.fillStyle = BG;
     ctx.fill();
-    ctx.textAlign = "center";
-    ctx.fillStyle = TEXT;
-    ctx.font = `500 12px 'Playfair Display', Georgia, serif`;
-    ctx.fillText("Total Value", cx, cy - 10);
-    ctx.font = `700 15px 'Playfair Display', Georgia, serif`;
-    ctx.fillText(fmt$(total), cx, cy + 10);
   }, [slices, total]);
   return <canvas ref={ref} style={{ width: "100%", height: "100%", display: "block" }} />;
 }
@@ -88,7 +82,7 @@ const inputStyle = {
   boxSizing: "border-box",
 };
 const goldBtn  = { flex: 1, padding: "9px 0", border: "none",
-                   background: GOLD, color: SURFACE, fontWeight: 700,
+                   background: GOLD, color: TEXT, fontWeight: 700,
                    fontSize: 13, cursor: "pointer", fontFamily: "inherit" };
 const ghostBtn = { flex: 1, padding: "9px 0", border: `1px solid ${BORDER}`,
                    background: "transparent", color: TEXT_DIM, fontSize: 13,
@@ -510,7 +504,7 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
           </button>
           <button onClick={() => setModal("add")} type="button" style={{
             padding: "10px 20px", border: "none", background: GOLD,
-            color: SURFACE, fontWeight: 700, fontSize: 13.5, cursor: "pointer",
+            color: TEXT, fontWeight: 700, fontSize: 13.5, cursor: "pointer",
             fontFamily: "inherit", whiteSpace: "nowrap",
           }}>
             + Add holding
@@ -696,8 +690,8 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
           ))}
         </div>
 
-        <div style={{ border: `1px solid ${BORDER}`, overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div style={{ border: `1px solid ${BORDER}`, overflowX: "auto" }}>
+          <table style={{ width: "100%", minWidth: 780, borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: SURFACE_2 }}>
                 {[

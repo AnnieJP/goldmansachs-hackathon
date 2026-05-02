@@ -15,7 +15,7 @@ const PALETTE = {
   SURFACE: "#FFFFFF",
   TEXT: "#0A1628",
   TEXT_DIM: "#7B8FA6",
-  ACCENT: "#1E40AF",
+  ACCENT: "#0A1628",
   GOLD: "#E8B84A",
   GREEN: "#047857",
 };
@@ -83,7 +83,7 @@ export default function MeridianBrandMark() {
   const reduced = usePrefersReducedMotion();
 
   // Total loop = 6.4s. Mount-only fade-up handled with animation-fill-mode.
-  const loopDuration = "6.4s";
+  const loopDuration = "9s";
 
   const containerStyle = {
     width: 220,
@@ -113,11 +113,11 @@ export default function MeridianBrandMark() {
   // Star sits just above the diamond's top corner.
   const needleAnim = reduced
     ? undefined
-    : `meridian-needle-sweep 2.4s ease-out forwards`;
+    : `meridian-needle-sweep 3.6s ease-out forwards`;
 
   const starAnim = reduced
     ? undefined
-    : `meridian-star-twinkle 2.4s ease-in-out forwards`;
+    : `meridian-star-twinkle 3.6s ease-in-out forwards`;
 
   // Static state (reduced motion): needle north, star bright.
   const needleStaticTransform = "rotate(360deg)";

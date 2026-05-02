@@ -85,13 +85,17 @@ function Sidebar({ screen, onNavigate, enriched, pricesLoading, onRefresh, curre
 
       {/* Portfolio value card */}
       {enriched && (
-        <div style={{
+        <div onClick={() => onNavigate("portfolio")} style={{
           margin: "0 16px 8px",
           padding: "16px",
           borderRadius: 12,
           background: "linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(245,158,11,0.06) 100%)",
           border: `1px solid ${GOLD_BORDER}`,
-        }}>
+          cursor: "pointer",
+          transition: "border-color 0.15s",
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.borderColor = GOLD}
+        onMouseLeave={(e) => e.currentTarget.style.borderColor = GOLD_BORDER}>
           <div style={{ fontSize: 10.5, fontWeight: 500, color: TEXT_DIM, marginBottom: 6, letterSpacing: "0.04em", textTransform: "uppercase" }}>
             Net Worth
           </div>
@@ -119,7 +123,7 @@ function Sidebar({ screen, onNavigate, enriched, pricesLoading, onRefresh, curre
               padding: "10px 12px", borderRadius: 10, border: "none",
               cursor: "pointer", marginBottom: 2, textAlign: "left",
               background: active ? GOLD_BG : "transparent",
-              color: active ? GOLD : TEXT_DIM,
+              color: active ? TEXT : TEXT_DIM,
               fontWeight: active ? 600 : 400, fontSize: 13.5,
               transition: "background 0.15s, color 0.15s",
             }}
@@ -127,7 +131,7 @@ function Sidebar({ screen, onNavigate, enriched, pricesLoading, onRefresh, curre
             onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = "transparent"; }}>
               <Icon size={16} strokeWidth={active ? 2.2 : 1.8} />
               {label}
-              {active && <span style={{ marginLeft: "auto", width: 5, height: 5, borderRadius: "50%", background: GOLD }} />}
+              {active && <span style={{ marginLeft: "auto", width: 5, height: 5, borderRadius: "50%", background: "#0A1628" }} />}
             </button>
           );
         })}
