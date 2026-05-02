@@ -1448,7 +1448,9 @@ class Handler(BaseHTTPRequestHandler):
                 }
                 save_users(users)
                 user_payload = public_user(users, email)
-            load_portfolio(email)   # seed default portfolio file
+            blank = {"name": "My Portfolio", "risk_profile": "moderate",
+                     "holdings": [], "cash": 0, "target_cash_pct": 5}
+            save_portfolio(email, blank)
             token = create_session(email)
             return self._json({"token": token, "user": user_payload}, set_cookie=token)
 
