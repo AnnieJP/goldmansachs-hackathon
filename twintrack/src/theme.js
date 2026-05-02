@@ -1,3 +1,6 @@
+/* ─── Shape ─────────────────────────────────────────────────────── */
+export const RADIUS = 0;  /* sharp square corners throughout */
+
 /* ─── Typography ────────────────────────────────────────────────── */
 export const FONT_SERIF = "'Playfair Display', Georgia, serif";
 export const FONT_SANS  = "'Playfair Display', Georgia, serif";
@@ -17,11 +20,11 @@ export const TEXT     = "#0A1628";  /* midnight navy               */
 export const TEXT_SEC = "#2A4165";  /* medium navy                 */
 export const TEXT_DIM = "#7B8FA6";  /* muted blue-gray             */
 
-/* ─── Gold accent ───────────────────────────────────────────────── */
-export const GOLD        = "#B45309";  /* amber-700, contrast on white */
-export const GOLD_LIGHT  = "#D97706";
-export const GOLD_BG     = "rgba(180,83,9,0.08)";
-export const GOLD_BORDER = "rgba(180,83,9,0.22)";
+/* ─── Blue accent ───────────────────────────────────────────────── */
+export const GOLD        = "#B0C1D6";  /* light blue accent            */
+export const GOLD_LIGHT  = "#C8D5E3";
+export const GOLD_BG     = "rgba(176,193,214,0.18)";
+export const GOLD_BORDER = "rgba(176,193,214,0.55)";
 
 /* ─── Semantic colors ───────────────────────────────────────────── */
 export const GREEN        = "#047857";  /* emerald-700 */

@@ -53,12 +53,11 @@ export default function LoginScreen({ onLogin }) {
 
       <div style={{
         width: "100%", maxWidth: 420, position: "relative", zIndex: 1,
-        background: "rgba(15,31,61,0.75)",
-        backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
-        border: `1px solid ${BORDER_MED}`,
+        background: SURFACE,
+        border: `1px solid ${BORDER}`,
         borderRadius: 20,
         padding: "40px 36px 32px",
-        boxShadow: "0 24px 64px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)",
+        boxShadow: "0 8px 40px rgba(10,22,40,0.10)",
       }}>
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
@@ -101,9 +100,9 @@ export default function LoginScreen({ onLogin }) {
 
           {error && (
             <div style={{
-              fontSize: 12.5, color: "#FC8181",
-              background: "rgba(239,68,68,0.08)",
-              border: "1px solid rgba(239,68,68,0.2)",
+              fontSize: 12.5, color: RED,
+              background: "rgba(185,28,28,0.06)",
+              border: `1px solid ${RED}33`,
               borderRadius: 9, padding: "10px 12px", marginBottom: 16,
             }}>
               {error}
@@ -112,13 +111,12 @@ export default function LoginScreen({ onLogin }) {
 
           <button type="submit" disabled={!canSubmit || submitting} style={{
             width: "100%", padding: "12px 0", borderRadius: 10,
-            background: canSubmit && !submitting
-              ? "linear-gradient(135deg, #F59E0B, #D97706)"
-              : "rgba(245,158,11,0.3)",
-            color: BG, border: "none",
+            background: canSubmit && !submitting ? GOLD : GOLD_BG,
+            color: canSubmit && !submitting ? SURFACE : TEXT_DIM,
+            border: `1px solid ${canSubmit && !submitting ? GOLD : GOLD_BORDER}`,
             fontWeight: 700, fontSize: 14, letterSpacing: "0.01em",
             cursor: canSubmit && !submitting ? "pointer" : "not-allowed",
-            boxShadow: canSubmit && !submitting ? "0 4px 16px rgba(245,158,11,0.3)" : "none",
+            boxShadow: "none",
             transition: "all 0.2s",
           }}>
             {submitting
@@ -185,11 +183,11 @@ function Field({ label, value, onChange, type = "text", autoComplete, autoFocus,
         onBlur={() => setFocused(false)}
         style={{
           width: "100%", padding: "11px 14px", borderRadius: 10,
-          background: "rgba(10,22,40,0.7)", color: TEXT,
+          background: BG, color: TEXT,
           border: `1px solid ${focused ? GOLD_BORDER : BORDER}`,
           fontSize: 14, outline: "none",
           transition: "border-color 0.15s", boxSizing: "border-box",
-          boxShadow: focused ? `0 0 0 3px rgba(245,158,11,0.1)` : "none",
+          boxShadow: focused ? `0 0 0 3px ${GOLD_BG}` : "none",
         }}
       />
     </div>

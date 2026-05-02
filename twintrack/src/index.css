@@ -25,6 +25,7 @@ html, body {
 
 *, *::before, *::after {
   font-family: 'Playfair Display', Georgia, serif;
+  border-radius: 0 !important;
 }
 
 ::-webkit-scrollbar { width: 5px; height: 5px; }
