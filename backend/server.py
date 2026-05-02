@@ -26,6 +26,7 @@ import io
 import json
 import os
 import re
+import sys
 import secrets
 import threading
 import time
@@ -34,13 +35,35 @@ from concurrent.futures import ThreadPoolExecutor
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlparse
+from urllib.request import urlopen
 
 from dotenv import load_dotenv
 load_dotenv()
 
+# ── Planner + rebalancer imports (optional) ───────────────────────────────────
+try:
+    sys.path.insert(0, str(Path(__file__).resolve().parent / "reasoning"))
+    from planner import run_planner as _run_planner
+    PLANNER_AVAILABLE = True
+except Exception:
+    PLANNER_AVAILABLE = False
+    def _run_planner(*a, **kw):
+        return {"verdict": ["proceed"], "flags": [], "violations": [],
+                "recommendations": [], "prefer_sell": []}
+
+try:
+    from rebalancer import generate_rebalance_plan as _generate_rebalance_plan
+    REBALANCER_AVAILABLE = True
+except Exception:
+    REBALANCER_AVAILABLE = False
+    def _generate_rebalance_plan(*a, **kw):
+        return {"target_allocation": {}, "gap_analysis": {}, "trades": [],
+                "before": {}, "after": {}}, "Rebalancer unavailable."
+
 BACKEND        = Path(__file__).resolve().parent
 DATA_DIR       = BACKEND / "data"
 PORTFOLIO_DIR  = DATA_DIR / "portfolios"
+SCENARIOS_DIR  = BACKEND / "scenarios"
 USERS_FILE     = DATA_DIR / "users.json"
 LEGACY_PORTFOLIO_FILE = DATA_DIR / "portfolio.json"
 
@@ -197,6 +220,26 @@ def load_portfolio(email: str) -> dict:
 def save_portfolio(email: str, data: dict) -> None:
     PORTFOLIO_DIR.mkdir(parents=True, exist_ok=True)
     _portfolio_path(email).write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+# ── Scenario persistence (per-user) ──────────────────────────────────────────
+def _scenarios_path(email: str) -> Path:
+    return SCENARIOS_DIR / f"{_email_key(email)}.json"
+
+def load_user_scenarios(email: str) -> list:
+    path = _scenarios_path(email)
+    if path.exists():
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            return []
+    return []
+
+def save_user_scenario(email: str, record: dict) -> None:
+    SCENARIOS_DIR.mkdir(parents=True, exist_ok=True)
+    path      = _scenarios_path(email)
+    scenarios = load_user_scenarios(email)
+    scenarios.insert(0, record)
+    path.write_text(json.dumps(scenarios[:50], indent=2), encoding="utf-8")
 
 # ── Live price fetching ───────────────────────────────────────────────────────
 _MOCK_PRICES = {
@@ -528,7 +571,7 @@ def calc_scenario(portfolio: dict, prices: dict, scenario_id: str) -> dict:
         h["current_value"] / total_orig * 100
         for h in [{"current_value": impacts[i]["original_value"], **holdings[i]}
                   for i in range(len(holdings))]
-        if holdings[i].get("type") == "bond"
+        if h.get("type") == "bond"
     ) if total_orig else 0
 
     advice_map = {
@@ -558,6 +601,413 @@ def calc_scenario(portfolio: dict, prices: dict, scenario_id: str) -> dict:
         "holdings_impact":      sorted(impacts, key=lambda x: x["change"]),
         "advice":               advice_map.get(scenario_id, ""),
     }
+
+# ── FRED: risk-free rate ──────────────────────────────────────────────────────
+_FRED_CACHE: dict = {"ts": 0, "value": 0.045}
+_FRED_TTL   = 86400   # refresh once a day
+
+def fetch_risk_free_rate() -> float:
+    """10-year Treasury yield from FRED GS10. Falls back to ~4.5% if unavailable."""
+    now = time.time()
+    if now - _FRED_CACHE["ts"] < _FRED_TTL:
+        return _FRED_CACHE["value"]
+    api_key = os.getenv("FRED_API_KEY", "")
+    if not api_key:
+        return _FRED_CACHE["value"]
+    try:
+        url = (
+            "https://api.stlouisfed.org/fred/series/observations"
+            f"?series_id=GS10&file_type=json&api_key={api_key}&limit=1&sort_order=desc"
+        )
+        with urlopen(url, timeout=5) as r:
+            data = json.loads(r.read().decode())
+        val = float(data["observations"][0]["value"]) / 100
+        _FRED_CACHE["ts"]    = now
+        _FRED_CACHE["value"] = val
+        return val
+    except Exception:
+        return _FRED_CACHE["value"]
+
+# ── CAPM math ─────────────────────────────────────────────────────────────────
+SPY_LONG_RUN_RETURN = 0.10   # S&P 500 nominal annualised avg (Damodaran, 1928–2023)
+
+def calc_capm(portfolio: dict, prices: dict, betas: dict) -> dict:
+    """
+    Portfolio expected return via CAPM.
+    E(r) = Rf + β × (Rm − Rf)
+    Rf  = FRED GS10 (10-year Treasury)
+    Rm  = 10% nominal (S&P 500 long-run average)
+    β   = per-holding from yfinance, weighted by value
+    """
+    rf = fetch_risk_free_rate()
+    rm = SPY_LONG_RUN_RETURN
+
+    holdings = portfolio.get("holdings", [])
+    cash     = float(portfolio.get("cash", 0))
+    total    = cash
+    valued   = []
+    for h in holdings:
+        price = float(prices.get(h["symbol"]) or h.get("avg_cost") or 0)
+        val   = h["shares"] * price
+        total += val
+        valued.append({**h, "current_price": price, "current_value": val})
+    if total == 0:
+        total = 1
+
+    port_beta = 0.0
+    for h in valued:
+        w = h["current_value"] / total
+        b = betas.get(h["symbol"], TYPE_BETA.get(h.get("type", "stock"), 1.0))
+        port_beta += w * b
+
+    cash_w = cash / total
+    equity_er = rf + port_beta * (rm - rf)
+    cash_er   = rf
+    blended_er = equity_er * (1 - cash_w) + cash_er * cash_w
+
+    return {
+        "risk_free_rate":           round(rf, 4),
+        "market_return":            rm,
+        "portfolio_beta":           round(port_beta, 3),
+        "portfolio_expected_annual": round(blended_er, 4),
+        "total_value":              round(total, 2),
+        "source":                   "CAPM: Rf=FRED GS10, Rm=SPY long-run 10%",
+    }
+
+def calc_return_gap(current_val: float, target_val: float,
+                    timeline_months: float, expected_annual: float) -> str:
+    """
+    Classify whether the target is achievable with the expected portfolio return.
+    Returns: 'achievable', 'high', or 'impossible'
+    """
+    if not target_val or not timeline_months or current_val <= 0:
+        return "achievable"
+    years    = timeline_months / 12
+    required = (target_val / current_val) ** (1 / max(years, 0.08)) - 1
+    if required <= 0:
+        return "achievable"
+    ratio = required / max(expected_annual, 0.001)
+    if ratio <= 1.25:
+        return "achievable"
+    if ratio <= 2.25:
+        return "high"
+    return "impossible"
+
+# ── Intent parser ─────────────────────────────────────────────────────────────
+_INTENT_SYSTEM = """\
+You are a financial intent extractor for a portfolio management app.
+Given a user message, return ONLY a JSON object with these fields (omit any field whose value is null):
+
+  scenario         : "market_crash" | "recession" | "tech_selloff" | "rate_hike" | "bull_market"
+  target_value     : number   (dollar amount the user wants to reach)
+  timeline_months  : number   (how many months until they want to reach the target or make a withdrawal)
+  goal_type        : "growth" | "income" | "preservation"
+  withdrawal_months: number   (months until they need to withdraw money / retire)
+  market_trend     : "bullish" | "bearish" | "neutral"
+  vix_level        : "high" | "moderate" | "low"
+  rate_environment : "rising" | "falling" | "stable"
+  yield_curve      : "inverted" | "flat" | "normal"
+  inflation_level  : "high" | "moderate" | "low"
+
+Rules:
+- If the user asks about a market crash, meltdown, 2008-style event → scenario: market_crash
+- If they mention recession, prolonged downturn → scenario: recession
+- If they mention tech stocks falling, NASDAQ drop → scenario: tech_selloff
+- If they mention rate hikes, Fed tightening, interest rates rising → scenario: rate_hike
+- If they mention bull market, rally, boom, markets rising → scenario: bull_market
+- Extract dollar amounts like "$25k" as 25000, "50k", "50,000", "$1.5 million" as the number (no $ needed)
+- Convert year timelines to months (e.g. "2 years" → 24)
+- "retiring in 6 months" or "need money in 3 months" → withdrawal_months
+- Return ONLY the JSON — no explanation, no markdown fences."""
+
+def parse_intent(message: str) -> dict:
+    """
+    Use Claude to extract structured intent from natural language.
+    Falls back to regex if the API key is unavailable or the call fails.
+    """
+    api_key = os.getenv("ANTHROPIC_API_KEY", "")
+    if api_key:
+        try:
+            import anthropic
+            client = anthropic.Anthropic(api_key=api_key)
+            resp = client.messages.create(
+                model="claude-haiku-4-5-20251001",
+                max_tokens=300,
+                system=_INTENT_SYSTEM,
+                messages=[{"role": "user", "content": message}],
+            )
+            text = resp.content[0].text.strip()
+            # Strip markdown fences if model adds them anyway
+            if text.startswith("```"):
+                text = re.sub(r"```(?:json)?\s*|\s*```", "", text).strip()
+            parsed = json.loads(text)
+            # Keep only non-null values; coerce numeric fields to correct types
+            result: dict = {}
+            for k, v in parsed.items():
+                if v is None:
+                    continue
+                if k in ("target_value", "timeline_months", "withdrawal_months"):
+                    result[k] = float(v) if k == "target_value" else int(v)
+                else:
+                    result[k] = v
+            return result
+        except Exception:
+            pass  # fall through to regex backup
+
+    # ── Regex fallback (no API key or LLM error) ──────────────────────────
+    return _parse_intent_regex(message)
+
+
+def _parse_intent_regex(message: str) -> dict:
+    """Regex-based fallback intent parser."""
+    msg    = message.lower()
+    intent: dict = {}
+
+    _SCENARIO_RE = {
+        "market_crash": re.compile(r"crash|collapse|black\s*swan|tank(?:ing)?|plummet|2008", re.I),
+        "recession":    re.compile(r"recession|slowdown|contraction|economic.*down|downturn", re.I),
+        "tech_selloff": re.compile(r"tech.*sell|tech.*drop|tech.*crash|tech.*fall|nasdaq.*fall|tech.*tank", re.I),
+        "rate_hike":    re.compile(r"rate.*hike|interest.*ris|fed.*rais|hike.*rate|tighten", re.I),
+        "bull_market":  re.compile(r"bull(?:\s*market)?|boom|rally|surge|market.*rising|go.*up|optimis", re.I),
+    }
+    for sc_id, pat in _SCENARIO_RE.items():
+        if pat.search(msg):
+            intent["scenario"] = sc_id
+            break
+
+    amt = re.search(r"\$\s*([0-9,]+(?:\.[0-9]+)?)\s*(k|thousand|million|m\b)?", msg, re.I)
+    if not amt:
+        amt = re.search(r"([0-9,]+(?:\.[0-9]+)?)\s*(k|thousand|million)?\s*dollars?", msg, re.I)
+    if amt:
+        val = float(amt.group(1).replace(",", ""))
+        suffix = (amt.group(2) or "").lower()
+        if suffix in ("k", "thousand"):     val *= 1_000
+        elif suffix in ("m", "million"):    val *= 1_000_000
+        intent["target_value"] = val
+
+    tl = re.search(r"in\s+(\d+)\s*(years?|yrs?|months?|mos?)\b", msg, re.I) or \
+         re.search(r"(\d+)\s*(years?|yrs?|months?|mos?)\b", msg, re.I)
+    if tl:
+        n, unit = int(tl.group(1)), tl.group(2).lower()
+        intent["timeline_months"] = n if unit.startswith("mo") else n * 12
+
+    if re.search(r"grow|maximiz|wealth|build|accumulate|rich", msg, re.I):
+        intent.setdefault("goal_type", "growth")
+    if re.search(r"income|dividend|retir|living|passive", msg, re.I):
+        intent["goal_type"] = "income"
+    if re.search(r"\bsafe\b|protect|preserv|conserv|cautious", msg, re.I):
+        intent["goal_type"] = "preservation"
+
+    if re.search(r"bearish|bear market|market.*down|declin", msg, re.I):
+        intent["market_trend"] = "bearish"
+    elif re.search(r"bullish|bull market|market.*up", msg, re.I):
+        intent["market_trend"] = "bullish"
+
+    if re.search(r"volatile|uncertainty|panic|vix|fear", msg, re.I):
+        intent["vix_level"] = "high"
+    if re.search(r"inflation|price.*ris|cpi", msg, re.I):
+        intent["inflation_level"] = "high"
+    if re.search(r"rate.*ris|rising.*rate|fed.*hike", msg, re.I):
+        intent["rate_environment"] = "rising"
+    elif re.search(r"rate.*fall|rate.*cut|lower.*rate|fed.*cut", msg, re.I):
+        intent["rate_environment"] = "falling"
+    if re.search(r"inverted|yield.*curve|2s10s", msg, re.I):
+        intent["yield_curve"] = "inverted"
+
+    if re.search(r"retir|withdraw|need.*money|cash.*out|liquidat", msg, re.I):
+        wm = re.search(r"(\d+)\s*months?\b", msg, re.I)
+        if wm:
+            intent["withdrawal_months"] = int(wm.group(1))
+
+    return intent
+
+# ── Scenario → ASP market context ────────────────────────────────────────────
+_SCENARIO_CONTEXT = {
+    "market_crash": {
+        "vix_level": "high", "market_trend": "bearish",
+        "yield_curve": "inverted", "rate_environment": "stable",
+        "inflation_level": "moderate", "scenario_loss_pct": 22,
+    },
+    "recession": {
+        "vix_level": "moderate", "market_trend": "bearish",
+        "yield_curve": "inverted", "rate_environment": "stable",
+        "inflation_level": "moderate", "scenario_loss_pct": 35,
+    },
+    "tech_selloff": {
+        "vix_level": "high", "market_trend": "bearish",
+        "yield_curve": "normal", "rate_environment": "stable",
+        "inflation_level": "moderate", "scenario_loss_pct": 32,
+    },
+    "rate_hike": {
+        "vix_level": "moderate", "market_trend": "neutral",
+        "yield_curve": "flat", "rate_environment": "rising",
+        "inflation_level": "high", "scenario_loss_pct": 12,
+    },
+    "bull_market": {
+        "vix_level": "low", "market_trend": "bullish",
+        "yield_curve": "normal", "rate_environment": "stable",
+        "inflation_level": "low", "scenario_loss_pct": 0,
+    },
+}
+
+# ── Flag / violation human messages ──────────────────────────────────────────
+_FLAG_MSGS: dict[str, dict | str] = {
+    "conflict": {
+        "crash_vs_growth": "Your growth goal conflicts with a market crash — growth assets take the biggest hit in downturns.",
+        "recession_vs_equity": "High equity exposure during a recession is risky — stocks historically drop 30–50% in prolonged downturns.",
+        "inflation_vs_bonds": "Adding bonds while inflation is high erodes real returns — consider TIPS or short-duration bonds instead.",
+        "no_sell_path": "You need liquidity soon but don't have enough low-risk assets to sell without crystallising big losses.",
+        "goal_impossible": "The annual return needed to hit your target far exceeds what any realistic portfolio can deliver.",
+        "income_in_crash": "Income-focused portfolios face dividend cuts during market crashes — companies prioritise survival over payouts.",
+        "cash_vs_equity_posture": "You can't move to safety and growth at the same time — pick a direction.",
+        "reduce_bond_in_crash": "Selling bonds during a crash removes your shock absorber — bonds typically rally when equities fall.",
+        "scenario_loss_equity_push": "Pushing into equities when the scenario projects double-digit losses amplifies your downside significantly.",
+        "near_withdrawal_equity_push": "Increasing equity exposure with a withdrawal less than 12 months away is risky — a dip could hurt your plans.",
+        "reduce_bonds_before_withdrawal": "Selling bonds just before a withdrawal removes your safest liquid asset.",
+        "unsat_model": "The market conditions you described create contradictory constraints — try simplifying the scenario.",
+    },
+    "caution": {
+        "flat_curve": "A flat yield curve signals market uncertainty about future growth — avoid aggressive bets in either direction.",
+        "goal_risky": "Hitting your target is possible but requires more risk than your conservative profile suggests.",
+        "trivial_drift": "Some suggested trades are tiny — weigh whether the transaction cost justifies the rebalance.",
+        "preservation_in_bull": "A preservation-focused portfolio will underperform in a bull market — that's the deliberate tradeoff.",
+        "equity_ceiling_breach": "Your equity allocation exceeds the typical ceiling for your risk profile — consider rebalancing toward bonds or cash.",
+        "beta_ceiling_breach": "Your portfolio beta is higher than recommended for your risk tolerance — a more volatile ride ahead.",
+        "buffer_too_low_breach": "Your bond + cash buffer is thin for your risk profile — you'd have limited dry powder in a downturn.",
+    },
+    "opportunity": {
+        "defensive_rotation": "Consider rotating toward defensive sectors (consumer staples, healthcare, utilities) that hold up in recessions.",
+        "financials_rotation": "Rising rates typically boost bank earnings — financial ETFs like XLF often outperform in rate-hike cycles.",
+        "real_assets": "High inflation + falling markets often favours real assets — commodity ETFs or TIPS can provide a hedge.",
+        "growth_stocks": "Normal yield curve + bull market is the ideal environment for growth-oriented equities.",
+        "recovery_signal": "Normal yield curve + bullish trend suggests economic expansion — a good time to add growth exposure.",
+    },
+    "review_holding":        "This position is down more than 20% — review whether the original investment thesis still holds.",
+    "stop_loss_review":      "This position is down over 30% — a stop-loss review is strongly recommended.",
+    "tax_loss_harvest":      "This losing position could be sold to offset gains elsewhere (tax-loss harvesting).",
+    "short_term_gain_warning": "Selling now triggers short-term capital gains tax — consider waiting past the 1-year mark.",
+    "overtrading":           "Too many trades at once — focus on the highest-impact moves first to keep costs down.",
+    "full_liquidation_risk": "This trade would sell your entire position — make sure that's intentional.",
+    "critically_low_balance": "After this withdrawal your portfolio balance will be dangerously low.",
+}
+
+_REC_MSGS: dict[tuple, str] = {
+    ("increase", "cash"):  "Move more of your portfolio into cash or money-market funds as a defensive buffer.",
+    ("reduce",   "bond"):  "Trim your bond allocation — current conditions favour less fixed-income exposure.",
+    ("increase", "bond"):  "Add more bonds to your portfolio for stability and recession protection.",
+    ("reduce",   "stock"): "Reduce your equity exposure to lower portfolio risk in this environment.",
+    ("increase", "stock"): "Increase your equity allocation to capture potential upside in this environment.",
+    ("reduce",   "etf"):   "Trim broad-market ETF positions that are overweight vs your target.",
+    ("increase", "etf"):   "Add broad-market ETF exposure for diversified upside.",
+}
+
+_VIOLATION_MSGS: dict[str, str] = {
+    "concentration":      "A single holding makes up too much of your portfolio (>35%) — this is excessive concentration risk.",
+    "type_concentration": "A single asset class exceeds 60% of your portfolio — diversification is limited.",
+    "under_diversified":  "Your portfolio has fewer than 3 holdings — more diversification is strongly recommended.",
+    "equity_ceiling":     "Your equity exposure exceeds the recommended ceiling for your risk profile.",
+    "beta_ceiling":       "Your portfolio beta is too high for your stated risk tolerance.",
+    "buffer_too_low":     "Your bond + cash buffer is below the minimum for your risk profile — you lack a safety net.",
+}
+
+def _flag_message(f: dict) -> str:
+    ft, fd = f.get("type", ""), f.get("detail", "")
+    node   = _FLAG_MSGS.get(ft)
+    if isinstance(node, dict):
+        return node.get(fd) or f"{ft}: {fd}"
+    if isinstance(node, str):
+        return f"{node} ({fd})"
+    return f"{ft}: {fd}"
+
+def _rec_message(r: dict) -> str:
+    key = (r.get("action", ""), r.get("target", ""))
+    return _REC_MSGS.get(key) or f"{r.get('action','').capitalize()} {r.get('target','').upper()} exposure."
+
+def _build_narrative(
+    verdict:         list[str],
+    flags:           list[dict],
+    violations:      list[dict],
+    recommendations: list[dict],
+    capm_data:       dict,
+    scenario_id:     str | None,
+    intent:          dict,
+) -> str:
+    v = verdict[0] if verdict else "proceed"
+    parts = []
+
+    # ── Opening verdict sentence ──────────────────────────────────────────
+    if v == "do_not_proceed":
+        parts.append("I'd recommend holding off on any major rebalancing right now.")
+    elif v == "proceed_with_caution":
+        parts.append("You can rebalance, but there are important things to watch out for first.")
+    else:
+        parts.append("Conditions look favourable — this is a reasonable time to rebalance.")
+
+    # ── CAPM math sentence ────────────────────────────────────────────────
+    er = capm_data.get("portfolio_expected_annual", 0) * 100 if capm_data else 0
+    rf = capm_data.get("risk_free_rate", 0) * 100 if capm_data else 4.5
+    pb = capm_data.get("portfolio_beta", 0) if capm_data else 0
+    if er > 0:
+        parts.append(
+            f"Your portfolio beta is {pb:.2f}, and with today's {rf:.1f}% risk-free rate "
+            f"(FRED 10-yr Treasury), CAPM puts your expected annual return at about {er:.1f}%."
+        )
+
+    # ── Goal / return-gap sentence ────────────────────────────────────────
+    tv = intent.get("target_value")
+    tl = intent.get("timeline_months")
+    rg = capm_data.get("return_gap", "achievable") if capm_data else "achievable"
+    if tv and tl:
+        years      = tl / 12
+        total_val  = capm_data.get("total_value", 0) if capm_data else 0
+        yr_label   = f"{years:.0f} year{'s' if years != 1 else ''}"
+        needed_pct = ((tv / total_val) ** (1 / max(years, 0.08)) - 1) * 100 if total_val > 0 else 0
+        if rg == "achievable":
+            parts.append(
+                f"Your goal of ${tv:,.0f} in {yr_label} is on track — "
+                f"your expected {er:.1f}% return is in the right ballpark."
+            )
+        elif rg == "high":
+            parts.append(
+                f"Reaching ${tv:,.0f} in {yr_label} would need ~{needed_pct:.0f}% annually — "
+                f"ambitious, but not impossible with a more growth-oriented allocation."
+            )
+        else:
+            parts.append(
+                f"Reaching ${tv:,.0f} in {yr_label} would require ~{needed_pct:.0f}% per year — "
+                f"far beyond what CAPM predicts for this portfolio. "
+                f"Consider a longer timeline, a lower target, or a significantly higher-risk allocation."
+            )
+    elif intent.get("withdrawal_months"):
+        wm = intent["withdrawal_months"]
+        parts.append(
+            f"With a withdrawal in {wm} month{'s' if wm != 1 else ''}, "
+            f"{'move defensive assets to the front of your sell queue.' if wm < 6 else 'protect your near-term liquidity above all else.'}"
+        )
+
+    # ── Classify flags ────────────────────────────────────────────────────
+    hard_violations = [v2 for v2 in violations
+                       if v2["type"] in ("concentration", "type_concentration", "under_diversified")]
+    conflicts = [f for f in flags if f.get("type") == "conflict"]
+    opps      = [f for f in flags if f.get("type") == "opportunity"]
+
+    # Top conflict or hard violation — most important signal
+    if hard_violations:
+        parts.append(_VIOLATION_MSGS.get(hard_violations[0]["type"], "A structural portfolio problem was detected."))
+    elif conflicts:
+        parts.append(_flag_message(conflicts[0]))
+
+    # Top opportunity
+    if opps:
+        parts.append(_flag_message(opps[0]))
+
+    # Recommendation summary if any
+    if recommendations:
+        moves = [f"{'↑' if r['action']=='increase' else '↓'} {r['target'].upper()}"
+                 for r in recommendations[:3]]
+        parts.append(f"Suggested moves: {', '.join(moves)}.")
+
+    return " ".join(parts)
 
 # ── URL helper ────────────────────────────────────────────────────────────────
 def request_path(handler: BaseHTTPRequestHandler) -> str:
@@ -641,6 +1091,31 @@ class Handler(BaseHTTPRequestHandler):
             with _users_lock:
                 profile = load_users().get(email, {}).get("investor_profile")
             return self._json({"profile": profile})
+        if p == "/api/user-scenarios":
+            email = self._require_auth()
+            if not email: return
+            scenarios = load_user_scenarios(email)
+            summaries = [
+                {
+                    "id":            s.get("id"),
+                    "timestamp":     s.get("timestamp"),
+                    "scenario_text": s.get("scenario_text"),
+                    "verdict":       s.get("verdict"),
+                    "verdict_label": s.get("verdict_label"),
+                    "trade_count":   s.get("trade_count", 0),
+                }
+                for s in scenarios
+            ]
+            return self._json({"scenarios": summaries})
+        if p.startswith("/api/user-scenarios/"):
+            email = self._require_auth()
+            if not email: return
+            sid = p.split("/api/user-scenarios/")[1]
+            scenarios = load_user_scenarios(email)
+            match = next((s for s in scenarios if s.get("id") == sid), None)
+            if not match:
+                return self._json({"error": "Not found"}, 404)
+            return self._json(match)
         self._json({"error": "Not found"}, 404)
 
     def do_POST(self):
@@ -751,7 +1226,266 @@ class Handler(BaseHTTPRequestHandler):
                     save_users(users)
             return self._json({"ok": True})
 
+        if p == "/api/chat":
+            try:
+                return self._handle_chat(email, body)
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                return self._json({"error": f"Chat error: {e}"}, 500)
+
+        if p == "/api/analyze":
+            try:
+                return self._handle_analyze(email, body)
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                return self._json({"error": f"Analyze error: {e}"}, 500)
+
         self._json({"error": "Not found"}, 404)
+
+    # ── Chat / rebalancing advisor ────────────────────────────────────────
+    def _handle_chat(self, email: str, body: dict):
+        message   = str(body.get("message", "")).strip()
+        portfolio = body.get("portfolio") or load_portfolio(email)
+        prices    = body.get("prices", {})
+
+        if not message:
+            return self._json({"error": "message is required"}, 400)
+
+        # 1. Parse intent from natural language
+        intent = parse_intent(message)
+
+        # 2. Fetch live betas (parallel, same as calc_risk)
+        holdings = portfolio.get("holdings", [])
+        betas: dict[str, float] = {}
+        def _get_beta(st: tuple[str, str]) -> tuple[str, float]:
+            sym, typ = st
+            try:
+                import yfinance as yf
+                b = yf.Ticker(sym).info.get("beta")
+                return sym, float(b) if b else TYPE_BETA.get(typ, 1.0)
+            except Exception:
+                return sym, TYPE_BETA.get(typ, 1.0)
+        if holdings:
+            with ThreadPoolExecutor(max_workers=min(len(holdings), 10)) as ex:
+                for sym, beta in ex.map(_get_beta, [(h["symbol"], h["type"]) for h in holdings]):
+                    betas[sym] = beta
+
+        # 3. Build market context
+        scenario_id = intent.get("scenario")
+        market_ctx  = dict(_SCENARIO_CONTEXT.get(scenario_id, {
+            "vix_level": "moderate", "market_trend": "neutral",
+            "yield_curve": "normal",  "rate_environment": "stable",
+            "inflation_level": "moderate",
+        }))
+        market_ctx["scenario"] = scenario_id
+        # Intent overrides
+        for key in ("vix_level", "market_trend", "yield_curve", "rate_environment", "inflation_level"):
+            if key in intent:
+                market_ctx[key] = intent[key]
+
+        # 4. CAPM expected return
+        capm_data = calc_capm(portfolio, prices, betas)
+        target_val = intent.get("target_value")
+        tl_months  = intent.get("timeline_months")
+        rg = calc_return_gap(
+            capm_data["total_value"], target_val, tl_months,
+            capm_data["portfolio_expected_annual"],
+        ) if target_val else "achievable"
+        capm_data["return_gap"] = rg
+
+        # 5. Build goal context
+        goal_ctx = {
+            "type":              intent.get("goal_type", "growth"),
+            "target_value":      target_val,
+            "timeline_months":   tl_months,
+            "withdrawal_months": intent.get("withdrawal_months"),
+        }
+
+        # 6. Run ASP planner
+        asp = _run_planner(portfolio, prices, betas, market_ctx, goal_ctx, capm_data)
+
+        # 7. Run scenario simulation if scenario detected
+        scenario_result = None
+        if scenario_id and scenario_id in SCENARIOS:
+            scenario_result = calc_scenario(portfolio, prices, scenario_id)
+
+        # 8. Build human-readable narrative
+        narrative = _build_narrative(
+            asp["verdict"], asp["flags"], asp["violations"],
+            asp["recommendations"], capm_data, scenario_id, intent,
+        )
+
+        # 9. Enrich flags/recs with messages
+        enriched_flags = [
+            {**f, "message": _flag_message(f)} for f in asp["flags"]
+        ]
+        enriched_recs = [
+            {**r, "message": _rec_message(r)} for r in asp["recommendations"]
+        ]
+        enriched_violations = [
+            {**v, "message": _VIOLATION_MSGS.get(v["type"], v["type"])}
+            for v in asp["violations"]
+        ]
+
+        # 10. Prefer-sell liquidation order (top 5)
+        prefer_sell_out = asp.get("prefer_sell", [])[:5]
+
+        verdict_val = asp["verdict"][0] if asp["verdict"] else "proceed"
+        verdict_map = {
+            "proceed":              {"label": "Proceed",              "color": "green"},
+            "proceed_with_caution": {"label": "Proceed with Caution", "color": "yellow"},
+            "do_not_proceed":       {"label": "Do Not Proceed",       "color": "red"},
+        }
+
+        return self._json({
+            "verdict":         verdict_val,
+            "verdict_label":   verdict_map[verdict_val]["label"],
+            "verdict_color":   verdict_map[verdict_val]["color"],
+            "narrative":       narrative,
+            "flags":           enriched_flags,
+            "violations":      enriched_violations,
+            "recommendations": enriched_recs,
+            "prefer_sell":     prefer_sell_out,
+            "math": {
+                "portfolio_beta":           capm_data["portfolio_beta"],
+                "risk_free_rate":           capm_data["risk_free_rate"],
+                "portfolio_expected_annual": capm_data["portfolio_expected_annual"],
+                "return_gap":               rg,
+                "target_value":             target_val,
+                "timeline_months":          tl_months,
+                "capm_source":              capm_data["source"],
+            },
+            "scenario_result": scenario_result,
+            "parsed_intent":   intent,
+            "planner_engine":  "clingo" if PLANNER_AVAILABLE else "python-fallback",
+        })
+
+    # ── Scenario analyzer + rebalance planner ────────────────────────────
+    def _handle_analyze(self, email: str, body: dict):
+        message   = str(body.get("message", "")).strip()
+        portfolio = body.get("portfolio") or load_portfolio(email)
+        prices    = body.get("prices", {})
+
+        if not message:
+            return self._json({"error": "message is required"}, 400)
+
+        # Load investor profile from user record (set by OnboardingScreen)
+        with _users_lock:
+            profile = load_users().get(email, {}).get("investor_profile") or {}
+
+        # 1. Parse intent
+        intent = parse_intent(message)
+
+        # 2. Fetch live betas (parallel)
+        holdings = portfolio.get("holdings", [])
+        betas: dict[str, float] = {}
+        def _get_beta(st: tuple[str, str]) -> tuple[str, float]:
+            sym, typ = st
+            try:
+                import yfinance as yf
+                b = yf.Ticker(sym).info.get("beta")
+                return sym, float(b) if b else TYPE_BETA.get(typ, 1.0)
+            except Exception:
+                return sym, TYPE_BETA.get(typ, 1.0)
+        if holdings:
+            with ThreadPoolExecutor(max_workers=min(len(holdings), 10)) as ex:
+                for sym, beta in ex.map(_get_beta, [(h["symbol"], h["type"]) for h in holdings]):
+                    betas[sym] = beta
+
+        # 3. Market context from scenario + intent
+        scenario_id = intent.get("scenario")
+        market_ctx  = dict(_SCENARIO_CONTEXT.get(scenario_id, {
+            "vix_level": "moderate", "market_trend": "neutral",
+            "yield_curve": "normal",  "rate_environment": "stable",
+            "inflation_level": "moderate",
+        }))
+        market_ctx["scenario"] = scenario_id
+        for key in ("vix_level", "market_trend", "yield_curve", "rate_environment", "inflation_level"):
+            if key in intent:
+                market_ctx[key] = intent[key]
+
+        # 4. CAPM + return gap
+        capm_data  = calc_capm(portfolio, prices, betas)
+        target_val = intent.get("target_value")
+        tl_months  = intent.get("timeline_months")
+        rg = calc_return_gap(
+            capm_data["total_value"], target_val, tl_months,
+            capm_data["portfolio_expected_annual"],
+        ) if target_val else "achievable"
+        capm_data["return_gap"] = rg
+
+        # 5. Goal context for ASP
+        goal_ctx = {
+            "type":              intent.get("goal_type", profile.get("goal", "growth").lower()),
+            "target_value":      target_val,
+            "timeline_months":   tl_months,
+            "withdrawal_months": intent.get("withdrawal_months"),
+        }
+
+        # 6. ASP planner verdict
+        asp = _run_planner(portfolio, prices, betas, market_ctx, goal_ctx, capm_data)
+
+        # 7. Concrete rebalance plan
+        rebalance_plan, reasoning = _generate_rebalance_plan(
+            portfolio, prices, betas, profile, scenario_id, asp,
+        )
+
+        # 8. Scenario simulation (price shock)
+        scenario_result = None
+        if scenario_id and scenario_id in SCENARIOS:
+            scenario_result = calc_scenario(portfolio, prices, scenario_id)
+
+        # 9. Narrative + enriched flags
+        narrative = _build_narrative(
+            asp["verdict"], asp["flags"], asp["violations"],
+            asp["recommendations"], capm_data, scenario_id, intent,
+        )
+        enriched_flags      = [{**f, "message": _flag_message(f)} for f in asp["flags"]]
+        enriched_violations = [{**v, "message": _VIOLATION_MSGS.get(v["type"], v["type"])}
+                               for v in asp["violations"]]
+        enriched_recs       = [{**r, "message": _rec_message(r)} for r in asp["recommendations"]]
+
+        verdict_val = (asp["verdict"] or ["proceed"])[0]
+        verdict_map = {
+            "proceed":              {"label": "Proceed",              "color": "green"},
+            "proceed_with_caution": {"label": "Proceed with Caution", "color": "yellow"},
+            "do_not_proceed":       {"label": "Do Not Proceed",       "color": "red"},
+        }
+        v_info = verdict_map.get(verdict_val, verdict_map["proceed"])
+
+        # 10. Persist scenario record
+        record = {
+            "id":            str(uuid.uuid4()),
+            "timestamp":     time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime()),
+            "scenario_text": message,
+            "parsed_intent": intent,
+            "verdict":       verdict_val,
+            "verdict_label": v_info["label"],
+            "verdict_color": v_info["color"],
+            "trade_count":   len(rebalance_plan.get("trades", [])),
+            "narrative":     narrative,
+            "reasoning":     reasoning,
+            "rebalance":     rebalance_plan,
+            "flags":         enriched_flags,
+            "violations":    enriched_violations,
+            "recommendations": enriched_recs,
+            "math": {
+                "portfolio_beta":            capm_data["portfolio_beta"],
+                "risk_free_rate":            capm_data["risk_free_rate"],
+                "portfolio_expected_annual": capm_data["portfolio_expected_annual"],
+                "return_gap":                rg,
+                "target_value":              target_val,
+                "timeline_months":           tl_months,
+                "capm_source":               capm_data["source"],
+            },
+            "scenario_result": scenario_result,
+            "planner_engine":  "clingo" if PLANNER_AVAILABLE else "python-fallback",
+            "profile_used":    profile,
+        }
+        save_user_scenario(email, record)
+        return self._json(record)
 
 
 if __name__ == "__main__":

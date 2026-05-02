@@ -1,0 +1,1013 @@
+{
+  "ts": 1777699950.209735,
+  "universe": {
+    "us_equity_broad": [
+      {
+        "ticker": "CATH",
+        "bucket": "us_equity_broad",
+        "label": "US Broad Market",
+        "price": 86.63,
+        "volume": 45767,
+        "beta": 0.0,
+        "aum": 1091173504
+      },
+      {
+        "ticker": "BLUX",
+        "bucket": "us_equity_broad",
+        "label": "US Broad Market",
+        "price": 30.52,
+        "volume": 53335,
+        "beta": 0.0,
+        "aum": 417351360
+      },
+      {
+        "ticker": "BUFP",
+        "bucket": "us_equity_broad",
+        "label": "US Broad Market",
+        "price": 31.43,
+        "volume": 36232,
+        "beta": 0.0,
+        "aum": 134744912
+      },
+      {
+        "ticker": "CPSL",
+        "bucket": "us_equity_broad",
+        "label": "US Broad Market",
+        "price": 27.71,
+        "volume": 20737,
+        "beta": 0.0,
+        "aum": 107549504
+      },
+      {
+        "ticker": "CPSM",
+        "bucket": "us_equity_broad",
+        "label": "US Broad Market",
+        "price": 29.11,
+        "volume": 4320,
+        "beta": 0.0,
+        "aum": 53451824
+      },
+      {
+        "ticker": "CPSD",
+        "bucket": "us_equity_broad",
+        "label": "US Broad Market",
+        "price": 26.45,
+        "volume": 1782,
+        "beta": 0.0,
+        "aum": 44191432
+      },
+      {
+        "ticker": "CPSA",
+        "bucket": "us_equity_broad",
+        "label": "US Broad Market",
+        "price": 27.5,
+        "volume": 2469,
+        "beta": 0.0,
+        "aum": 43100024
+      },
+      {
+        "ticker": "CPSJ",
+        "bucket": "us_equity_broad",
+        "label": "US Broad Market",
+        "price": 27.42,
+        "volume": 1987,
+        "beta": 0.0,
+        "aum": 40410596
+      },
+      {
+        "ticker": "CPSN",
+        "bucket": "us_equity_broad",
+        "label": "US Broad Market",
+        "price": 27.39,
+        "volume": 2429,
+        "beta": 0.0,
+        "aum": 33574280
+      },
+      {
+        "ticker": "CPSF",
+        "bucket": "us_equity_broad",
+        "label": "US Broad Market",
+        "price": 26.03,
+        "volume": 7787,
+        "beta": 0.0,
+        "aum": 32692848
+      }
+    ],
+    "us_equity_growth": [
+      {
+        "ticker": "BGIG",
+        "bucket": "us_equity_growth",
+        "label": "US Growth Equity",
+        "price": 34.86,
+        "volume": 100111,
+        "beta": 0.0,
+        "aum": 2039110656
+      },
+      {
+        "ticker": "BASG",
+        "bucket": "us_equity_growth",
+        "label": "US Growth Equity",
+        "price": 25.21,
+        "volume": 55401,
+        "beta": 0.0,
+        "aum": 430942432
+      },
+      {
+        "ticker": "CAML",
+        "bucket": "us_equity_growth",
+        "label": "US Growth Equity",
+        "price": 39.03,
+        "volume": 37088,
+        "beta": 0.0,
+        "aum": 339719040
+      },
+      {
+        "ticker": "BUFG",
+        "bucket": "us_equity_growth",
+        "label": "US Growth Equity",
+        "price": 28.64,
+        "volume": 38151,
+        "beta": 0.0,
+        "aum": 286055616
+      },
+      {
+        "ticker": "ADME",
+        "bucket": "us_equity_growth",
+        "label": "US Growth Equity",
+        "price": 54.15,
+        "volume": 16435,
+        "beta": 0.0,
+        "aum": 231543744
+      },
+      {
+        "ticker": "BLGR",
+        "bucket": "us_equity_growth",
+        "label": "US Growth Equity",
+        "price": 30.47,
+        "volume": 24654,
+        "beta": 0.0,
+        "aum": 200627776
+      },
+      {
+        "ticker": "BUL",
+        "bucket": "us_equity_growth",
+        "label": "US Growth Equity",
+        "price": 56.94,
+        "volume": 15235,
+        "beta": 0.0,
+        "aum": 118776264
+      },
+      {
+        "ticker": "BKCG",
+        "bucket": "us_equity_growth",
+        "label": "US Growth Equity",
+        "price": 37.33,
+        "volume": 3270,
+        "beta": 0.0,
+        "aum": 110350720
+      },
+      {
+        "ticker": "BAMG",
+        "bucket": "us_equity_growth",
+        "label": "US Growth Equity",
+        "price": 40.89,
+        "volume": 26664,
+        "beta": 0.0,
+        "aum": 109642200
+      },
+      {
+        "ticker": "AGRW",
+        "bucket": "us_equity_growth",
+        "label": "US Growth Equity",
+        "price": 30.71,
+        "volume": 6137,
+        "beta": 0.0,
+        "aum": 94613688
+      }
+    ],
+    "us_equity_value": [
+      {
+        "ticker": "AVUV",
+        "bucket": "us_equity_value",
+        "label": "US Value Equity",
+        "price": 119.96,
+        "volume": 1156816,
+        "beta": 0.0,
+        "aum": 23433220096
+      },
+      {
+        "ticker": "AVDV",
+        "bucket": "us_equity_value",
+        "label": "US Value Equity",
+        "price": 105.61,
+        "volume": 829364,
+        "beta": 0.0,
+        "aum": 17260677120
+      },
+      {
+        "ticker": "AVLV",
+        "bucket": "us_equity_value",
+        "label": "US Value Equity",
+        "price": 86.46,
+        "volume": 707882,
+        "beta": 0.0,
+        "aum": 10413878272
+      },
+      {
+        "ticker": "AVES",
+        "bucket": "us_equity_value",
+        "label": "US Value Equity",
+        "price": 65.43,
+        "volume": 134567,
+        "beta": 0.0,
+        "aum": 1246687872
+      },
+      {
+        "ticker": "AVIV",
+        "bucket": "us_equity_value",
+        "label": "US Value Equity",
+        "price": 77.82,
+        "volume": 87648,
+        "beta": 0.0,
+        "aum": 1189143808
+      },
+      {
+        "ticker": "AVMV",
+        "bucket": "us_equity_value",
+        "label": "US Value Equity",
+        "price": 78.55,
+        "volume": 41769,
+        "beta": 0.0,
+        "aum": 510226688
+      },
+      {
+        "ticker": "AIVL",
+        "bucket": "us_equity_value",
+        "label": "US Value Equity",
+        "price": 122.77,
+        "volume": 2314,
+        "beta": 0.0,
+        "aum": 373609504
+      },
+      {
+        "ticker": "BASV",
+        "bucket": "us_equity_value",
+        "label": "US Value Equity",
+        "price": 28.63,
+        "volume": 41653,
+        "beta": 0.0,
+        "aum": 324952640
+      },
+      {
+        "ticker": "AVGV",
+        "bucket": "us_equity_value",
+        "label": "US Value Equity",
+        "price": 82.83,
+        "volume": 29977,
+        "beta": 0.0,
+        "aum": 284022208
+      },
+      {
+        "ticker": "ASLV",
+        "bucket": "us_equity_value",
+        "label": "US Value Equity",
+        "price": 29.61,
+        "volume": 22674,
+        "beta": 0.0,
+        "aum": 223260384
+      }
+    ],
+    "dividend": [
+      {
+        "ticker": "CGDG",
+        "bucket": "dividend",
+        "label": "Dividend / Income",
+        "price": 37.23,
+        "volume": 783904,
+        "beta": 0.0,
+        "aum": 4545876992
+      },
+      {
+        "ticker": "DEM",
+        "bucket": "dividend",
+        "label": "Dividend / Income",
+        "price": 52.62,
+        "volume": 290070,
+        "beta": 0.0,
+        "aum": 3470680320
+      },
+      {
+        "ticker": "DES",
+        "bucket": "dividend",
+        "label": "Dividend / Income",
+        "price": 38.64,
+        "volume": 127964,
+        "beta": 0.0,
+        "aum": 1941842304
+      },
+      {
+        "ticker": "DGS",
+        "bucket": "dividend",
+        "label": "Dividend / Income",
+        "price": 63.96,
+        "volume": 103993,
+        "beta": 0.0,
+        "aum": 1640714624
+      },
+      {
+        "ticker": "DHS",
+        "bucket": "dividend",
+        "label": "Dividend / Income",
+        "price": 111.64,
+        "volume": 37635,
+        "beta": 0.0,
+        "aum": 1431054208
+      },
+      {
+        "ticker": "DIVB",
+        "bucket": "dividend",
+        "label": "Dividend / Income",
+        "price": 57.6,
+        "volume": 111058,
+        "beta": 0.0,
+        "aum": 1262228096
+      },
+      {
+        "ticker": "DIV",
+        "bucket": "dividend",
+        "label": "Dividend / Income",
+        "price": 19.51,
+        "volume": 300711,
+        "beta": 0.0,
+        "aum": 711477248
+      },
+      {
+        "ticker": "BGDV",
+        "bucket": "dividend",
+        "label": "Dividend / Income",
+        "price": 30.08,
+        "volume": 10898,
+        "beta": 0.0,
+        "aum": 710986112
+      },
+      {
+        "ticker": "BIDD",
+        "bucket": "dividend",
+        "label": "Dividend / Income",
+        "price": 30.39,
+        "volume": 51770,
+        "beta": 0.0,
+        "aum": 415555680
+      },
+      {
+        "ticker": "DFJ",
+        "bucket": "dividend",
+        "label": "Dividend / Income",
+        "price": 103.38,
+        "volume": 44959,
+        "beta": 0.0,
+        "aum": 387673184
+      }
+    ],
+    "international": [
+      {
+        "ticker": "AVEM",
+        "bucket": "international",
+        "label": "International Equity",
+        "price": 90.53,
+        "volume": 2142862,
+        "beta": 0.0,
+        "aum": 19935643648
+      },
+      {
+        "ticker": "AVDE",
+        "bucket": "international",
+        "label": "International Equity",
+        "price": 89.32,
+        "volume": 1236351,
+        "beta": 0.0,
+        "aum": 14400534528
+      },
+      {
+        "ticker": "ACWX",
+        "bucket": "international",
+        "label": "International Equity",
+        "price": 73.65,
+        "volume": 3033130,
+        "beta": 0.0,
+        "aum": 9372976128
+      },
+      {
+        "ticker": "BBAX",
+        "bucket": "international",
+        "label": "International Equity",
+        "price": 61.9,
+        "volume": 275653,
+        "beta": 0.0,
+        "aum": 6089742336
+      },
+      {
+        "ticker": "AAXJ",
+        "bucket": "international",
+        "label": "International Equity",
+        "price": 110.14,
+        "volume": 1094091,
+        "beta": 0.0,
+        "aum": 3340816384
+      },
+      {
+        "ticker": "AIA",
+        "bucket": "international",
+        "label": "International Equity",
+        "price": 125.28,
+        "volume": 477864,
+        "beta": 0.0,
+        "aum": 3337159424
+      },
+      {
+        "ticker": "APIE",
+        "bucket": "international",
+        "label": "International Equity",
+        "price": 37.62,
+        "volume": 54979,
+        "beta": 0.0,
+        "aum": 950378432
+      },
+      {
+        "ticker": "BBEM",
+        "bucket": "international",
+        "label": "International Equity",
+        "price": 73.69,
+        "volume": 46996,
+        "beta": 0.0,
+        "aum": 714820288
+      },
+      {
+        "ticker": "AVNM",
+        "bucket": "international",
+        "label": "International Equity",
+        "price": 81.62,
+        "volume": 69401,
+        "beta": 0.0,
+        "aum": 556476224
+      },
+      {
+        "ticker": "AVSD",
+        "bucket": "international",
+        "label": "International Equity",
+        "price": 78.31,
+        "volume": 13779,
+        "beta": 0.0,
+        "aum": 411701024
+      }
+    ],
+    "bonds_short": [
+      {
+        "ticker": "BSV",
+        "bucket": "bonds_short",
+        "label": "Short-Term Bonds",
+        "price": 78.08,
+        "volume": 2623666,
+        "beta": 0.0,
+        "aum": 69754806272
+      },
+      {
+        "ticker": "CGSD",
+        "bucket": "bonds_short",
+        "label": "Short-Term Bonds",
+        "price": 25.81,
+        "volume": 477708,
+        "beta": 0.0,
+        "aum": 2137110016
+      },
+      {
+        "ticker": "CGSM",
+        "bucket": "bonds_short",
+        "label": "Short-Term Bonds",
+        "price": 26.31,
+        "volume": 279056,
+        "beta": 0.0,
+        "aum": 1110300672
+      },
+      {
+        "ticker": "BILZ",
+        "bucket": "bonds_short",
+        "label": "Short-Term Bonds",
+        "price": 100.69,
+        "volume": 288683,
+        "beta": 0.0,
+        "aum": 924930368
+      },
+      {
+        "ticker": "BKUI",
+        "bucket": "bonds_short",
+        "label": "Short-Term Bonds",
+        "price": 49.64,
+        "volume": 161398,
+        "beta": 0.0,
+        "aum": 550082368
+      },
+      {
+        "ticker": "BKMS",
+        "bucket": "bonds_short",
+        "label": "Short-Term Bonds",
+        "price": 25.49,
+        "volume": 47098,
+        "beta": 0.0,
+        "aum": 439826176
+      },
+      {
+        "ticker": "CGUI",
+        "bucket": "bonds_short",
+        "label": "Short-Term Bonds",
+        "price": 25.31,
+        "volume": 134079,
+        "beta": 0.0,
+        "aum": 231947648
+      },
+      {
+        "ticker": "CSHP",
+        "bucket": "bonds_short",
+        "label": "Short-Term Bonds",
+        "price": 99.33,
+        "volume": 4138,
+        "beta": 0.0,
+        "aum": 197701088
+      },
+      {
+        "ticker": "BLST",
+        "bucket": "bonds_short",
+        "label": "Short-Term Bonds",
+        "price": 25.07,
+        "volume": 20087,
+        "beta": 0.0,
+        "aum": 146002240
+      },
+      {
+        "ticker": "BRLN",
+        "bucket": "bonds_short",
+        "label": "Short-Term Bonds",
+        "price": 50.69,
+        "volume": 8674,
+        "beta": 0.0,
+        "aum": 56139008
+      }
+    ],
+    "bonds_medium": [
+      {
+        "ticker": "BND",
+        "bucket": "bonds_medium",
+        "label": "Core Bonds",
+        "price": 73.36,
+        "volume": 8665095,
+        "beta": 0.0,
+        "aum": 387461611520
+      },
+      {
+        "ticker": "AGG",
+        "bucket": "bonds_medium",
+        "label": "Core Bonds",
+        "price": 98.9,
+        "volume": 10061924,
+        "beta": 0.0,
+        "aum": 138698178560
+      },
+      {
+        "ticker": "CGCB",
+        "bucket": "bonds_medium",
+        "label": "Core Bonds",
+        "price": 26.22,
+        "volume": 1177417,
+        "beta": 0.0,
+        "aum": 4581028352
+      },
+      {
+        "ticker": "BKAG",
+        "bucket": "bonds_medium",
+        "label": "Core Bonds",
+        "price": 41.92,
+        "volume": 199614,
+        "beta": 0.0,
+        "aum": 2089782528
+      },
+      {
+        "ticker": "BBAG",
+        "bucket": "bonds_medium",
+        "label": "Core Bonds",
+        "price": 45.92,
+        "volume": 98619,
+        "beta": 0.0,
+        "aum": 1132887040
+      },
+      {
+        "ticker": "APCB",
+        "bucket": "bonds_medium",
+        "label": "Core Bonds",
+        "price": 29.37,
+        "volume": 62580,
+        "beta": 0.0,
+        "aum": 914631296
+      },
+      {
+        "ticker": "AGGY",
+        "bucket": "bonds_medium",
+        "label": "Core Bonds",
+        "price": 43.52,
+        "volume": 76000,
+        "beta": 0.0,
+        "aum": 882454464
+      },
+      {
+        "ticker": "AGGH",
+        "bucket": "bonds_medium",
+        "label": "Core Bonds",
+        "price": 20.3,
+        "volume": 196070,
+        "beta": 0.0,
+        "aum": 431285728
+      },
+      {
+        "ticker": "BDBT",
+        "bucket": "bonds_medium",
+        "label": "Core Bonds",
+        "price": 25.22,
+        "volume": 58241,
+        "beta": 0.0,
+        "aum": 419807936
+      },
+      {
+        "ticker": "CAFX",
+        "bucket": "bonds_medium",
+        "label": "Core Bonds",
+        "price": 24.72,
+        "volume": 53720,
+        "beta": 0.0,
+        "aum": 330396128
+      }
+    ],
+    "bonds_long": [
+      {
+        "ticker": "BLV",
+        "bucket": "bonds_long",
+        "label": "Long-Term Bonds",
+        "price": 68.31,
+        "volume": 922167,
+        "beta": 0.0,
+        "aum": 8662070272
+      },
+      {
+        "ticker": "BLTD",
+        "bucket": "bonds_long",
+        "label": "Long-Term Bonds",
+        "price": 25.13,
+        "volume": 21003,
+        "beta": 0.0,
+        "aum": 142130864
+      },
+      {
+        "ticker": "BBLB",
+        "bucket": "bonds_long",
+        "label": "Long-Term Bonds",
+        "price": 80.97,
+        "volume": 5833,
+        "beta": 0.0,
+        "aum": 5928543
+      }
+    ],
+    "bonds_tips": [],
+    "bonds_corporate": [
+      {
+        "ticker": "BSCR",
+        "bucket": "bonds_corporate",
+        "label": "Corporate Bonds",
+        "price": 19.65,
+        "volume": 830030,
+        "beta": 0.0,
+        "aum": 4663071232
+      },
+      {
+        "ticker": "BSCQ",
+        "bucket": "bonds_corporate",
+        "label": "Corporate Bonds",
+        "price": 19.54,
+        "volume": 918316,
+        "beta": 0.0,
+        "aum": 4024314624
+      },
+      {
+        "ticker": "BSCS",
+        "bucket": "bonds_corporate",
+        "label": "Corporate Bonds",
+        "price": 20.43,
+        "volume": 734391,
+        "beta": 0.0,
+        "aum": 3406477568
+      },
+      {
+        "ticker": "ANGL",
+        "bucket": "bonds_corporate",
+        "label": "Corporate Bonds",
+        "price": 29.14,
+        "volume": 1023843,
+        "beta": 0.0,
+        "aum": 3009064960
+      },
+      {
+        "ticker": "BSCT",
+        "bucket": "bonds_corporate",
+        "label": "Corporate Bonds",
+        "price": 18.66,
+        "volume": 712495,
+        "beta": 0.0,
+        "aum": 2826968576
+      },
+      {
+        "ticker": "BSCU",
+        "bucket": "bonds_corporate",
+        "label": "Corporate Bonds",
+        "price": 16.73,
+        "volume": 635435,
+        "beta": 0.0,
+        "aum": 2467401216
+      },
+      {
+        "ticker": "BSCV",
+        "bucket": "bonds_corporate",
+        "label": "Corporate Bonds",
+        "price": 16.48,
+        "volume": 540069,
+        "beta": 0.0,
+        "aum": 1627316224
+      },
+      {
+        "ticker": "BSCW",
+        "bucket": "bonds_corporate",
+        "label": "Corporate Bonds",
+        "price": 20.61,
+        "volume": 292938,
+        "beta": 0.0,
+        "aum": 1388898176
+      },
+      {
+        "ticker": "BSJQ",
+        "bucket": "bonds_corporate",
+        "label": "Corporate Bonds",
+        "price": 23.2,
+        "volume": 264469,
+        "beta": 0.0,
+        "aum": 1094960256
+      },
+      {
+        "ticker": "BSCX",
+        "bucket": "bonds_corporate",
+        "label": "Corporate Bonds",
+        "price": 21.17,
+        "volume": 197259,
+        "beta": 0.0,
+        "aum": 931490368
+      }
+    ],
+    "defensive": [
+      {
+        "ticker": "ACWV",
+        "bucket": "defensive",
+        "label": "Defensive / Low-Vol",
+        "price": 120.9,
+        "volume": 146922,
+        "beta": 0.0,
+        "aum": 3312949248
+      },
+      {
+        "ticker": "BUFT",
+        "bucket": "defensive",
+        "label": "Defensive / Low-Vol",
+        "price": 25.65,
+        "volume": 22396,
+        "beta": 0.0,
+        "aum": 140039616
+      },
+      {
+        "ticker": "CURE",
+        "bucket": "defensive",
+        "label": "Defensive / Low-Vol",
+        "price": 87.83,
+        "volume": 49025,
+        "beta": 0.0,
+        "aum": 128456696
+      },
+      {
+        "ticker": "DVUT",
+        "bucket": "defensive",
+        "label": "Defensive / Low-Vol",
+        "price": 28.55,
+        "volume": 493,
+        "beta": 0.0,
+        "aum": 276188
+      },
+      {
+        "ticker": "DVXP",
+        "bucket": "defensive",
+        "label": "Defensive / Low-Vol",
+        "price": 25.34,
+        "volume": 332,
+        "beta": 0.0,
+        "aum": 246734
+      }
+    ],
+    "real_estate": [
+      {
+        "ticker": "DFGR",
+        "bucket": "real_estate",
+        "label": "Real Estate (REITs)",
+        "price": 28.8,
+        "volume": 375940,
+        "beta": 0.0,
+        "aum": 3192431360
+      },
+      {
+        "ticker": "DFAR",
+        "bucket": "real_estate",
+        "label": "Real Estate (REITs)",
+        "price": 25.77,
+        "volume": 1860851,
+        "beta": 0.0,
+        "aum": 1558954880
+      },
+      {
+        "ticker": "BBRE",
+        "bucket": "real_estate",
+        "label": "Real Estate (REITs)",
+        "price": 104.07,
+        "volume": 22716,
+        "beta": 0.0,
+        "aum": 1028889216
+      },
+      {
+        "ticker": "AVRE",
+        "bucket": "real_estate",
+        "label": "Real Estate (REITs)",
+        "price": 47.62,
+        "volume": 62620,
+        "beta": 0.0,
+        "aum": 719890112
+      },
+      {
+        "ticker": "DCRE",
+        "bucket": "real_estate",
+        "label": "Real Estate (REITs)",
+        "price": 51.77,
+        "volume": 43585,
+        "beta": 0.0,
+        "aum": 405932416
+      },
+      {
+        "ticker": "CSRE",
+        "bucket": "real_estate",
+        "label": "Real Estate (REITs)",
+        "price": 28.66,
+        "volume": 126282,
+        "beta": 0.0,
+        "aum": 289827488
+      },
+      {
+        "ticker": "BLDG",
+        "bucket": "real_estate",
+        "label": "Real Estate (REITs)",
+        "price": 25.86,
+        "volume": 18051,
+        "beta": 0.0,
+        "aum": 47479700
+      },
+      {
+        "ticker": "DRN",
+        "bucket": "real_estate",
+        "label": "Real Estate (REITs)",
+        "price": 10.82,
+        "volume": 1119700,
+        "beta": 0.0,
+        "aum": 46006460
+      },
+      {
+        "ticker": "DRV",
+        "bucket": "real_estate",
+        "label": "Real Estate (REITs)",
+        "price": 19.53,
+        "volume": 172845,
+        "beta": 0.0,
+        "aum": 36984460
+      },
+      {
+        "ticker": "BYRE",
+        "bucket": "real_estate",
+        "label": "Real Estate (REITs)",
+        "price": 27.15,
+        "volume": 4564,
+        "beta": 0.0,
+        "aum": 23506224
+      }
+    ],
+    "commodities": [
+      {
+        "ticker": "AAAU",
+        "bucket": "commodities",
+        "label": "Commodities & Gold",
+        "price": 45.46,
+        "volume": 2908530,
+        "beta": 0.0,
+        "aum": 2819811840
+      },
+      {
+        "ticker": "BCI",
+        "bucket": "commodities",
+        "label": "Commodities & Gold",
+        "price": 25.22,
+        "volume": 1844908,
+        "beta": 0.0,
+        "aum": 2518024704
+      },
+      {
+        "ticker": "CERY",
+        "bucket": "commodities",
+        "label": "Commodities & Gold",
+        "price": 37.27,
+        "volume": 237122,
+        "beta": 0.0,
+        "aum": 973527232
+      },
+      {
+        "ticker": "CMDT",
+        "bucket": "commodities",
+        "label": "Commodities & Gold",
+        "price": 33.92,
+        "volume": 178638,
+        "beta": 0.0,
+        "aum": 747775104
+      },
+      {
+        "ticker": "CMDY",
+        "bucket": "commodities",
+        "label": "Commodities & Gold",
+        "price": 61.99,
+        "volume": 81411,
+        "beta": 0.0,
+        "aum": 478180288
+      },
+      {
+        "ticker": "BCD",
+        "bucket": "commodities",
+        "label": "Commodities & Gold",
+        "price": 37.4,
+        "volume": 68690,
+        "beta": 0.0,
+        "aum": 386179136
+      },
+      {
+        "ticker": "CCNR",
+        "bucket": "commodities",
+        "label": "Commodities & Gold",
+        "price": 41.1,
+        "volume": 54445,
+        "beta": 0.0,
+        "aum": 375646688
+      },
+      {
+        "ticker": "COM",
+        "bucket": "commodities",
+        "label": "Commodities & Gold",
+        "price": 34.45,
+        "volume": 170503,
+        "beta": 0.0,
+        "aum": 232850304
+      },
+      {
+        "ticker": "COMB",
+        "bucket": "commodities",
+        "label": "Commodities & Gold",
+        "price": 27.26,
+        "volume": 72975,
+        "beta": 0.0,
+        "aum": 174356752
+      },
+      {
+        "ticker": "ACES",
+        "bucket": "commodities",
+        "label": "Commodities & Gold",
+        "price": 35.71,
+        "volume": 107354,
+        "beta": 0.0,
+        "aum": 112079968
+      }
+    ],
+    "financials": [
+      {
+        "ticker": "DVXF",
+        "bucket": "financials",
+        "label": "Financials",
+        "price": 23.7,
+        "volume": 324,
+        "beta": 0.0,
+        "aum": 217413
+      }
+    ]
+  }
+}

@@ -1,0 +1,3063 @@
+[
+  {
+    "id": "b6d58033-a144-4a46-bc26-db5b7a9f3fa2",
+    "timestamp": "2026-05-02T05:39:58",
+    "scenario_text": "What if healthcare market is crashing",
+    "parsed_intent": {
+      "scenario": "tech_selloff",
+      "market_trend": "bearish",
+      "goal_type": "preservation"
+    },
+    "verdict": "proceed_with_caution",
+    "verdict_label": "Proceed with Caution",
+    "verdict_color": "yellow",
+    "trade_count": 13,
+    "narrative": "You can rebalance, but there are important things to watch out for first. Your portfolio beta is 0.72, and with today's 4.3% risk-free rate (FRED 10-yr Treasury), CAPM puts your expected annual return at about 7.7%.",
+    "reasoning": "Given a Tech Selloff scenario and your low risk profile, this plan realigns your portfolio toward your target allocation. Trim: AAPL (sell 5 shares), MSFT (sell 3 shares), VOO (sell 3 shares). Add: ACWV (buy 18 shares), CGDG (buy 60 shares), AVEM (buy 16 shares). Biggest overweight: US Growth Equity at 32% vs 0% target \u2014 trimming here frees up capital. Some risk signals are active \u2014 proceed carefully and monitor the flagged items.",
+    "rebalance": {
+      "target_allocation": {
+        "us_equity_broad": 25.0,
+        "us_equity_value": 5.0,
+        "dividend": 15.0,
+        "international": 10.0,
+        "bonds_medium": 15.0,
+        "bonds_short": 5.0,
+        "defensive": 15.0,
+        "real_estate": 5.0,
+        "commodities": 5.0
+      },
+      "gap_analysis": {
+        "real_estate": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Real Estate (REITs)"
+        },
+        "international": {
+          "current_pct": 0,
+          "target_pct": 10.0,
+          "gap_pct": 10.0,
+          "label": "International Equity"
+        },
+        "defensive": {
+          "current_pct": 0,
+          "target_pct": 15.0,
+          "gap_pct": 15.0,
+          "label": "Defensive / Low-Vol"
+        },
+        "us_equity_growth": {
+          "current_pct": 31.5,
+          "target_pct": 0,
+          "gap_pct": -31.5,
+          "label": "US Growth Equity"
+        },
+        "bonds_short": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Short-Term Bonds"
+        },
+        "bonds_medium": {
+          "current_pct": 11.5,
+          "target_pct": 15.0,
+          "gap_pct": 3.5,
+          "label": "Core Bonds"
+        },
+        "us_equity_broad": {
+          "current_pct": 38.8,
+          "target_pct": 25.0,
+          "gap_pct": -13.8,
+          "label": "US Broad Market"
+        },
+        "commodities": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Commodities & Gold"
+        },
+        "dividend": {
+          "current_pct": 0,
+          "target_pct": 15.0,
+          "gap_pct": 15.0,
+          "label": "Dividend / Income"
+        },
+        "cash": {
+          "current_pct": 18.3,
+          "target_pct": 0,
+          "gap_pct": -18.3,
+          "label": "Cash"
+        },
+        "us_equity_value": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "US Value Equity"
+        }
+      },
+      "trades": [
+        {
+          "action": "sell",
+          "ticker": "AAPL",
+          "name": "Apple Inc.",
+          "shares": 5,
+          "price": 280.14,
+          "value": 1400.7,
+          "bucket": "us_equity_growth",
+          "reason": "AAPL is in the growth/tech bucket, which takes the biggest hit in a tech selloff. Your allocation is 32% above target \u2014 trimming now limits your exposure.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "MSFT",
+          "name": "Microsoft Corp.",
+          "shares": 3,
+          "price": 414.44,
+          "value": 1243.32,
+          "bucket": "us_equity_growth",
+          "reason": "MSFT is in the growth/tech bucket, which takes the biggest hit in a tech selloff. Your allocation is 32% above target \u2014 trimming now limits your exposure.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "VOO",
+          "name": "Vanguard S&P 500 ETF",
+          "shares": 3,
+          "price": 662.52,
+          "value": 1987.56,
+          "bucket": "us_equity_broad",
+          "reason": "VOO makes up 39% of your portfolio \u2014 14% above your 25% target. Selling some locks in gains and brings your US Broad Market exposure back in line.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "GOOGL",
+          "name": "Alphabet Inc.",
+          "shares": 1,
+          "price": 385.69,
+          "value": 385.69,
+          "bucket": "us_equity_growth",
+          "reason": "GOOGL is in the growth/tech bucket, which takes the biggest hit in a tech selloff. Your allocation is 32% above target \u2014 trimming now limits your exposure.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "VTI",
+          "name": "Vanguard Total Stock Market ETF",
+          "shares": 3,
+          "price": 355.29,
+          "value": 1065.87,
+          "bucket": "us_equity_broad",
+          "reason": "VTI makes up 39% of your portfolio \u2014 14% above your 25% target. Selling some locks in gains and brings your US Broad Market exposure back in line.",
+          "is_new": false
+        },
+        {
+          "action": "buy",
+          "ticker": "ACWV",
+          "name": "Defensive / Low-Vol",
+          "shares": 18,
+          "price": 120.9,
+          "value": 2176.2,
+          "bucket": "defensive",
+          "reason": "Utilities, healthcare, and staples hold their value when markets drop. ACWV fills your Defensive / Low-Vol gap (0% \u2192 15%).",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "CGDG",
+          "name": "Dividend / Income",
+          "shares": 60,
+          "price": 37.23,
+          "value": 2233.8,
+          "bucket": "dividend",
+          "reason": "You're 15% underweight in Dividend / Income. CGDG is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AVEM",
+          "name": "International Equity",
+          "shares": 16,
+          "price": 90.53,
+          "value": 1448.48,
+          "bucket": "international",
+          "reason": "You're 10% underweight in International Equity. AVEM is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "DFGR",
+          "name": "Real Estate (REITs)",
+          "shares": 26,
+          "price": 28.8,
+          "value": 748.8,
+          "bucket": "real_estate",
+          "reason": "You're 5% underweight in Real Estate (REITs). DFGR is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "BSV",
+          "name": "Short-Term Bonds",
+          "shares": 9,
+          "price": 78.08,
+          "value": 702.72,
+          "bucket": "bonds_short",
+          "reason": "You're 5% underweight in Short-Term Bonds. BSV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AAAU",
+          "name": "Commodities & Gold",
+          "shares": 16,
+          "price": 45.46,
+          "value": 727.36,
+          "bucket": "commodities",
+          "reason": "You're 5% underweight in Commodities & Gold. AAAU is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AVUV",
+          "name": "US Value Equity",
+          "shares": 6,
+          "price": 119.96,
+          "value": 719.76,
+          "bucket": "us_equity_value",
+          "reason": "You're 5% underweight in US Value Equity. AVUV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "BND",
+          "name": "Core Bonds",
+          "shares": 7,
+          "price": 73.36,
+          "value": 513.52,
+          "bucket": "bonds_medium",
+          "reason": "You're 4% underweight in Core Bonds. BND is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        }
+      ],
+      "before": {
+        "holdings": [
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "value": 2801.4,
+            "pct": 14.6,
+            "bucket": "us_equity_growth",
+            "price": 280.14,
+            "shares": 10
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "value": 2072.2,
+            "pct": 10.8,
+            "bucket": "us_equity_growth",
+            "price": 414.44,
+            "shares": 5
+          },
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "value": 5300.16,
+            "pct": 27.7,
+            "bucket": "us_equity_broad",
+            "price": 662.52,
+            "shares": 8
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond Market ETF",
+            "value": 2200.8,
+            "pct": 11.5,
+            "bucket": "bonds_medium",
+            "price": 73.36,
+            "shares": 30
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc.",
+            "value": 1157.07,
+            "pct": 6.0,
+            "bucket": "us_equity_growth",
+            "price": 385.69,
+            "shares": 3
+          },
+          {
+            "ticker": "VTI",
+            "name": "Vanguard Total Stock Market ETF",
+            "value": 2131.74,
+            "pct": 11.1,
+            "bucket": "us_equity_broad",
+            "price": 355.29,
+            "shares": 6
+          }
+        ],
+        "total_value": 19163.37,
+        "cash": 3500.0
+      },
+      "after": {
+        "holdings": [
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "shares": 5.0,
+            "price": 662.52,
+            "value": 3312.6,
+            "pct": 17.6,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond Market ETF",
+            "shares": 37.0,
+            "price": 73.36,
+            "value": 2714.32,
+            "pct": 14.4,
+            "bucket": "bonds_medium"
+          },
+          {
+            "ticker": "CGDG",
+            "name": "Dividend / Income",
+            "shares": 60.0,
+            "price": 37.23,
+            "value": 2233.8,
+            "pct": 11.8,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "ACWV",
+            "name": "Defensive / Low-Vol",
+            "shares": 18.0,
+            "price": 120.9,
+            "value": 2176.2,
+            "pct": 11.5,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AVEM",
+            "name": "International Equity",
+            "shares": 16.0,
+            "price": 90.53,
+            "value": 1448.48,
+            "pct": 7.7,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "shares": 5.0,
+            "price": 280.14,
+            "value": 1400.7,
+            "pct": 7.4,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "VTI",
+            "name": "Vanguard Total Stock Market ETF",
+            "shares": 3.0,
+            "price": 355.29,
+            "value": 1065.87,
+            "pct": 5.7,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "shares": 2.0,
+            "price": 414.44,
+            "value": 828.88,
+            "pct": 4.4,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc.",
+            "shares": 2.0,
+            "price": 385.69,
+            "value": 771.38,
+            "pct": 4.1,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "DFGR",
+            "name": "Real Estate (REITs)",
+            "shares": 26.0,
+            "price": 28.8,
+            "value": 748.8,
+            "pct": 4.0,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AAAU",
+            "name": "Commodities & Gold",
+            "shares": 16.0,
+            "price": 45.46,
+            "value": 727.36,
+            "pct": 3.9,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AVUV",
+            "name": "US Value Equity",
+            "shares": 6.0,
+            "price": 119.96,
+            "value": 719.76,
+            "pct": 3.8,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "BSV",
+            "name": "Short-Term Bonds",
+            "shares": 9.0,
+            "price": 78.08,
+            "value": 702.72,
+            "pct": 3.7,
+            "bucket": "us_equity_broad"
+          }
+        ],
+        "total_value": 19163.37
+      }
+    },
+    "flags": [
+      {
+        "type": "caution",
+        "detail": "equity_ceiling_breach",
+        "message": "Your equity allocation exceeds the typical ceiling for your risk profile \u2014 consider rebalancing toward bonds or cash."
+      }
+    ],
+    "violations": [
+      {
+        "type": "equity_ceiling",
+        "detail": "moderate",
+        "message": "Your equity exposure exceeds the recommended ceiling for your risk profile."
+      }
+    ],
+    "recommendations": [],
+    "math": {
+      "portfolio_beta": 0.721,
+      "risk_free_rate": 0.0432,
+      "portfolio_expected_annual": 0.0767,
+      "return_gap": "achievable",
+      "target_value": null,
+      "timeline_months": null,
+      "capm_source": "CAPM: Rf=FRED GS10, Rm=SPY long-run 10%"
+    },
+    "scenario_result": {
+      "scenario_id": "tech_selloff",
+      "scenario_name": "Tech Selloff",
+      "scenario_description": "Technology stocks fall sharply while other sectors hold steady.",
+      "original_value": 19163.37,
+      "simulated_value": 16683.02,
+      "change": -2480.35,
+      "change_pct": -12.9,
+      "holdings_impact": [
+        {
+          "symbol": "AAPL",
+          "name": "Apple Inc.",
+          "type": "stock",
+          "original_value": 2801.4,
+          "simulated_value": 1904.95,
+          "change": -896.45,
+          "change_pct": -32.0
+        },
+        {
+          "symbol": "MSFT",
+          "name": "Microsoft Corp.",
+          "type": "stock",
+          "original_value": 2072.2,
+          "simulated_value": 1409.1,
+          "change": -663.1,
+          "change_pct": -32.0
+        },
+        {
+          "symbol": "VOO",
+          "name": "Vanguard S&P 500 ETF",
+          "type": "etf",
+          "original_value": 5300.16,
+          "simulated_value": 4876.15,
+          "change": -424.01,
+          "change_pct": -8.0
+        },
+        {
+          "symbol": "GOOGL",
+          "name": "Alphabet Inc.",
+          "type": "stock",
+          "original_value": 1157.07,
+          "simulated_value": 786.81,
+          "change": -370.26,
+          "change_pct": -32.0
+        },
+        {
+          "symbol": "VTI",
+          "name": "Vanguard Total Stock Market ETF",
+          "type": "etf",
+          "original_value": 2131.74,
+          "simulated_value": 1961.2,
+          "change": -170.54,
+          "change_pct": -8.0
+        },
+        {
+          "symbol": "BND",
+          "name": "Vanguard Total Bond Market ETF",
+          "type": "bond",
+          "original_value": 2200.8,
+          "simulated_value": 2244.82,
+          "change": 44.02,
+          "change_pct": 2.0
+        }
+      ],
+      "advice": "Your exposure to tech stocks drives this loss. Diversifying into healthcare, consumer goods, or bonds would reduce this risk."
+    },
+    "planner_engine": "clingo",
+    "profile_used": {
+      "investor_type": "conservative",
+      "risk_level": "low",
+      "time_horizon": "long_term",
+      "liquidity_need": "medium",
+      "panic_risk": "medium_high",
+      "goal": "wealth_growth"
+    }
+  },
+  {
+    "id": "cd5f2c0a-00d7-4b3b-865c-0be2beaceca9",
+    "timestamp": "2026-05-02T05:39:29",
+    "scenario_text": "tech market is crashing 70% anf i still want to increase my profit?",
+    "parsed_intent": {
+      "scenario": "tech_selloff",
+      "goal_type": "growth",
+      "market_trend": "bearish",
+      "vix_level": "high"
+    },
+    "verdict": "proceed_with_caution",
+    "verdict_label": "Proceed with Caution",
+    "verdict_color": "yellow",
+    "trade_count": 13,
+    "narrative": "You can rebalance, but there are important things to watch out for first. Your portfolio beta is 0.72, and with today's 4.3% risk-free rate (FRED 10-yr Treasury), CAPM puts your expected annual return at about 7.7%.",
+    "reasoning": "Given a Tech Selloff scenario and your low risk profile, this plan realigns your portfolio toward your target allocation. Trim: AAPL (sell 5 shares), MSFT (sell 3 shares), VOO (sell 3 shares). Add: ACWV (buy 18 shares), CGDG (buy 60 shares), AVEM (buy 16 shares). Biggest overweight: US Growth Equity at 32% vs 0% target \u2014 trimming here frees up capital. Some risk signals are active \u2014 proceed carefully and monitor the flagged items.",
+    "rebalance": {
+      "target_allocation": {
+        "us_equity_broad": 25.0,
+        "us_equity_value": 5.0,
+        "dividend": 15.0,
+        "international": 10.0,
+        "bonds_medium": 15.0,
+        "bonds_short": 5.0,
+        "defensive": 15.0,
+        "real_estate": 5.0,
+        "commodities": 5.0
+      },
+      "gap_analysis": {
+        "real_estate": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Real Estate (REITs)"
+        },
+        "international": {
+          "current_pct": 0,
+          "target_pct": 10.0,
+          "gap_pct": 10.0,
+          "label": "International Equity"
+        },
+        "defensive": {
+          "current_pct": 0,
+          "target_pct": 15.0,
+          "gap_pct": 15.0,
+          "label": "Defensive / Low-Vol"
+        },
+        "us_equity_growth": {
+          "current_pct": 31.5,
+          "target_pct": 0,
+          "gap_pct": -31.5,
+          "label": "US Growth Equity"
+        },
+        "bonds_short": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Short-Term Bonds"
+        },
+        "bonds_medium": {
+          "current_pct": 11.5,
+          "target_pct": 15.0,
+          "gap_pct": 3.5,
+          "label": "Core Bonds"
+        },
+        "us_equity_broad": {
+          "current_pct": 38.8,
+          "target_pct": 25.0,
+          "gap_pct": -13.8,
+          "label": "US Broad Market"
+        },
+        "commodities": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Commodities & Gold"
+        },
+        "dividend": {
+          "current_pct": 0,
+          "target_pct": 15.0,
+          "gap_pct": 15.0,
+          "label": "Dividend / Income"
+        },
+        "cash": {
+          "current_pct": 18.3,
+          "target_pct": 0,
+          "gap_pct": -18.3,
+          "label": "Cash"
+        },
+        "us_equity_value": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "US Value Equity"
+        }
+      },
+      "trades": [
+        {
+          "action": "sell",
+          "ticker": "AAPL",
+          "name": "Apple Inc.",
+          "shares": 5,
+          "price": 280.14,
+          "value": 1400.7,
+          "bucket": "us_equity_growth",
+          "reason": "AAPL is in the growth/tech bucket, which takes the biggest hit in a tech selloff. Your allocation is 32% above target \u2014 trimming now limits your exposure.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "MSFT",
+          "name": "Microsoft Corp.",
+          "shares": 3,
+          "price": 414.44,
+          "value": 1243.32,
+          "bucket": "us_equity_growth",
+          "reason": "MSFT is in the growth/tech bucket, which takes the biggest hit in a tech selloff. Your allocation is 32% above target \u2014 trimming now limits your exposure.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "VOO",
+          "name": "Vanguard S&P 500 ETF",
+          "shares": 3,
+          "price": 662.52,
+          "value": 1987.56,
+          "bucket": "us_equity_broad",
+          "reason": "VOO makes up 39% of your portfolio \u2014 14% above your 25% target. Selling some locks in gains and brings your US Broad Market exposure back in line.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "GOOGL",
+          "name": "Alphabet Inc.",
+          "shares": 1,
+          "price": 385.69,
+          "value": 385.69,
+          "bucket": "us_equity_growth",
+          "reason": "GOOGL is in the growth/tech bucket, which takes the biggest hit in a tech selloff. Your allocation is 32% above target \u2014 trimming now limits your exposure.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "VTI",
+          "name": "Vanguard Total Stock Market ETF",
+          "shares": 3,
+          "price": 355.29,
+          "value": 1065.87,
+          "bucket": "us_equity_broad",
+          "reason": "VTI makes up 39% of your portfolio \u2014 14% above your 25% target. Selling some locks in gains and brings your US Broad Market exposure back in line.",
+          "is_new": false
+        },
+        {
+          "action": "buy",
+          "ticker": "ACWV",
+          "name": "Defensive / Low-Vol",
+          "shares": 18,
+          "price": 120.9,
+          "value": 2176.2,
+          "bucket": "defensive",
+          "reason": "Utilities, healthcare, and staples hold their value when markets drop. ACWV fills your Defensive / Low-Vol gap (0% \u2192 15%).",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "CGDG",
+          "name": "Dividend / Income",
+          "shares": 60,
+          "price": 37.23,
+          "value": 2233.8,
+          "bucket": "dividend",
+          "reason": "You're 15% underweight in Dividend / Income. CGDG is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AVEM",
+          "name": "International Equity",
+          "shares": 16,
+          "price": 90.53,
+          "value": 1448.48,
+          "bucket": "international",
+          "reason": "You're 10% underweight in International Equity. AVEM is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "DFGR",
+          "name": "Real Estate (REITs)",
+          "shares": 26,
+          "price": 28.8,
+          "value": 748.8,
+          "bucket": "real_estate",
+          "reason": "You're 5% underweight in Real Estate (REITs). DFGR is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "BSV",
+          "name": "Short-Term Bonds",
+          "shares": 9,
+          "price": 78.08,
+          "value": 702.72,
+          "bucket": "bonds_short",
+          "reason": "You're 5% underweight in Short-Term Bonds. BSV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AAAU",
+          "name": "Commodities & Gold",
+          "shares": 16,
+          "price": 45.46,
+          "value": 727.36,
+          "bucket": "commodities",
+          "reason": "You're 5% underweight in Commodities & Gold. AAAU is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AVUV",
+          "name": "US Value Equity",
+          "shares": 6,
+          "price": 119.96,
+          "value": 719.76,
+          "bucket": "us_equity_value",
+          "reason": "You're 5% underweight in US Value Equity. AVUV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "BND",
+          "name": "Core Bonds",
+          "shares": 7,
+          "price": 73.36,
+          "value": 513.52,
+          "bucket": "bonds_medium",
+          "reason": "You're 4% underweight in Core Bonds. BND is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        }
+      ],
+      "before": {
+        "holdings": [
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "value": 2801.4,
+            "pct": 14.6,
+            "bucket": "us_equity_growth",
+            "price": 280.14,
+            "shares": 10
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "value": 2072.2,
+            "pct": 10.8,
+            "bucket": "us_equity_growth",
+            "price": 414.44,
+            "shares": 5
+          },
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "value": 5300.16,
+            "pct": 27.7,
+            "bucket": "us_equity_broad",
+            "price": 662.52,
+            "shares": 8
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond Market ETF",
+            "value": 2200.8,
+            "pct": 11.5,
+            "bucket": "bonds_medium",
+            "price": 73.36,
+            "shares": 30
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc.",
+            "value": 1157.07,
+            "pct": 6.0,
+            "bucket": "us_equity_growth",
+            "price": 385.69,
+            "shares": 3
+          },
+          {
+            "ticker": "VTI",
+            "name": "Vanguard Total Stock Market ETF",
+            "value": 2131.74,
+            "pct": 11.1,
+            "bucket": "us_equity_broad",
+            "price": 355.29,
+            "shares": 6
+          }
+        ],
+        "total_value": 19163.37,
+        "cash": 3500.0
+      },
+      "after": {
+        "holdings": [
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "shares": 5.0,
+            "price": 662.52,
+            "value": 3312.6,
+            "pct": 17.6,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond Market ETF",
+            "shares": 37.0,
+            "price": 73.36,
+            "value": 2714.32,
+            "pct": 14.4,
+            "bucket": "bonds_medium"
+          },
+          {
+            "ticker": "CGDG",
+            "name": "Dividend / Income",
+            "shares": 60.0,
+            "price": 37.23,
+            "value": 2233.8,
+            "pct": 11.8,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "ACWV",
+            "name": "Defensive / Low-Vol",
+            "shares": 18.0,
+            "price": 120.9,
+            "value": 2176.2,
+            "pct": 11.5,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AVEM",
+            "name": "International Equity",
+            "shares": 16.0,
+            "price": 90.53,
+            "value": 1448.48,
+            "pct": 7.7,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "shares": 5.0,
+            "price": 280.14,
+            "value": 1400.7,
+            "pct": 7.4,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "VTI",
+            "name": "Vanguard Total Stock Market ETF",
+            "shares": 3.0,
+            "price": 355.29,
+            "value": 1065.87,
+            "pct": 5.7,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "shares": 2.0,
+            "price": 414.44,
+            "value": 828.88,
+            "pct": 4.4,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc.",
+            "shares": 2.0,
+            "price": 385.69,
+            "value": 771.38,
+            "pct": 4.1,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "DFGR",
+            "name": "Real Estate (REITs)",
+            "shares": 26.0,
+            "price": 28.8,
+            "value": 748.8,
+            "pct": 4.0,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AAAU",
+            "name": "Commodities & Gold",
+            "shares": 16.0,
+            "price": 45.46,
+            "value": 727.36,
+            "pct": 3.9,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AVUV",
+            "name": "US Value Equity",
+            "shares": 6.0,
+            "price": 119.96,
+            "value": 719.76,
+            "pct": 3.8,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "BSV",
+            "name": "Short-Term Bonds",
+            "shares": 9.0,
+            "price": 78.08,
+            "value": 702.72,
+            "pct": 3.7,
+            "bucket": "us_equity_broad"
+          }
+        ],
+        "total_value": 19163.37
+      }
+    },
+    "flags": [
+      {
+        "type": "caution",
+        "detail": "equity_ceiling_breach",
+        "message": "Your equity allocation exceeds the typical ceiling for your risk profile \u2014 consider rebalancing toward bonds or cash."
+      }
+    ],
+    "violations": [
+      {
+        "type": "equity_ceiling",
+        "detail": "moderate",
+        "message": "Your equity exposure exceeds the recommended ceiling for your risk profile."
+      }
+    ],
+    "recommendations": [],
+    "math": {
+      "portfolio_beta": 0.721,
+      "risk_free_rate": 0.0432,
+      "portfolio_expected_annual": 0.0767,
+      "return_gap": "achievable",
+      "target_value": null,
+      "timeline_months": null,
+      "capm_source": "CAPM: Rf=FRED GS10, Rm=SPY long-run 10%"
+    },
+    "scenario_result": {
+      "scenario_id": "tech_selloff",
+      "scenario_name": "Tech Selloff",
+      "scenario_description": "Technology stocks fall sharply while other sectors hold steady.",
+      "original_value": 19163.37,
+      "simulated_value": 16683.02,
+      "change": -2480.35,
+      "change_pct": -12.9,
+      "holdings_impact": [
+        {
+          "symbol": "AAPL",
+          "name": "Apple Inc.",
+          "type": "stock",
+          "original_value": 2801.4,
+          "simulated_value": 1904.95,
+          "change": -896.45,
+          "change_pct": -32.0
+        },
+        {
+          "symbol": "MSFT",
+          "name": "Microsoft Corp.",
+          "type": "stock",
+          "original_value": 2072.2,
+          "simulated_value": 1409.1,
+          "change": -663.1,
+          "change_pct": -32.0
+        },
+        {
+          "symbol": "VOO",
+          "name": "Vanguard S&P 500 ETF",
+          "type": "etf",
+          "original_value": 5300.16,
+          "simulated_value": 4876.15,
+          "change": -424.01,
+          "change_pct": -8.0
+        },
+        {
+          "symbol": "GOOGL",
+          "name": "Alphabet Inc.",
+          "type": "stock",
+          "original_value": 1157.07,
+          "simulated_value": 786.81,
+          "change": -370.26,
+          "change_pct": -32.0
+        },
+        {
+          "symbol": "VTI",
+          "name": "Vanguard Total Stock Market ETF",
+          "type": "etf",
+          "original_value": 2131.74,
+          "simulated_value": 1961.2,
+          "change": -170.54,
+          "change_pct": -8.0
+        },
+        {
+          "symbol": "BND",
+          "name": "Vanguard Total Bond Market ETF",
+          "type": "bond",
+          "original_value": 2200.8,
+          "simulated_value": 2244.82,
+          "change": 44.02,
+          "change_pct": 2.0
+        }
+      ],
+      "advice": "Your exposure to tech stocks drives this loss. Diversifying into healthcare, consumer goods, or bonds would reduce this risk."
+    },
+    "planner_engine": "clingo",
+    "profile_used": {
+      "investor_type": "conservative",
+      "risk_level": "low",
+      "time_horizon": "long_term",
+      "liquidity_need": "medium",
+      "panic_risk": "medium_high",
+      "goal": "wealth_growth"
+    }
+  },
+  {
+    "id": "c545adec-a8fe-430e-93dc-1300cdd9f720",
+    "timestamp": "2026-05-02T05:38:04",
+    "scenario_text": "What if market drops vy 50% in tech equipment",
+    "parsed_intent": {
+      "scenario": "tech_selloff",
+      "market_trend": "bearish",
+      "vix_level": "high"
+    },
+    "verdict": "proceed_with_caution",
+    "verdict_label": "Proceed with Caution",
+    "verdict_color": "yellow",
+    "trade_count": 13,
+    "narrative": "You can rebalance, but there are important things to watch out for first. Your portfolio beta is 0.72, and with today's 4.3% risk-free rate (FRED 10-yr Treasury), CAPM puts your expected annual return at about 7.7%.",
+    "reasoning": "Given a Tech Selloff scenario and your low risk profile, this plan realigns your portfolio toward your target allocation. Trim: AAPL (sell 5 shares), MSFT (sell 3 shares), VOO (sell 3 shares). Add: ACWV (buy 18 shares), CGDG (buy 60 shares), AVEM (buy 16 shares). Biggest overweight: US Growth Equity at 32% vs 0% target \u2014 trimming here frees up capital. Some risk signals are active \u2014 proceed carefully and monitor the flagged items.",
+    "rebalance": {
+      "target_allocation": {
+        "us_equity_broad": 25.0,
+        "us_equity_value": 5.0,
+        "dividend": 15.0,
+        "international": 10.0,
+        "bonds_medium": 15.0,
+        "bonds_short": 5.0,
+        "defensive": 15.0,
+        "real_estate": 5.0,
+        "commodities": 5.0
+      },
+      "gap_analysis": {
+        "real_estate": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Real Estate (REITs)"
+        },
+        "international": {
+          "current_pct": 0,
+          "target_pct": 10.0,
+          "gap_pct": 10.0,
+          "label": "International Equity"
+        },
+        "defensive": {
+          "current_pct": 0,
+          "target_pct": 15.0,
+          "gap_pct": 15.0,
+          "label": "Defensive / Low-Vol"
+        },
+        "us_equity_growth": {
+          "current_pct": 31.5,
+          "target_pct": 0,
+          "gap_pct": -31.5,
+          "label": "US Growth Equity"
+        },
+        "bonds_short": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Short-Term Bonds"
+        },
+        "bonds_medium": {
+          "current_pct": 11.5,
+          "target_pct": 15.0,
+          "gap_pct": 3.5,
+          "label": "Core Bonds"
+        },
+        "us_equity_broad": {
+          "current_pct": 38.8,
+          "target_pct": 25.0,
+          "gap_pct": -13.8,
+          "label": "US Broad Market"
+        },
+        "commodities": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Commodities & Gold"
+        },
+        "dividend": {
+          "current_pct": 0,
+          "target_pct": 15.0,
+          "gap_pct": 15.0,
+          "label": "Dividend / Income"
+        },
+        "cash": {
+          "current_pct": 18.3,
+          "target_pct": 0,
+          "gap_pct": -18.3,
+          "label": "Cash"
+        },
+        "us_equity_value": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "US Value Equity"
+        }
+      },
+      "trades": [
+        {
+          "action": "sell",
+          "ticker": "AAPL",
+          "name": "Apple Inc.",
+          "shares": 5,
+          "price": 280.14,
+          "value": 1400.7,
+          "bucket": "us_equity_growth",
+          "reason": "AAPL is in the growth/tech bucket, which takes the biggest hit in a tech selloff. Your allocation is 32% above target \u2014 trimming now limits your exposure.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "MSFT",
+          "name": "Microsoft Corp.",
+          "shares": 3,
+          "price": 414.44,
+          "value": 1243.32,
+          "bucket": "us_equity_growth",
+          "reason": "MSFT is in the growth/tech bucket, which takes the biggest hit in a tech selloff. Your allocation is 32% above target \u2014 trimming now limits your exposure.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "VOO",
+          "name": "Vanguard S&P 500 ETF",
+          "shares": 3,
+          "price": 662.52,
+          "value": 1987.56,
+          "bucket": "us_equity_broad",
+          "reason": "VOO makes up 39% of your portfolio \u2014 14% above your 25% target. Selling some locks in gains and brings your US Broad Market exposure back in line.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "GOOGL",
+          "name": "Alphabet Inc.",
+          "shares": 1,
+          "price": 385.69,
+          "value": 385.69,
+          "bucket": "us_equity_growth",
+          "reason": "GOOGL is in the growth/tech bucket, which takes the biggest hit in a tech selloff. Your allocation is 32% above target \u2014 trimming now limits your exposure.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "VTI",
+          "name": "Vanguard Total Stock Market ETF",
+          "shares": 3,
+          "price": 355.29,
+          "value": 1065.87,
+          "bucket": "us_equity_broad",
+          "reason": "VTI makes up 39% of your portfolio \u2014 14% above your 25% target. Selling some locks in gains and brings your US Broad Market exposure back in line.",
+          "is_new": false
+        },
+        {
+          "action": "buy",
+          "ticker": "ACWV",
+          "name": "Defensive / Low-Vol",
+          "shares": 18,
+          "price": 120.9,
+          "value": 2176.2,
+          "bucket": "defensive",
+          "reason": "Utilities, healthcare, and staples hold their value when markets drop. ACWV fills your Defensive / Low-Vol gap (0% \u2192 15%).",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "CGDG",
+          "name": "Dividend / Income",
+          "shares": 60,
+          "price": 37.23,
+          "value": 2233.8,
+          "bucket": "dividend",
+          "reason": "You're 15% underweight in Dividend / Income. CGDG is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AVEM",
+          "name": "International Equity",
+          "shares": 16,
+          "price": 90.53,
+          "value": 1448.48,
+          "bucket": "international",
+          "reason": "You're 10% underweight in International Equity. AVEM is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "DFGR",
+          "name": "Real Estate (REITs)",
+          "shares": 26,
+          "price": 28.8,
+          "value": 748.8,
+          "bucket": "real_estate",
+          "reason": "You're 5% underweight in Real Estate (REITs). DFGR is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "BSV",
+          "name": "Short-Term Bonds",
+          "shares": 9,
+          "price": 78.08,
+          "value": 702.72,
+          "bucket": "bonds_short",
+          "reason": "You're 5% underweight in Short-Term Bonds. BSV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AAAU",
+          "name": "Commodities & Gold",
+          "shares": 16,
+          "price": 45.46,
+          "value": 727.36,
+          "bucket": "commodities",
+          "reason": "You're 5% underweight in Commodities & Gold. AAAU is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AVUV",
+          "name": "US Value Equity",
+          "shares": 6,
+          "price": 119.96,
+          "value": 719.76,
+          "bucket": "us_equity_value",
+          "reason": "You're 5% underweight in US Value Equity. AVUV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "BND",
+          "name": "Core Bonds",
+          "shares": 7,
+          "price": 73.36,
+          "value": 513.52,
+          "bucket": "bonds_medium",
+          "reason": "You're 4% underweight in Core Bonds. BND is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        }
+      ],
+      "before": {
+        "holdings": [
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "value": 2801.4,
+            "pct": 14.6,
+            "bucket": "us_equity_growth",
+            "price": 280.14,
+            "shares": 10
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "value": 2072.2,
+            "pct": 10.8,
+            "bucket": "us_equity_growth",
+            "price": 414.44,
+            "shares": 5
+          },
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "value": 5300.16,
+            "pct": 27.7,
+            "bucket": "us_equity_broad",
+            "price": 662.52,
+            "shares": 8
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond Market ETF",
+            "value": 2200.8,
+            "pct": 11.5,
+            "bucket": "bonds_medium",
+            "price": 73.36,
+            "shares": 30
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc.",
+            "value": 1157.07,
+            "pct": 6.0,
+            "bucket": "us_equity_growth",
+            "price": 385.69,
+            "shares": 3
+          },
+          {
+            "ticker": "VTI",
+            "name": "Vanguard Total Stock Market ETF",
+            "value": 2131.74,
+            "pct": 11.1,
+            "bucket": "us_equity_broad",
+            "price": 355.29,
+            "shares": 6
+          }
+        ],
+        "total_value": 19163.37,
+        "cash": 3500.0
+      },
+      "after": {
+        "holdings": [
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "shares": 5.0,
+            "price": 662.52,
+            "value": 3312.6,
+            "pct": 17.6,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond Market ETF",
+            "shares": 37.0,
+            "price": 73.36,
+            "value": 2714.32,
+            "pct": 14.4,
+            "bucket": "bonds_medium"
+          },
+          {
+            "ticker": "CGDG",
+            "name": "Dividend / Income",
+            "shares": 60.0,
+            "price": 37.23,
+            "value": 2233.8,
+            "pct": 11.8,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "ACWV",
+            "name": "Defensive / Low-Vol",
+            "shares": 18.0,
+            "price": 120.9,
+            "value": 2176.2,
+            "pct": 11.5,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AVEM",
+            "name": "International Equity",
+            "shares": 16.0,
+            "price": 90.53,
+            "value": 1448.48,
+            "pct": 7.7,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "shares": 5.0,
+            "price": 280.14,
+            "value": 1400.7,
+            "pct": 7.4,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "VTI",
+            "name": "Vanguard Total Stock Market ETF",
+            "shares": 3.0,
+            "price": 355.29,
+            "value": 1065.87,
+            "pct": 5.7,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "shares": 2.0,
+            "price": 414.44,
+            "value": 828.88,
+            "pct": 4.4,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc.",
+            "shares": 2.0,
+            "price": 385.69,
+            "value": 771.38,
+            "pct": 4.1,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "DFGR",
+            "name": "Real Estate (REITs)",
+            "shares": 26.0,
+            "price": 28.8,
+            "value": 748.8,
+            "pct": 4.0,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AAAU",
+            "name": "Commodities & Gold",
+            "shares": 16.0,
+            "price": 45.46,
+            "value": 727.36,
+            "pct": 3.9,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AVUV",
+            "name": "US Value Equity",
+            "shares": 6.0,
+            "price": 119.96,
+            "value": 719.76,
+            "pct": 3.8,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "BSV",
+            "name": "Short-Term Bonds",
+            "shares": 9.0,
+            "price": 78.08,
+            "value": 702.72,
+            "pct": 3.7,
+            "bucket": "us_equity_broad"
+          }
+        ],
+        "total_value": 19163.37
+      }
+    },
+    "flags": [
+      {
+        "type": "caution",
+        "detail": "equity_ceiling_breach",
+        "message": "Your equity allocation exceeds the typical ceiling for your risk profile \u2014 consider rebalancing toward bonds or cash."
+      }
+    ],
+    "violations": [
+      {
+        "type": "equity_ceiling",
+        "detail": "moderate",
+        "message": "Your equity exposure exceeds the recommended ceiling for your risk profile."
+      }
+    ],
+    "recommendations": [],
+    "math": {
+      "portfolio_beta": 0.721,
+      "risk_free_rate": 0.0432,
+      "portfolio_expected_annual": 0.0767,
+      "return_gap": "achievable",
+      "target_value": null,
+      "timeline_months": null,
+      "capm_source": "CAPM: Rf=FRED GS10, Rm=SPY long-run 10%"
+    },
+    "scenario_result": {
+      "scenario_id": "tech_selloff",
+      "scenario_name": "Tech Selloff",
+      "scenario_description": "Technology stocks fall sharply while other sectors hold steady.",
+      "original_value": 19163.37,
+      "simulated_value": 16683.02,
+      "change": -2480.35,
+      "change_pct": -12.9,
+      "holdings_impact": [
+        {
+          "symbol": "AAPL",
+          "name": "Apple Inc.",
+          "type": "stock",
+          "original_value": 2801.4,
+          "simulated_value": 1904.95,
+          "change": -896.45,
+          "change_pct": -32.0
+        },
+        {
+          "symbol": "MSFT",
+          "name": "Microsoft Corp.",
+          "type": "stock",
+          "original_value": 2072.2,
+          "simulated_value": 1409.1,
+          "change": -663.1,
+          "change_pct": -32.0
+        },
+        {
+          "symbol": "VOO",
+          "name": "Vanguard S&P 500 ETF",
+          "type": "etf",
+          "original_value": 5300.16,
+          "simulated_value": 4876.15,
+          "change": -424.01,
+          "change_pct": -8.0
+        },
+        {
+          "symbol": "GOOGL",
+          "name": "Alphabet Inc.",
+          "type": "stock",
+          "original_value": 1157.07,
+          "simulated_value": 786.81,
+          "change": -370.26,
+          "change_pct": -32.0
+        },
+        {
+          "symbol": "VTI",
+          "name": "Vanguard Total Stock Market ETF",
+          "type": "etf",
+          "original_value": 2131.74,
+          "simulated_value": 1961.2,
+          "change": -170.54,
+          "change_pct": -8.0
+        },
+        {
+          "symbol": "BND",
+          "name": "Vanguard Total Bond Market ETF",
+          "type": "bond",
+          "original_value": 2200.8,
+          "simulated_value": 2244.82,
+          "change": 44.02,
+          "change_pct": 2.0
+        }
+      ],
+      "advice": "Your exposure to tech stocks drives this loss. Diversifying into healthcare, consumer goods, or bonds would reduce this risk."
+    },
+    "planner_engine": "clingo",
+    "profile_used": {
+      "investor_type": "conservative",
+      "risk_level": "low",
+      "time_horizon": "long_term",
+      "liquidity_need": "medium",
+      "panic_risk": "medium_high",
+      "goal": "wealth_growth"
+    }
+  },
+  {
+    "id": "5091f61d-01c5-4ed4-a218-e6a2155a1e0c",
+    "timestamp": "2026-05-02T05:37:13",
+    "scenario_text": "what to do given apple laptops are having a recall?",
+    "parsed_intent": {
+      "scenario": "tech_selloff",
+      "market_trend": "bearish"
+    },
+    "verdict": "proceed_with_caution",
+    "verdict_label": "Proceed with Caution",
+    "verdict_color": "yellow",
+    "trade_count": 13,
+    "narrative": "You can rebalance, but there are important things to watch out for first. Your portfolio beta is 0.72, and with today's 4.3% risk-free rate (FRED 10-yr Treasury), CAPM puts your expected annual return at about 7.7%.",
+    "reasoning": "Given a Tech Selloff scenario and your low risk profile, this plan realigns your portfolio toward your target allocation. Trim: AAPL (sell 5 shares), MSFT (sell 3 shares), VOO (sell 3 shares). Add: ACWV (buy 18 shares), CGDG (buy 60 shares), AVEM (buy 16 shares). Biggest overweight: US Growth Equity at 32% vs 0% target \u2014 trimming here frees up capital. Some risk signals are active \u2014 proceed carefully and monitor the flagged items.",
+    "rebalance": {
+      "target_allocation": {
+        "us_equity_broad": 25.0,
+        "us_equity_value": 5.0,
+        "dividend": 15.0,
+        "international": 10.0,
+        "bonds_medium": 15.0,
+        "bonds_short": 5.0,
+        "defensive": 15.0,
+        "real_estate": 5.0,
+        "commodities": 5.0
+      },
+      "gap_analysis": {
+        "real_estate": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Real Estate (REITs)"
+        },
+        "international": {
+          "current_pct": 0,
+          "target_pct": 10.0,
+          "gap_pct": 10.0,
+          "label": "International Equity"
+        },
+        "defensive": {
+          "current_pct": 0,
+          "target_pct": 15.0,
+          "gap_pct": 15.0,
+          "label": "Defensive / Low-Vol"
+        },
+        "us_equity_growth": {
+          "current_pct": 31.5,
+          "target_pct": 0,
+          "gap_pct": -31.5,
+          "label": "US Growth Equity"
+        },
+        "bonds_short": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Short-Term Bonds"
+        },
+        "bonds_medium": {
+          "current_pct": 11.5,
+          "target_pct": 15.0,
+          "gap_pct": 3.5,
+          "label": "Core Bonds"
+        },
+        "us_equity_broad": {
+          "current_pct": 38.8,
+          "target_pct": 25.0,
+          "gap_pct": -13.8,
+          "label": "US Broad Market"
+        },
+        "commodities": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Commodities & Gold"
+        },
+        "dividend": {
+          "current_pct": 0,
+          "target_pct": 15.0,
+          "gap_pct": 15.0,
+          "label": "Dividend / Income"
+        },
+        "cash": {
+          "current_pct": 18.3,
+          "target_pct": 0,
+          "gap_pct": -18.3,
+          "label": "Cash"
+        },
+        "us_equity_value": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "US Value Equity"
+        }
+      },
+      "trades": [
+        {
+          "action": "sell",
+          "ticker": "AAPL",
+          "name": "Apple Inc.",
+          "shares": 5,
+          "price": 280.14,
+          "value": 1400.7,
+          "bucket": "us_equity_growth",
+          "reason": "AAPL is in the growth/tech bucket, which takes the biggest hit in a tech selloff. Your allocation is 32% above target \u2014 trimming now limits your exposure.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "MSFT",
+          "name": "Microsoft Corp.",
+          "shares": 3,
+          "price": 414.44,
+          "value": 1243.32,
+          "bucket": "us_equity_growth",
+          "reason": "MSFT is in the growth/tech bucket, which takes the biggest hit in a tech selloff. Your allocation is 32% above target \u2014 trimming now limits your exposure.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "VOO",
+          "name": "Vanguard S&P 500 ETF",
+          "shares": 3,
+          "price": 662.52,
+          "value": 1987.56,
+          "bucket": "us_equity_broad",
+          "reason": "VOO makes up 39% of your portfolio \u2014 14% above your 25% target. Selling some locks in gains and brings your US Broad Market exposure back in line.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "GOOGL",
+          "name": "Alphabet Inc.",
+          "shares": 1,
+          "price": 385.69,
+          "value": 385.69,
+          "bucket": "us_equity_growth",
+          "reason": "GOOGL is in the growth/tech bucket, which takes the biggest hit in a tech selloff. Your allocation is 32% above target \u2014 trimming now limits your exposure.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "VTI",
+          "name": "Vanguard Total Stock Market ETF",
+          "shares": 3,
+          "price": 355.29,
+          "value": 1065.87,
+          "bucket": "us_equity_broad",
+          "reason": "VTI makes up 39% of your portfolio \u2014 14% above your 25% target. Selling some locks in gains and brings your US Broad Market exposure back in line.",
+          "is_new": false
+        },
+        {
+          "action": "buy",
+          "ticker": "ACWV",
+          "name": "Defensive / Low-Vol",
+          "shares": 18,
+          "price": 120.9,
+          "value": 2176.2,
+          "bucket": "defensive",
+          "reason": "Utilities, healthcare, and staples hold their value when markets drop. ACWV fills your Defensive / Low-Vol gap (0% \u2192 15%).",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "CGDG",
+          "name": "Dividend / Income",
+          "shares": 60,
+          "price": 37.23,
+          "value": 2233.8,
+          "bucket": "dividend",
+          "reason": "You're 15% underweight in Dividend / Income. CGDG is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AVEM",
+          "name": "International Equity",
+          "shares": 16,
+          "price": 90.53,
+          "value": 1448.48,
+          "bucket": "international",
+          "reason": "You're 10% underweight in International Equity. AVEM is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "DFGR",
+          "name": "Real Estate (REITs)",
+          "shares": 26,
+          "price": 28.8,
+          "value": 748.8,
+          "bucket": "real_estate",
+          "reason": "You're 5% underweight in Real Estate (REITs). DFGR is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "BSV",
+          "name": "Short-Term Bonds",
+          "shares": 9,
+          "price": 78.08,
+          "value": 702.72,
+          "bucket": "bonds_short",
+          "reason": "You're 5% underweight in Short-Term Bonds. BSV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AAAU",
+          "name": "Commodities & Gold",
+          "shares": 16,
+          "price": 45.46,
+          "value": 727.36,
+          "bucket": "commodities",
+          "reason": "You're 5% underweight in Commodities & Gold. AAAU is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AVUV",
+          "name": "US Value Equity",
+          "shares": 6,
+          "price": 119.96,
+          "value": 719.76,
+          "bucket": "us_equity_value",
+          "reason": "You're 5% underweight in US Value Equity. AVUV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "BND",
+          "name": "Core Bonds",
+          "shares": 7,
+          "price": 73.36,
+          "value": 513.52,
+          "bucket": "bonds_medium",
+          "reason": "You're 4% underweight in Core Bonds. BND is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        }
+      ],
+      "before": {
+        "holdings": [
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "value": 2801.4,
+            "pct": 14.6,
+            "bucket": "us_equity_growth",
+            "price": 280.14,
+            "shares": 10
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "value": 2072.2,
+            "pct": 10.8,
+            "bucket": "us_equity_growth",
+            "price": 414.44,
+            "shares": 5
+          },
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "value": 5300.16,
+            "pct": 27.7,
+            "bucket": "us_equity_broad",
+            "price": 662.52,
+            "shares": 8
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond Market ETF",
+            "value": 2200.8,
+            "pct": 11.5,
+            "bucket": "bonds_medium",
+            "price": 73.36,
+            "shares": 30
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc.",
+            "value": 1157.07,
+            "pct": 6.0,
+            "bucket": "us_equity_growth",
+            "price": 385.69,
+            "shares": 3
+          },
+          {
+            "ticker": "VTI",
+            "name": "Vanguard Total Stock Market ETF",
+            "value": 2131.74,
+            "pct": 11.1,
+            "bucket": "us_equity_broad",
+            "price": 355.29,
+            "shares": 6
+          }
+        ],
+        "total_value": 19163.37,
+        "cash": 3500.0
+      },
+      "after": {
+        "holdings": [
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "shares": 5.0,
+            "price": 662.52,
+            "value": 3312.6,
+            "pct": 17.6,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond Market ETF",
+            "shares": 37.0,
+            "price": 73.36,
+            "value": 2714.32,
+            "pct": 14.4,
+            "bucket": "bonds_medium"
+          },
+          {
+            "ticker": "CGDG",
+            "name": "Dividend / Income",
+            "shares": 60.0,
+            "price": 37.23,
+            "value": 2233.8,
+            "pct": 11.8,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "ACWV",
+            "name": "Defensive / Low-Vol",
+            "shares": 18.0,
+            "price": 120.9,
+            "value": 2176.2,
+            "pct": 11.5,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AVEM",
+            "name": "International Equity",
+            "shares": 16.0,
+            "price": 90.53,
+            "value": 1448.48,
+            "pct": 7.7,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "shares": 5.0,
+            "price": 280.14,
+            "value": 1400.7,
+            "pct": 7.4,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "VTI",
+            "name": "Vanguard Total Stock Market ETF",
+            "shares": 3.0,
+            "price": 355.29,
+            "value": 1065.87,
+            "pct": 5.7,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "shares": 2.0,
+            "price": 414.44,
+            "value": 828.88,
+            "pct": 4.4,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc.",
+            "shares": 2.0,
+            "price": 385.69,
+            "value": 771.38,
+            "pct": 4.1,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "DFGR",
+            "name": "Real Estate (REITs)",
+            "shares": 26.0,
+            "price": 28.8,
+            "value": 748.8,
+            "pct": 4.0,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AAAU",
+            "name": "Commodities & Gold",
+            "shares": 16.0,
+            "price": 45.46,
+            "value": 727.36,
+            "pct": 3.9,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AVUV",
+            "name": "US Value Equity",
+            "shares": 6.0,
+            "price": 119.96,
+            "value": 719.76,
+            "pct": 3.8,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "BSV",
+            "name": "Short-Term Bonds",
+            "shares": 9.0,
+            "price": 78.08,
+            "value": 702.72,
+            "pct": 3.7,
+            "bucket": "us_equity_broad"
+          }
+        ],
+        "total_value": 19163.37
+      }
+    },
+    "flags": [
+      {
+        "type": "caution",
+        "detail": "equity_ceiling_breach",
+        "message": "Your equity allocation exceeds the typical ceiling for your risk profile \u2014 consider rebalancing toward bonds or cash."
+      }
+    ],
+    "violations": [
+      {
+        "type": "equity_ceiling",
+        "detail": "moderate",
+        "message": "Your equity exposure exceeds the recommended ceiling for your risk profile."
+      }
+    ],
+    "recommendations": [],
+    "math": {
+      "portfolio_beta": 0.721,
+      "risk_free_rate": 0.0432,
+      "portfolio_expected_annual": 0.0767,
+      "return_gap": "achievable",
+      "target_value": null,
+      "timeline_months": null,
+      "capm_source": "CAPM: Rf=FRED GS10, Rm=SPY long-run 10%"
+    },
+    "scenario_result": {
+      "scenario_id": "tech_selloff",
+      "scenario_name": "Tech Selloff",
+      "scenario_description": "Technology stocks fall sharply while other sectors hold steady.",
+      "original_value": 19163.37,
+      "simulated_value": 16683.02,
+      "change": -2480.35,
+      "change_pct": -12.9,
+      "holdings_impact": [
+        {
+          "symbol": "AAPL",
+          "name": "Apple Inc.",
+          "type": "stock",
+          "original_value": 2801.4,
+          "simulated_value": 1904.95,
+          "change": -896.45,
+          "change_pct": -32.0
+        },
+        {
+          "symbol": "MSFT",
+          "name": "Microsoft Corp.",
+          "type": "stock",
+          "original_value": 2072.2,
+          "simulated_value": 1409.1,
+          "change": -663.1,
+          "change_pct": -32.0
+        },
+        {
+          "symbol": "VOO",
+          "name": "Vanguard S&P 500 ETF",
+          "type": "etf",
+          "original_value": 5300.16,
+          "simulated_value": 4876.15,
+          "change": -424.01,
+          "change_pct": -8.0
+        },
+        {
+          "symbol": "GOOGL",
+          "name": "Alphabet Inc.",
+          "type": "stock",
+          "original_value": 1157.07,
+          "simulated_value": 786.81,
+          "change": -370.26,
+          "change_pct": -32.0
+        },
+        {
+          "symbol": "VTI",
+          "name": "Vanguard Total Stock Market ETF",
+          "type": "etf",
+          "original_value": 2131.74,
+          "simulated_value": 1961.2,
+          "change": -170.54,
+          "change_pct": -8.0
+        },
+        {
+          "symbol": "BND",
+          "name": "Vanguard Total Bond Market ETF",
+          "type": "bond",
+          "original_value": 2200.8,
+          "simulated_value": 2244.82,
+          "change": 44.02,
+          "change_pct": 2.0
+        }
+      ],
+      "advice": "Your exposure to tech stocks drives this loss. Diversifying into healthcare, consumer goods, or bonds would reduce this risk."
+    },
+    "planner_engine": "clingo",
+    "profile_used": {
+      "investor_type": "conservative",
+      "risk_level": "low",
+      "time_horizon": "long_term",
+      "liquidity_need": "medium",
+      "panic_risk": "medium_high",
+      "goal": "wealth_growth"
+    }
+  },
+  {
+    "id": "a1996cf7-fbf2-4c89-aade-a7a1a9d5fe9a",
+    "timestamp": "2026-05-02T05:36:20",
+    "scenario_text": "what can i do given these oil price increase",
+    "parsed_intent": {
+      "market_trend": "bearish",
+      "inflation_level": "high"
+    },
+    "verdict": "proceed_with_caution",
+    "verdict_label": "Proceed with Caution",
+    "verdict_color": "yellow",
+    "trade_count": 12,
+    "narrative": "You can rebalance, but there are important things to watch out for first. Your portfolio beta is 0.72, and with today's 4.3% risk-free rate (FRED 10-yr Treasury), CAPM puts your expected annual return at about 7.7%. High inflation + falling markets often favours real assets \u2014 commodity ETFs or TIPS can provide a hedge.",
+    "reasoning": "Based on your current allocation and your low risk profile, this plan realigns your portfolio toward your target allocation. Trim: AAPL (sell 5 shares), MSFT (sell 3 shares), VOO (sell 2 shares). Add: AVEM (buy 21 shares), CGDG (buy 53 shares), DFGR (buy 34 shares). Biggest overweight: Cash at 18% vs 0% target \u2014 trimming here frees up capital. Some risk signals are active \u2014 proceed carefully and monitor the flagged items.",
+    "rebalance": {
+      "target_allocation": {
+        "us_equity_broad": 30.0,
+        "us_equity_growth": 15.0,
+        "us_equity_value": 5.0,
+        "dividend": 10.0,
+        "international": 10.0,
+        "bonds_medium": 10.0,
+        "bonds_short": 5.0,
+        "defensive": 5.0,
+        "real_estate": 5.0,
+        "commodities": 5.0
+      },
+      "gap_analysis": {
+        "real_estate": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Real Estate (REITs)"
+        },
+        "international": {
+          "current_pct": 0,
+          "target_pct": 10.0,
+          "gap_pct": 10.0,
+          "label": "International Equity"
+        },
+        "defensive": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Defensive / Low-Vol"
+        },
+        "us_equity_growth": {
+          "current_pct": 31.5,
+          "target_pct": 15.0,
+          "gap_pct": -16.5,
+          "label": "US Growth Equity"
+        },
+        "bonds_short": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Short-Term Bonds"
+        },
+        "bonds_medium": {
+          "current_pct": 11.5,
+          "target_pct": 10.0,
+          "gap_pct": -1.5,
+          "label": "Core Bonds"
+        },
+        "us_equity_broad": {
+          "current_pct": 38.8,
+          "target_pct": 30.0,
+          "gap_pct": -8.8,
+          "label": "US Broad Market"
+        },
+        "commodities": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "Commodities & Gold"
+        },
+        "dividend": {
+          "current_pct": 0,
+          "target_pct": 10.0,
+          "gap_pct": 10.0,
+          "label": "Dividend / Income"
+        },
+        "cash": {
+          "current_pct": 18.3,
+          "target_pct": 0,
+          "gap_pct": -18.3,
+          "label": "Cash"
+        },
+        "us_equity_value": {
+          "current_pct": 0,
+          "target_pct": 5.0,
+          "gap_pct": 5.0,
+          "label": "US Value Equity"
+        }
+      },
+      "trades": [
+        {
+          "action": "sell",
+          "ticker": "AAPL",
+          "name": "Apple Inc.",
+          "shares": 5,
+          "price": 280.14,
+          "value": 1400.7,
+          "bucket": "us_equity_growth",
+          "reason": "AAPL makes up 32% of your portfolio \u2014 16% above your 15% target. Selling some locks in gains and brings your US Growth Equity exposure back in line.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "MSFT",
+          "name": "Microsoft Corp.",
+          "shares": 3,
+          "price": 414.44,
+          "value": 1243.32,
+          "bucket": "us_equity_growth",
+          "reason": "MSFT makes up 32% of your portfolio \u2014 16% above your 15% target. Selling some locks in gains and brings your US Growth Equity exposure back in line.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "VOO",
+          "name": "Vanguard S&P 500 ETF",
+          "shares": 2,
+          "price": 662.52,
+          "value": 1325.04,
+          "bucket": "us_equity_broad",
+          "reason": "VOO makes up 39% of your portfolio \u2014 9% above your 30% target. Selling some locks in gains and brings your US Broad Market exposure back in line.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "GOOGL",
+          "name": "Alphabet Inc.",
+          "shares": 1,
+          "price": 385.69,
+          "value": 385.69,
+          "bucket": "us_equity_growth",
+          "reason": "GOOGL makes up 32% of your portfolio \u2014 16% above your 15% target. Selling some locks in gains and brings your US Growth Equity exposure back in line.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "VTI",
+          "name": "Vanguard Total Stock Market ETF",
+          "shares": 3,
+          "price": 355.29,
+          "value": 1065.87,
+          "bucket": "us_equity_broad",
+          "reason": "VTI makes up 39% of your portfolio \u2014 9% above your 30% target. Selling some locks in gains and brings your US Broad Market exposure back in line.",
+          "is_new": false
+        },
+        {
+          "action": "buy",
+          "ticker": "AVEM",
+          "name": "International Equity",
+          "shares": 21,
+          "price": 90.53,
+          "value": 1901.13,
+          "bucket": "international",
+          "reason": "You're 10% underweight in International Equity. AVEM is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "CGDG",
+          "name": "Dividend / Income",
+          "shares": 53,
+          "price": 37.23,
+          "value": 1973.19,
+          "bucket": "dividend",
+          "reason": "You're 10% underweight in Dividend / Income. CGDG is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "DFGR",
+          "name": "Real Estate (REITs)",
+          "shares": 34,
+          "price": 28.8,
+          "value": 979.2,
+          "bucket": "real_estate",
+          "reason": "You're 5% underweight in Real Estate (REITs). DFGR is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "ACWV",
+          "name": "Defensive / Low-Vol",
+          "shares": 8,
+          "price": 120.9,
+          "value": 967.2,
+          "bucket": "defensive",
+          "reason": "You're 5% underweight in Defensive / Low-Vol. ACWV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "BSV",
+          "name": "Short-Term Bonds",
+          "shares": 12,
+          "price": 78.08,
+          "value": 936.96,
+          "bucket": "bonds_short",
+          "reason": "You're 5% underweight in Short-Term Bonds. BSV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AAAU",
+          "name": "Commodities & Gold",
+          "shares": 21,
+          "price": 45.46,
+          "value": 954.66,
+          "bucket": "commodities",
+          "reason": "You're 5% underweight in Commodities & Gold. AAAU is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AVUV",
+          "name": "US Value Equity",
+          "shares": 8,
+          "price": 119.96,
+          "value": 959.68,
+          "bucket": "us_equity_value",
+          "reason": "You're 5% underweight in US Value Equity. AVUV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        }
+      ],
+      "before": {
+        "holdings": [
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "value": 2801.4,
+            "pct": 14.6,
+            "bucket": "us_equity_growth",
+            "price": 280.14,
+            "shares": 10
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "value": 2072.2,
+            "pct": 10.8,
+            "bucket": "us_equity_growth",
+            "price": 414.44,
+            "shares": 5
+          },
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "value": 5300.16,
+            "pct": 27.7,
+            "bucket": "us_equity_broad",
+            "price": 662.52,
+            "shares": 8
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond Market ETF",
+            "value": 2200.8,
+            "pct": 11.5,
+            "bucket": "bonds_medium",
+            "price": 73.36,
+            "shares": 30
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc.",
+            "value": 1157.07,
+            "pct": 6.0,
+            "bucket": "us_equity_growth",
+            "price": 385.69,
+            "shares": 3
+          },
+          {
+            "ticker": "VTI",
+            "name": "Vanguard Total Stock Market ETF",
+            "value": 2131.74,
+            "pct": 11.1,
+            "bucket": "us_equity_broad",
+            "price": 355.29,
+            "shares": 6
+          }
+        ],
+        "total_value": 19163.37,
+        "cash": 3500.0
+      },
+      "after": {
+        "holdings": [
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "shares": 6.0,
+            "price": 662.52,
+            "value": 3975.12,
+            "pct": 21.0,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond Market ETF",
+            "shares": 30.0,
+            "price": 73.36,
+            "value": 2200.8,
+            "pct": 11.6,
+            "bucket": "bonds_medium"
+          },
+          {
+            "ticker": "CGDG",
+            "name": "Dividend / Income",
+            "shares": 53.0,
+            "price": 37.23,
+            "value": 1973.19,
+            "pct": 10.4,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AVEM",
+            "name": "International Equity",
+            "shares": 21.0,
+            "price": 90.53,
+            "value": 1901.13,
+            "pct": 10.1,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "shares": 5.0,
+            "price": 280.14,
+            "value": 1400.7,
+            "pct": 7.4,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "VTI",
+            "name": "Vanguard Total Stock Market ETF",
+            "shares": 3.0,
+            "price": 355.29,
+            "value": 1065.87,
+            "pct": 5.6,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "DFGR",
+            "name": "Real Estate (REITs)",
+            "shares": 34.0,
+            "price": 28.8,
+            "value": 979.2,
+            "pct": 5.2,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "ACWV",
+            "name": "Defensive / Low-Vol",
+            "shares": 8.0,
+            "price": 120.9,
+            "value": 967.2,
+            "pct": 5.1,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AVUV",
+            "name": "US Value Equity",
+            "shares": 8.0,
+            "price": 119.96,
+            "value": 959.68,
+            "pct": 5.1,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AAAU",
+            "name": "Commodities & Gold",
+            "shares": 21.0,
+            "price": 45.46,
+            "value": 954.66,
+            "pct": 5.0,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "BSV",
+            "name": "Short-Term Bonds",
+            "shares": 12.0,
+            "price": 78.08,
+            "value": 936.96,
+            "pct": 5.0,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "shares": 2.0,
+            "price": 414.44,
+            "value": 828.88,
+            "pct": 4.4,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc.",
+            "shares": 2.0,
+            "price": 385.69,
+            "value": 771.38,
+            "pct": 4.1,
+            "bucket": "us_equity_growth"
+          }
+        ],
+        "total_value": 19163.37
+      }
+    },
+    "flags": [
+      {
+        "type": "opportunity",
+        "detail": "real_assets",
+        "message": "High inflation + falling markets often favours real assets \u2014 commodity ETFs or TIPS can provide a hedge."
+      },
+      {
+        "type": "caution",
+        "detail": "equity_ceiling_breach",
+        "message": "Your equity allocation exceeds the typical ceiling for your risk profile \u2014 consider rebalancing toward bonds or cash."
+      }
+    ],
+    "violations": [
+      {
+        "type": "equity_ceiling",
+        "detail": "moderate",
+        "message": "Your equity exposure exceeds the recommended ceiling for your risk profile."
+      }
+    ],
+    "recommendations": [],
+    "math": {
+      "portfolio_beta": 0.721,
+      "risk_free_rate": 0.0432,
+      "portfolio_expected_annual": 0.0767,
+      "return_gap": "achievable",
+      "target_value": null,
+      "timeline_months": null,
+      "capm_source": "CAPM: Rf=FRED GS10, Rm=SPY long-run 10%"
+    },
+    "scenario_result": null,
+    "planner_engine": "clingo",
+    "profile_used": {
+      "investor_type": "conservative",
+      "risk_level": "low",
+      "time_horizon": "long_term",
+      "liquidity_need": "medium",
+      "panic_risk": "medium_high",
+      "goal": "wealth_growth"
+    }
+  },
+  {
+    "id": "061b6a5a-c37f-4f0c-94c9-c7d44d6996d6",
+    "timestamp": "2026-05-02T05:33:37",
+    "scenario_text": "What if the market crashes next month?",
+    "parsed_intent": {
+      "scenario": "market_crash",
+      "timeline_months": 1,
+      "market_trend": "bearish",
+      "vix_level": "high"
+    },
+    "verdict": "proceed_with_caution",
+    "verdict_label": "Proceed with Caution",
+    "verdict_color": "yellow",
+    "trade_count": 12,
+    "narrative": "You can rebalance, but there are important things to watch out for first. Your portfolio beta is 0.72, and with today's 4.3% risk-free rate (FRED 10-yr Treasury), CAPM puts your expected annual return at about 7.7%. High equity exposure during a recession is risky \u2014 stocks historically drop 30\u201350% in prolonged downturns. Suggested moves: \u2191 CASH, \u2191 BOND.",
+    "reasoning": "Given a Market Crash scenario and your low risk profile, this plan realigns your portfolio toward your target allocation. Trim: AAPL (sell 5 shares), MSFT (sell 3 shares), VOO (sell 4 shares). Add: CGDG (buy 66 shares), ACWV (buy 13 shares), BSV (buy 21 shares). Biggest overweight: US Growth Equity at 32% vs 4% target \u2014 trimming here frees up capital. Some risk signals are active \u2014 proceed carefully and monitor the flagged items.",
+    "rebalance": {
+      "target_allocation": {
+        "us_equity_broad": 18.2,
+        "us_equity_growth": 4.5,
+        "us_equity_value": 4.5,
+        "dividend": 13.6,
+        "international": 4.5,
+        "bonds_medium": 18.2,
+        "bonds_short": 9.1,
+        "defensive": 9.1,
+        "commodities": 9.1,
+        "cash": 9.1
+      },
+      "gap_analysis": {
+        "international": {
+          "current_pct": 0,
+          "target_pct": 4.5,
+          "gap_pct": 4.5,
+          "label": "International Equity"
+        },
+        "defensive": {
+          "current_pct": 0,
+          "target_pct": 9.1,
+          "gap_pct": 9.1,
+          "label": "Defensive / Low-Vol"
+        },
+        "us_equity_growth": {
+          "current_pct": 31.5,
+          "target_pct": 4.5,
+          "gap_pct": -27.0,
+          "label": "US Growth Equity"
+        },
+        "bonds_short": {
+          "current_pct": 0,
+          "target_pct": 9.1,
+          "gap_pct": 9.1,
+          "label": "Short-Term Bonds"
+        },
+        "bonds_medium": {
+          "current_pct": 11.5,
+          "target_pct": 18.2,
+          "gap_pct": 6.7,
+          "label": "Core Bonds"
+        },
+        "us_equity_broad": {
+          "current_pct": 38.8,
+          "target_pct": 18.2,
+          "gap_pct": -20.6,
+          "label": "US Broad Market"
+        },
+        "commodities": {
+          "current_pct": 0,
+          "target_pct": 9.1,
+          "gap_pct": 9.1,
+          "label": "Commodities & Gold"
+        },
+        "dividend": {
+          "current_pct": 0,
+          "target_pct": 13.6,
+          "gap_pct": 13.6,
+          "label": "Dividend / Income"
+        },
+        "cash": {
+          "current_pct": 18.3,
+          "target_pct": 9.1,
+          "gap_pct": -9.2,
+          "label": "Cash"
+        },
+        "us_equity_value": {
+          "current_pct": 0,
+          "target_pct": 4.5,
+          "gap_pct": 4.5,
+          "label": "US Value Equity"
+        }
+      },
+      "trades": [
+        {
+          "action": "sell",
+          "ticker": "AAPL",
+          "name": "Apple Inc.",
+          "shares": 5,
+          "price": 280.14,
+          "value": 1400.7,
+          "bucket": "us_equity_growth",
+          "reason": "In a market crash, growth stocks drop the most. Reducing AAPL from 32% toward the 4% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "MSFT",
+          "name": "Microsoft Corp.",
+          "shares": 3,
+          "price": 414.44,
+          "value": 1243.32,
+          "bucket": "us_equity_growth",
+          "reason": "In a market crash, growth stocks drop the most. Reducing MSFT from 32% toward the 4% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "VOO",
+          "name": "Vanguard S&P 500 ETF",
+          "shares": 4,
+          "price": 662.52,
+          "value": 2650.08,
+          "bucket": "us_equity_broad",
+          "reason": "In a market crash, growth stocks drop the most. Reducing VOO from 39% toward the 18% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "GOOGL",
+          "name": "Alphabet Inc.",
+          "shares": 1,
+          "price": 385.69,
+          "value": 385.69,
+          "bucket": "us_equity_growth",
+          "reason": "In a market crash, growth stocks drop the most. Reducing GOOGL from 32% toward the 4% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "sell",
+          "ticker": "VTI",
+          "name": "Vanguard Total Stock Market ETF",
+          "shares": 3,
+          "price": 355.29,
+          "value": 1065.87,
+          "bucket": "us_equity_broad",
+          "reason": "In a market crash, growth stocks drop the most. Reducing VTI from 39% toward the 18% target protects your capital.",
+          "is_new": false
+        },
+        {
+          "action": "buy",
+          "ticker": "CGDG",
+          "name": "Dividend / Income",
+          "shares": 66,
+          "price": 37.23,
+          "value": 2457.18,
+          "bucket": "dividend",
+          "reason": "You're 14% underweight in Dividend / Income. CGDG is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "ACWV",
+          "name": "Defensive / Low-Vol",
+          "shares": 13,
+          "price": 120.9,
+          "value": 1571.7,
+          "bucket": "defensive",
+          "reason": "Utilities, healthcare, and staples hold their value when markets drop. ACWV fills your Defensive / Low-Vol gap (0% \u2192 9%).",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "BSV",
+          "name": "Short-Term Bonds",
+          "shares": 21,
+          "price": 78.08,
+          "value": 1639.68,
+          "bucket": "bonds_short",
+          "reason": "Bonds act as a shock absorber when stocks fall. Your Short-Term Bonds is only 0% vs the 9% target \u2014 BSV closes that gap and cushions the portfolio.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AAAU",
+          "name": "Commodities & Gold",
+          "shares": 36,
+          "price": 45.46,
+          "value": 1636.56,
+          "bucket": "commodities",
+          "reason": "Gold and commodities often rise when stocks fall or inflation picks up. AAAU adds that hedge \u2014 you currently have 0% vs 9% target.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "BND",
+          "name": "Core Bonds",
+          "shares": 16,
+          "price": 73.36,
+          "value": 1173.76,
+          "bucket": "bonds_medium",
+          "reason": "Bonds act as a shock absorber when stocks fall. Your Core Bonds is only 12% vs the 18% target \u2014 BND closes that gap and cushions the portfolio.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AVEM",
+          "name": "International Equity",
+          "shares": 8,
+          "price": 90.53,
+          "value": 724.24,
+          "bucket": "international",
+          "reason": "You're 4% underweight in International Equity. AVEM is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        },
+        {
+          "action": "buy",
+          "ticker": "AVUV",
+          "name": "US Value Equity",
+          "shares": 6,
+          "price": 119.96,
+          "value": 719.76,
+          "bucket": "us_equity_value",
+          "reason": "You're 4% underweight in US Value Equity. AVUV is the top-ranked ETF in this category by assets under management.",
+          "is_new": true
+        }
+      ],
+      "before": {
+        "holdings": [
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "value": 2801.4,
+            "pct": 14.6,
+            "bucket": "us_equity_growth",
+            "price": 280.14,
+            "shares": 10
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "value": 2072.2,
+            "pct": 10.8,
+            "bucket": "us_equity_growth",
+            "price": 414.44,
+            "shares": 5
+          },
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "value": 5300.16,
+            "pct": 27.7,
+            "bucket": "us_equity_broad",
+            "price": 662.52,
+            "shares": 8
+          },
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond Market ETF",
+            "value": 2200.8,
+            "pct": 11.5,
+            "bucket": "bonds_medium",
+            "price": 73.36,
+            "shares": 30
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc.",
+            "value": 1157.07,
+            "pct": 6.0,
+            "bucket": "us_equity_growth",
+            "price": 385.69,
+            "shares": 3
+          },
+          {
+            "ticker": "VTI",
+            "name": "Vanguard Total Stock Market ETF",
+            "value": 2131.74,
+            "pct": 11.1,
+            "bucket": "us_equity_broad",
+            "price": 355.29,
+            "shares": 6
+          }
+        ],
+        "total_value": 19163.37,
+        "cash": 3500.0
+      },
+      "after": {
+        "holdings": [
+          {
+            "ticker": "BND",
+            "name": "Vanguard Total Bond Market ETF",
+            "shares": 46.0,
+            "price": 73.36,
+            "value": 3374.56,
+            "pct": 17.9,
+            "bucket": "bonds_medium"
+          },
+          {
+            "ticker": "VOO",
+            "name": "Vanguard S&P 500 ETF",
+            "shares": 4.0,
+            "price": 662.52,
+            "value": 2650.08,
+            "pct": 14.1,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "CGDG",
+            "name": "Dividend / Income",
+            "shares": 66.0,
+            "price": 37.23,
+            "value": 2457.18,
+            "pct": 13.0,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "BSV",
+            "name": "Short-Term Bonds",
+            "shares": 21.0,
+            "price": 78.08,
+            "value": 1639.68,
+            "pct": 8.7,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AAAU",
+            "name": "Commodities & Gold",
+            "shares": 36.0,
+            "price": 45.46,
+            "value": 1636.56,
+            "pct": 8.7,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "ACWV",
+            "name": "Defensive / Low-Vol",
+            "shares": 13.0,
+            "price": 120.9,
+            "value": 1571.7,
+            "pct": 8.3,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AAPL",
+            "name": "Apple Inc.",
+            "shares": 5.0,
+            "price": 280.14,
+            "value": 1400.7,
+            "pct": 7.4,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "VTI",
+            "name": "Vanguard Total Stock Market ETF",
+            "shares": 3.0,
+            "price": 355.29,
+            "value": 1065.87,
+            "pct": 5.7,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft Corp.",
+            "shares": 2.0,
+            "price": 414.44,
+            "value": 828.88,
+            "pct": 4.4,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet Inc.",
+            "shares": 2.0,
+            "price": 385.69,
+            "value": 771.38,
+            "pct": 4.1,
+            "bucket": "us_equity_growth"
+          },
+          {
+            "ticker": "AVEM",
+            "name": "International Equity",
+            "shares": 8.0,
+            "price": 90.53,
+            "value": 724.24,
+            "pct": 3.8,
+            "bucket": "us_equity_broad"
+          },
+          {
+            "ticker": "AVUV",
+            "name": "US Value Equity",
+            "shares": 6.0,
+            "price": 119.96,
+            "value": 719.76,
+            "pct": 3.8,
+            "bucket": "us_equity_broad"
+          }
+        ],
+        "total_value": 19163.37
+      }
+    },
+    "flags": [
+      {
+        "type": "conflict",
+        "detail": "recession_vs_equity",
+        "message": "High equity exposure during a recession is risky \u2014 stocks historically drop 30\u201350% in prolonged downturns."
+      },
+      {
+        "type": "caution",
+        "detail": "equity_ceiling_breach",
+        "message": "Your equity allocation exceeds the typical ceiling for your risk profile \u2014 consider rebalancing toward bonds or cash."
+      }
+    ],
+    "violations": [
+      {
+        "type": "equity_ceiling",
+        "detail": "moderate",
+        "message": "Your equity exposure exceeds the recommended ceiling for your risk profile."
+      }
+    ],
+    "recommendations": [
+      {
+        "action": "increase",
+        "target": "cash",
+        "scope": "type",
+        "message": "Move more of your portfolio into cash or money-market funds as a defensive buffer."
+      },
+      {
+        "action": "increase",
+        "target": "bond",
+        "scope": "type",
+        "message": "Add more bonds to your portfolio for stability and recession protection."
+      }
+    ],
+    "math": {
+      "portfolio_beta": 0.721,
+      "risk_free_rate": 0.0432,
+      "portfolio_expected_annual": 0.0767,
+      "return_gap": "achievable",
+      "target_value": null,
+      "timeline_months": 1,
+      "capm_source": "CAPM: Rf=FRED GS10, Rm=SPY long-run 10%"
+    },
+    "scenario_result": {
+      "scenario_id": "market_crash",
+      "scenario_name": "Market Crash",
+      "scenario_description": "A sudden sharp drop across all markets \u2014 like 2008 or early 2020.",
+      "original_value": 19163.37,
+      "simulated_value": 16586.91,
+      "change": -2576.46,
+      "change_pct": -13.4,
+      "holdings_impact": [
+        {
+          "symbol": "VOO",
+          "name": "Vanguard S&P 500 ETF",
+          "type": "etf",
+          "original_value": 5300.16,
+          "simulated_value": 4346.13,
+          "change": -954.03,
+          "change_pct": -18.0
+        },
+        {
+          "symbol": "AAPL",
+          "name": "Apple Inc.",
+          "type": "stock",
+          "original_value": 2801.4,
+          "simulated_value": 2185.09,
+          "change": -616.31,
+          "change_pct": -22.0
+        },
+        {
+          "symbol": "MSFT",
+          "name": "Microsoft Corp.",
+          "type": "stock",
+          "original_value": 2072.2,
+          "simulated_value": 1616.32,
+          "change": -455.88,
+          "change_pct": -22.0
+        },
+        {
+          "symbol": "VTI",
+          "name": "Vanguard Total Stock Market ETF",
+          "type": "etf",
+          "original_value": 2131.74,
+          "simulated_value": 1748.03,
+          "change": -383.71,
+          "change_pct": -18.0
+        },
+        {
+          "symbol": "GOOGL",
+          "name": "Alphabet Inc.",
+          "type": "stock",
+          "original_value": 1157.07,
+          "simulated_value": 902.51,
+          "change": -254.56,
+          "change_pct": -22.0
+        },
+        {
+          "symbol": "BND",
+          "name": "Vanguard Total Bond Market ETF",
+          "type": "bond",
+          "original_value": 2200.8,
+          "simulated_value": 2288.83,
+          "change": 88.03,
+          "change_pct": 4.0
+        }
+      ],
+      "advice": "Adding more bonds (target ~25%) would make your portfolio more resilient to sudden crashes."
+    },
+    "planner_engine": "clingo",
+    "profile_used": {
+      "investor_type": "conservative",
+      "risk_level": "low",
+      "time_horizon": "long_term",
+      "liquidity_need": "medium",
+      "panic_risk": "medium_high",
+      "goal": "wealth_growth"
+    }
+  }
+]

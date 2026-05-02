@@ -7,7 +7,9 @@ import RiskScreen       from "./screens/RiskScreen.jsx";
 import RebalanceScreen  from "./screens/RebalanceScreen.jsx";
 import { apiFetch }     from "./api.js";
 import { BarChart3, ShieldCheck, ArrowUpDown,
-         RefreshCw, LogOut, TrendingUp, TrendingDown } from "lucide-react";
+         RefreshCw, LogOut, TrendingUp, TrendingDown, MessageSquare, History } from "lucide-react";
+import AskFolioScreen         from "./screens/AskFolioScreen.jsx";
+import ScenariosHistoryScreen from "./screens/ScenariosHistoryScreen.jsx";
 
 /* ─── Ambient background canvas ────────────────────────────────── */
 function AmbientCanvas() {
@@ -51,9 +53,11 @@ function AmbientCanvas() {
 
 /* ─── Sidebar nav config ────────────────────────────────────────── */
 const NAV = [
-  { id: "portfolio", Icon: BarChart3,   label: "My Holdings" },
-  { id: "risk",      Icon: ShieldCheck, label: "Risk Check"  },
-  { id: "rebalance", Icon: ArrowUpDown, label: "Rebalance"   },
+  { id: "portfolio", Icon: BarChart3,     label: "My Holdings"  },
+  { id: "risk",      Icon: ShieldCheck,   label: "Risk Check"   },
+  { id: "rebalance", Icon: ArrowUpDown,   label: "Rebalance"    },
+  { id: "askfolio",  Icon: MessageSquare, label: "Ask Folio"    },
+  { id: "history",   Icon: History,       label: "My Scenarios" },
 ];
 
 /* ─── Sidebar ───────────────────────────────────────────────────── */
@@ -197,10 +201,10 @@ function HubScreen({ enriched, setScreen, currentUser, onLogout }) {
   const isPos   = gain >= 0;
 
   const features = [
-    { id: "portfolio", Icon: BarChart3,   title: "My Holdings",  desc: "Live prices, cost basis, gain & loss per position.", color: "#F59E0B" },
-    { id: "risk",      Icon: ShieldCheck, title: "Risk Check",   desc: "Beta analysis and plain-English risk rating.",        color: "#10B981" },
-    { id: "rebalance", Icon: ArrowUpDown, title: "Rebalance",    desc: "Drift from targets — exactly what to buy or sell.",  color: "#6366F1" },
-    { id: "scenario",  Icon: Sparkles,    title: "What-If",      desc: "Simulate crashes, rate hikes, bull runs and more.",  color: "#EC4899" },
+    { id: "portfolio", Icon: BarChart3,     title: "My Holdings",  desc: "Live prices, cost basis, gain & loss per position.", color: "#F59E0B" },
+    { id: "risk",      Icon: ShieldCheck,   title: "Risk Check",   desc: "Beta analysis and plain-English risk rating.",        color: "#10B981" },
+    { id: "rebalance", Icon: ArrowUpDown,   title: "Rebalance",    desc: "Drift from targets — exactly what to buy or sell.",  color: "#6366F1" },
+    { id: "askfolio",  Icon: MessageSquare, title: "Ask Folio",    desc: "Describe a scenario and get a full rebalance plan.", color: "#0891B2" },
   ];
 
   return (
@@ -408,6 +412,8 @@ export default function TwinTrack({ currentUser, onLogout }) {
         )}
         {screen === "risk"      && <RiskScreen      portfolio={portfolio} prices={prices} />}
         {screen === "rebalance" && <RebalanceScreen portfolio={portfolio} prices={prices} />}
+        {screen === "askfolio"  && <AskFolioScreen  portfolio={portfolio} prices={prices} onNavigate={setScreen} />}
+        {screen === "history"   && <ScenariosHistoryScreen onNavigate={setScreen} />}
       </main>
     </div>
   );
