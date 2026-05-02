@@ -83,16 +83,33 @@ function DonutChart({ slices, total }) {
 const TYPES = ["stock", "etf", "bond", "fund"];
 
 const inputStyle = {
-  width: "100%", padding: "9px 12px", border: `1px solid ${BORDER}`,
-  background: BG, color: TEXT, fontSize: 13.5, fontFamily: "inherit",
+  width: "100%", padding: "7px 10px", border: `1px solid ${BORDER}`,
+  background: BG, color: TEXT, fontSize: 13, fontFamily: "inherit",
   boxSizing: "border-box",
 };
-const goldBtn  = { flex: 1, padding: "10px 0", border: "none",
+const goldBtn  = { flex: 1, padding: "9px 0", border: "none",
                    background: GOLD, color: SURFACE, fontWeight: 700,
-                   fontSize: 13.5, cursor: "pointer", fontFamily: "inherit" };
-const ghostBtn = { flex: 1, padding: "10px 0", border: `1px solid ${BORDER}`,
-                   background: "transparent", color: TEXT_DIM, fontSize: 13.5,
+                   fontSize: 13, cursor: "pointer", fontFamily: "inherit" };
+const ghostBtn = { flex: 1, padding: "9px 0", border: `1px solid ${BORDER}`,
+                   background: "transparent", color: TEXT_DIM, fontSize: 13,
                    cursor: "pointer", fontFamily: "inherit" };
+
+function ModalField({ label, fieldKey, type = "text", hint = "", form, set }) {
+  return (
+    <div>
+      <label style={{ display: "block", fontSize: 10, color: TEXT_DIM, marginBottom: 4,
+                      textTransform: "uppercase", letterSpacing: "0.07em" }}>{label}</label>
+      {fieldKey === "type" ? (
+        <select value={form[fieldKey]} onChange={(e) => set(fieldKey, e.target.value)} style={inputStyle}>
+          {TYPES.map((t) => <option key={t} value={t}>{t.toUpperCase()}</option>)}
+        </select>
+      ) : (
+        <input type={type} value={form[fieldKey]} onChange={(e) => set(fieldKey, e.target.value)}
+               placeholder={hint} style={inputStyle} required={fieldKey !== "target_pct"} />
+      )}
+    </div>
+  );
+}
 
 function HoldingModal({ initial, onSave, onClose, onDelete }) {
   const [form, setForm] = useState(initial || {
@@ -104,44 +121,43 @@ function HoldingModal({ initial, onSave, onClose, onDelete }) {
     onSave({ ...form, shares: parseFloat(form.shares), avg_cost: parseFloat(form.avg_cost),
               target_pct: parseFloat(form.target_pct) || 0 });
   };
-  const field = (label, key, type = "text", hint = "") => (
-    <div style={{ marginBottom: 14 }}>
-      <label style={{ display: "block", fontSize: 11, color: TEXT_DIM, marginBottom: 5,
-                      textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</label>
-      {key === "type" ? (
-        <select value={form[key]} onChange={(e) => set(key, e.target.value)} style={inputStyle}>
-          {TYPES.map((t) => <option key={t} value={t}>{t.toUpperCase()}</option>)}
-        </select>
-      ) : (
-        <input type={type} value={form[key]} onChange={(e) => set(key, e.target.value)}
-               placeholder={hint} style={inputStyle} required={key !== "target_pct"} />
-      )}
-    </div>
-  );
+  const fp = { form, set };
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(10,22,40,0.35)", zIndex: 100,
+    <div style={{ position: "fixed", inset: 0, background: "rgba(10,22,40,0.45)", zIndex: 100,
                   display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ background: SURFACE, border: `1px solid ${BORDER}`,
-                    boxShadow: "0 8px 40px rgba(10,22,40,0.12)",
-                    padding: "28px 28px", width: 380, maxWidth: "90vw" }}>
-        <h3 style={{ margin: "0 0 22px", fontSize: 17, fontWeight: 700, color: TEXT, fontFamily: FONT_SERIF }}>
-          {initial ? "Edit holding" : "Add a holding"}
-        </h3>
+                    boxShadow: "0 12px 48px rgba(10,22,40,0.18)",
+                    padding: "22px 22px 18px", width: 420, maxWidth: "92vw" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+          <span style={{ fontSize: 14, fontWeight: 700, color: TEXT }}>
+            {initial ? "Edit holding" : "Add a holding"}
+          </span>
+          <button type="button" onClick={onClose} style={{
+            background: "none", border: "none", cursor: "pointer", color: TEXT_DIM,
+            fontSize: 18, lineHeight: 1, padding: 0,
+          }}>×</button>
+        </div>
         <form onSubmit={submit}>
-          {field("Ticker symbol", "symbol", "text", "e.g. AAPL")}
-          {field("Company / fund name", "name", "text", "e.g. Apple Inc.")}
-          {field("Type", "type")}
-          {field("Number of shares", "shares", "number", "e.g. 10")}
-          {field("Price you paid per share ($)", "avg_cost", "number", "e.g. 150.00")}
-          {field("Target % of portfolio (optional)", "target_pct", "number", "e.g. 15")}
-          <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 14px", marginBottom: 10 }}>
+            <ModalField label="Ticker" fieldKey="symbol" hint="AAPL" {...fp} />
+            <ModalField label="Type" fieldKey="type" {...fp} />
+          </div>
+          <div style={{ marginBottom: 10 }}>
+            <ModalField label="Company / fund name" fieldKey="name" hint="e.g. Apple Inc." {...fp} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px 14px", marginBottom: 16 }}>
+            <ModalField label="Shares" fieldKey="shares" type="number" hint="10" {...fp} />
+            <ModalField label="Cost per share ($)" fieldKey="avg_cost" type="number" hint="150.00" {...fp} />
+            <ModalField label="Target % (optional)" fieldKey="target_pct" type="number" hint="15" {...fp} />
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
             <button type="button" onClick={onClose} style={ghostBtn}>Cancel</button>
             <button type="submit" style={goldBtn}>Save holding</button>
           </div>
           {onDelete && (
             <button type="button" onClick={onDelete} style={{
-              marginTop: 14, width: "100%", padding: "9px 0", border: "none",
-              background: "none", color: RED, fontSize: 12.5, cursor: "pointer",
+              marginTop: 12, width: "100%", padding: "7px 0", border: "none",
+              background: "none", color: RED, fontSize: 12, cursor: "pointer",
               fontFamily: "inherit", letterSpacing: "0.01em",
             }}>Delete this holding</button>
           )}
