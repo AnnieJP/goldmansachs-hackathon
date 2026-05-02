@@ -155,17 +155,69 @@ function TypeBadge({ type }) {
   );
 }
 
+/* ─── Status badge ──────────────────────────────────────────────── */
+const STATUS_COLORS = {
+  New:     { bg: `${GREEN}18`,              color: GREEN },
+  Update:  { bg: "rgba(30,64,175,0.10)",    color: "#1E40AF" },
+  Merged:  { bg: "rgba(217,119,6,0.10)",    color: "#D97706" },
+  Removed: { bg: `${RED}18`,               color: RED },
+};
+function StatusBadge({ status }) {
+  const c = STATUS_COLORS[status] || { bg: SURFACE_2, color: TEXT_DIM };
+  return (
+    <span style={{ display: "inline-block", padding: "2px 8px", fontSize: 10.5,
+                   fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em",
+                   background: c.bg, color: c.color }}>
+      {status}
+    </span>
+  );
+}
+
 /* ─── PDF import modal ──────────────────────────────────────────── */
-export function ImportModal({ onImport, onClose }) {
-  const [stage,    setStage]    = useState("idle");
-  const [parsed,   setParsed]   = useState([]);
-  const [selected, setSelected] = useState(new Set());
-  const [error,    setError]    = useState(null);
-  const [filename, setFilename] = useState("");
+export function ImportModal({ portfolio, onImport, onClose }) {
+  const [stage,             setStage]             = useState("idle");
+  const [parsed,            setParsed]            = useState([]);
+  const [selected,          setSelected]          = useState(new Set());
+  const [error,             setError]             = useState(null);
+  const [filename,          setFilename]          = useState("");
+  const [brokerage,         setBrokerage]         = useState("");
+  const [confirmedRemovals, setConfirmedRemovals] = useState([]);
+
+  const showPortfolioFeatures = !!portfolio;
+
+  const brokerageKey = brokerage.trim().toLowerCase();
+
+  const previewItems = useMemo(() => {
+    if (!portfolio) return parsed.map((h) => ({ ...h, status: null }));
+    const existing = portfolio.holdings || [];
+    return parsed.map((h) => {
+      const match = existing.find((e) => e.symbol === h.symbol);
+      if (!match) return { ...h, status: "New" };
+      const sources = match.sources || [];
+      if (sources.length === 0) return { ...h, status: "Merged" };
+      return { ...h, status: sources.some((s) => s.brokerage.trim().toLowerCase() === brokerageKey) ? "Update" : "Merged" };
+    });
+  }, [parsed, portfolio, brokerageKey]);
+
+  const removals = useMemo(() => {
+    if (!portfolio || !brokerageKey) return [];
+    const parsedSymbols = new Set(parsed.map((h) => h.symbol));
+    return (portfolio.holdings || []).filter((h) => {
+      const sources = h.sources || [];
+      return sources.some((s) => s.brokerage.trim().toLowerCase() === brokerageKey) && !parsedSymbols.has(h.symbol);
+    });
+  }, [portfolio, brokerageKey, parsed]);
+
+  useEffect(() => {
+    setConfirmedRemovals(removals.map((h) => h.symbol));
+  }, [removals]);
 
   const handleFile = (file) => {
     if (!file || !file.name.toLowerCase().endsWith(".pdf")) {
       setError("Please select a PDF file."); return;
+    }
+    if (!brokerage.trim()) {
+      setError("Please enter the brokerage name before uploading."); return;
     }
     setFilename(file.name); setError(null); setStage("parsing");
     const reader = new FileReader();
@@ -196,15 +248,19 @@ export function ImportModal({ onImport, onClose }) {
   const toggle = (id) => {
     const s = new Set(selected); s.has(id) ? s.delete(id) : s.add(id); setSelected(s);
   };
+  const toggleRemoval = (symbol) =>
+    setConfirmedRemovals((prev) =>
+      prev.includes(symbol) ? prev.filter((s) => s !== symbol) : [...prev, symbol]
+    );
+
   const confirmImport = async () => {
     setStage("importing");
-    for (const h of parsed.filter((h) => selected.has(h.id))) {
-      await apiFetch("/api/portfolio/add", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(h),
-      });
-    }
-    setStage("done"); onImport();
+    const toImport = parsed.filter((h) => selected.has(h.id));
+    await apiFetch("/api/portfolio/import-merge", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ holdings: toImport, brokerage, confirmed_removals: confirmedRemovals }),
+    });
+    onImport();
   };
 
   return (
@@ -226,20 +282,36 @@ export function ImportModal({ onImport, onClose }) {
 
         <div style={{ padding: "20px 24px", overflowY: "auto", flex: 1 }}>
           {(stage === "idle" || stage === "parsing") && (
-            <label style={{ display: "block", border: `2px dashed ${BORDER_MED}`,
-                            padding: "36px 20px", textAlign: "center", cursor: "pointer" }}
-                   onDragOver={(e) => e.preventDefault()}
-                   onDrop={(e) => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); }}>
-              <input type="file" accept=".pdf" style={{ display: "none" }}
-                     onChange={(e) => handleFile(e.target.files[0])} />
-              <div style={{ fontSize: 32, marginBottom: 10 }}>📄</div>
-              {stage === "parsing"
-                ? <div style={{ color: GOLD, fontWeight: 600, fontSize: 14 }}>Parsing {filename}…</div>
-                : <>
-                    <div style={{ fontWeight: 600, fontSize: 14, color: TEXT }}>Drop your PDF here, or click to browse</div>
-                    <div style={{ fontSize: 12, color: TEXT_DIM, marginTop: 6 }}>Supports account statements from most brokerages</div>
-                  </>}
-            </label>
+            <>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: "block", fontSize: 11, color: TEXT_DIM, marginBottom: 6,
+                                textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  Which brokerage is this statement from?
+                </label>
+                <input
+                  type="text"
+                  value={brokerage}
+                  onChange={(e) => setBrokerage(e.target.value)}
+                  placeholder="e.g. Fidelity, Schwab, Northstar Capital"
+                  disabled={stage === "parsing"}
+                  style={{ ...inputStyle, opacity: stage === "parsing" ? 0.5 : 1 }}
+                />
+              </div>
+              <label style={{ display: "block", border: `2px dashed ${BORDER_MED}`,
+                              padding: "36px 20px", textAlign: "center", cursor: "pointer" }}
+                     onDragOver={(e) => e.preventDefault()}
+                     onDrop={(e) => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); }}>
+                <input type="file" accept=".pdf" style={{ display: "none" }}
+                       onChange={(e) => { handleFile(e.target.files[0]); e.target.value = ""; }} />
+                <div style={{ fontSize: 32, marginBottom: 10 }}>📄</div>
+                {stage === "parsing"
+                  ? <div style={{ color: GOLD, fontWeight: 600, fontSize: 14 }}>Parsing {filename}…</div>
+                  : <>
+                      <div style={{ fontWeight: 600, fontSize: 14, color: TEXT }}>Drop your PDF here, or click to browse</div>
+                      <div style={{ fontSize: 12, color: TEXT_DIM, marginTop: 6 }}>Supports account statements from most brokerages</div>
+                    </>}
+              </label>
+            </>
           )}
 
           {error && (
@@ -265,7 +337,7 @@ export function ImportModal({ onImport, onClose }) {
                       <th style={{ padding: "8px 12px", textAlign: "left", width: 28 }}>
                         <input type="checkbox" checked={selected.size === parsed.length} onChange={toggleAll} />
                       </th>
-                      {["Ticker","Name","Type","Shares","Avg Cost"].map((h) => (
+                      {["Ticker","Name","Type","Shares","Avg Cost", ...(showPortfolioFeatures ? ["Status"] : [])].map((h) => (
                         <th key={h} style={{ padding: "8px 12px", textAlign: "left", fontWeight: 600,
                                              color: TEXT_DIM, textTransform: "uppercase", fontSize: 10.5,
                                              letterSpacing: "0.06em" }}>{h}</th>
@@ -273,7 +345,7 @@ export function ImportModal({ onImport, onClose }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {parsed.map((h) => (
+                    {previewItems.map((h) => (
                       <tr key={h.id} style={{ borderTop: `1px solid ${BORDER}`, opacity: selected.has(h.id) ? 1 : 0.4 }}>
                         <td style={{ padding: "8px 12px" }}><input type="checkbox" checked={selected.has(h.id)} onChange={() => toggle(h.id)} /></td>
                         <td style={{ padding: "8px 12px", fontWeight: 700 }}>{h.symbol}</td>
@@ -281,23 +353,47 @@ export function ImportModal({ onImport, onClose }) {
                         <td style={{ padding: "8px 12px" }}><TypeBadge type={h.type} /></td>
                         <td style={{ padding: "8px 12px" }}>{h.shares}</td>
                         <td style={{ padding: "8px 12px" }}>{fmt$(h.avg_cost)}</td>
+                        {showPortfolioFeatures && (
+                          <td style={{ padding: "8px 12px" }}><StatusBadge status={h.status} /></td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
+
+              {showPortfolioFeatures && removals.length > 0 && (
+                <div style={{ marginTop: 16 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: TEXT, marginBottom: 8 }}>
+                    Holdings missing from this statement
+                    <span style={{ marginLeft: 6, fontSize: 11, color: TEXT_DIM, fontWeight: 400 }}>
+                      (check to remove {brokerage}'s contribution)
+                    </span>
+                  </div>
+                  <div style={{ border: `1px solid ${BORDER}`, overflow: "hidden" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+                      <tbody>
+                        {removals.map((h) => {
+                          const checked = confirmedRemovals.includes(h.symbol);
+                          return (
+                            <tr key={h.symbol} style={{ borderTop: `1px solid ${BORDER}`, opacity: checked ? 1 : 0.5 }}>
+                              <td style={{ padding: "8px 12px", width: 28 }}>
+                                <input type="checkbox" checked={checked} onChange={() => toggleRemoval(h.symbol)} />
+                              </td>
+                              <td style={{ padding: "8px 12px", fontWeight: 700 }}>{h.symbol}</td>
+                              <td style={{ padding: "8px 12px", color: TEXT_DIM, maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{h.name}</td>
+                              <td style={{ padding: "8px 12px" }}><StatusBadge status="Removed" /></td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </>
           )}
 
-          {stage === "done" && (
-            <div style={{ textAlign: "center", padding: "32px 0" }}>
-              <div style={{ fontSize: 40, marginBottom: 12 }}>✓</div>
-              <div style={{ fontWeight: 700, fontSize: 16, color: TEXT }}>Import complete</div>
-              <div style={{ fontSize: 13, color: TEXT_DIM, marginTop: 6 }}>
-                {selected.size} holding{selected.size !== 1 ? "s" : ""} added to your portfolio.
-              </div>
-            </div>
-          )}
         </div>
 
         {stage === "preview" && (
@@ -308,11 +404,6 @@ export function ImportModal({ onImport, onClose }) {
                     style={{ ...goldBtn, flex: "unset", padding: "10px 24px", opacity: selected.size === 0 ? 0.4 : 1 }}>
               Import {selected.size} holding{selected.size !== 1 ? "s" : ""}
             </button>
-          </div>
-        )}
-        {stage === "done" && (
-          <div style={{ padding: "14px 24px", borderTop: `1px solid ${BORDER}`, display: "flex", justifyContent: "flex-end" }}>
-            <button onClick={onClose} style={{ ...goldBtn, flex: "unset", padding: "10px 24px" }}>Done</button>
           </div>
         )}
       </div>
@@ -640,7 +731,7 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
         </div>
       </div>
 
-      {importing && <ImportModal onImport={async () => { await onPortfolioChange(); setImporting(false); }} onClose={() => setImporting(false)} />}
+      {importing && <ImportModal portfolio={portfolio} onImport={async () => { await onPortfolioChange(); setImporting(false); }} onClose={() => setImporting(false)} />}
       {modal && <HoldingModal initial={modal === "add" ? null : modal} onSave={saveHolding} onClose={() => setModal(null)} />}
     </div>
   );
