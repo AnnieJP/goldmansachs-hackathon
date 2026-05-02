@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { fmt$, fmtPct } from "../theme.js";
+import { TYPE_COLOR } from "../components/TypeBadge.jsx";
 
 /* ─── Print-only styles injected into <head> ────────────────────── */
 const PRINT_CSS = `
@@ -119,11 +120,11 @@ function AccountStatementPage({ enriched, portfolio, today }) {
   );
 
   const sections = [
-    { label: "Equities — Individual Stocks", rows: stocks },
-    { label: "ETFs", rows: etfs },
-    { label: "Bonds", rows: bonds },
-    { label: "Mutual Funds / Index Funds", rows: funds },
-    { label: "Other", rows: other },
+    { label: "Equities — Individual Stocks", rows: stocks, type: "stock" },
+    { label: "ETFs", rows: etfs, type: "etf" },
+    { label: "Bonds", rows: bonds, type: "bond" },
+    { label: "Mutual Funds / Index Funds", rows: funds, type: "fund" },
+    { label: "Other", rows: other, type: null },
   ].filter((s) => s.rows.length > 0);
 
   return (
@@ -165,15 +166,20 @@ function AccountStatementPage({ enriched, portfolio, today }) {
       {/* Holdings by category */}
       <div style={{ marginBottom: 22 }}>
         <div style={S.sectionH}>Holdings Detail</div>
-        {sections.map((sec) => (
+        {sections.map((sec) => {
+          const c = sec.type ? TYPE_COLOR[sec.type] : "#444";
+          return (
           <div key={sec.label} style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: "#444", background: "#e8e8e8",
+            <div style={{ fontSize: 10, fontWeight: 700, color: c,
+                          background: sec.type ? c + "18" : "#e8e8e8",
+                          borderLeft: `3px solid ${c}`,
                           padding: "3px 8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
               {sec.label}
             </div>
             <HoldingsTable rows={sec.rows} />
           </div>
-        ))}
+          );
+        })}
 
         {/* Cash row */}
         <table style={S.table}>

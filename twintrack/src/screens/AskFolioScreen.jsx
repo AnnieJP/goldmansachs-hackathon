@@ -9,6 +9,7 @@ import {
   fmt$, fmtPct,
 } from "../theme.js";
 import { apiFetch } from "../api.js";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import InfoTip from "../components/InfoTip.jsx";
 import { Send, Loader2, TrendingUp, TrendingDown, ArrowRight,
          ShieldAlert, CheckCircle2, AlertTriangle, History, RefreshCw } from "lucide-react";
@@ -101,39 +102,83 @@ function AllocationRow({ label, current, target, gap }) {
   const isUnder = gap > 0;
   const isOver  = gap < 0;
   const gapAbs  = Math.abs(gap);
-  const maxBar  = Math.max(current, target, 5);
+  const gapColor = isUnder ? GREEN : isOver ? RED : TEXT_DIM;
   return (
-    <div style={{ marginBottom: 12 }}>
-      <div style={{ display: "flex", justifyContent: "space-between",
-                    alignItems: "baseline", marginBottom: 4 }}>
-        <span style={{ fontSize: 12.5, fontWeight: 500, color: TEXT_SEC }}>{label}</span>
-        <span style={{ fontSize: 11.5, color: TEXT_DIM }}>
-          {current.toFixed(0)}%
-          <span style={{ margin: "0 4px", color: BORDER_MED }}>→</span>
-          <b style={{ color: TEXT }}>{target.toFixed(0)}%</b>
-          {gapAbs >= 1 && (
-            <span style={{
-              marginLeft: 6, fontSize: 10.5, fontWeight: 700,
-              color: isUnder ? GREEN : isOver ? RED : TEXT_DIM,
-            }}>
-              {isUnder ? "+" : ""}{gap.toFixed(0)}%
-            </span>
-          )}
-        </span>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto auto",
+                  alignItems: "center", gap: "0 12px",
+                  padding: "9px 0", borderBottom: `1px solid ${BORDER}` }}>
+      <span style={{ fontSize: 12.5, color: TEXT, fontWeight: 500, minWidth: 0,
+                     overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        {label}
+      </span>
+      <span style={{ fontSize: 12, color: TEXT_DIM, textAlign: "right",
+                     fontVariantNumeric: "tabular-nums" }}>{current.toFixed(0)}%</span>
+      <span style={{ fontSize: 11, color: TEXT_DIM }}>→</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <span style={{ fontSize: 12, color: TEXT, fontWeight: 600,
+                       fontVariantNumeric: "tabular-nums" }}>{target.toFixed(0)}%</span>
+        {gapAbs >= 1 && (
+          <span style={{ fontSize: 10.5, fontWeight: 700, color: gapColor,
+                         background: `${gapColor}18`, padding: "1px 6px" }}>
+            {isUnder ? "+" : ""}{gap.toFixed(0)}%
+          </span>
+        )}
       </div>
-      <div style={{ position: "relative", height: 6, background: "#EDE8E1", borderRadius: 99 }}>
-        {/* current */}
-        <div style={{
-          position: "absolute", left: 0, top: 0, height: "100%", borderRadius: 99,
-          width: `${Math.min(100, (current / maxBar) * 100)}%`,
-          background: isOver ? RED : TEXT_DIM, opacity: 0.4,
-        }} />
-        {/* target */}
-        <div style={{
-          position: "absolute", left: 0, top: 0, height: "100%", borderRadius: 99,
-          width: `${Math.min(100, (target / maxBar) * 100)}%`,
-          background: isUnder ? GREEN : GOLD, opacity: 0.7,
-        }} />
+    </div>
+  );
+}
+
+/* ── Before / After pie charts ─────────────────────────────────── */
+const PIE_COLORS = ["#F59E0B","#6366F1","#10B981","#0891B2","#EC4899","#84cc16","#f97316","#8B5CF6","#14B8A6","#F43F5E"];
+
+function AllocationPie({ title, holdings, cash, total }) {
+  const slices = [
+    ...holdings.map((h, i) => ({ name: h.ticker, value: parseFloat(h.pct), color: PIE_COLORS[i % PIE_COLORS.length] })),
+    ...(cash > 0 ? [{ name: "Cash", value: parseFloat(((cash / total) * 100).toFixed(1)), color: BORDER_MED }] : []),
+  ];
+  return (
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: TEXT_DIM, textTransform: "uppercase",
+                    letterSpacing: "0.07em", textAlign: "center", marginBottom: 8 }}>{title}</div>
+      <ResponsiveContainer width="100%" height={160}>
+        <PieChart>
+          <Pie data={slices} dataKey="value" cx="50%" cy="50%"
+               innerRadius={44} outerRadius={68} paddingAngle={2} strokeWidth={0}>
+            {slices.map((s, i) => <Cell key={i} fill={s.color} />)}
+          </Pie>
+          <Tooltip
+            contentStyle={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 6,
+                            fontSize: 12, color: TEXT }}
+            formatter={(v, name) => [`${v}%`, name]}
+          />
+        </PieChart>
+      </ResponsiveContainer>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 10px", justifyContent: "center", marginTop: 4 }}>
+        {slices.map((s, i) => (
+          <div key={i} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: TEXT_DIM }}>
+            <div style={{ width: 8, height: 8, background: s.color, flexShrink: 0 }} />
+            {s.name} <span style={{ color: TEXT, fontWeight: 600 }}>{s.value}%</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function BeforeAfterPie({ before, after }) {
+  if (!before?.holdings?.length || !after?.holdings?.length) return null;
+  return (
+    <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, marginBottom: 16 }}>
+      <div style={{ padding: "12px 18px", borderBottom: `1px solid ${BORDER}` }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: TEXT_DIM, textTransform: "uppercase",
+                      letterSpacing: "0.08em" }}>Portfolio allocation — before &amp; after</div>
+      </div>
+      <div style={{ padding: "16px 18px", display: "flex", gap: 16, alignItems: "flex-start" }}>
+        <AllocationPie title="Before" holdings={before.holdings}
+                       cash={before.cash || 0} total={before.total_value || 1} />
+        <div style={{ width: 1, background: BORDER, alignSelf: "stretch", flexShrink: 0 }} />
+        <AllocationPie title="After rebalance" holdings={after.holdings}
+                       cash={after.cash || 0} total={after.total_value || 1} />
       </div>
     </div>
   );
@@ -303,6 +348,11 @@ function ResultPanel({ result, onReset }) {
         </div>
       )}
 
+      {/* Before / After allocation pie */}
+      {trades.length > 0 && before.holdings?.length > 0 && after.holdings?.length > 0 && (
+        <BeforeAfterPie before={before} after={after} />
+      )}
+
       {/* Trade plan — only shown when it's safe to act */}
       {verdict === "do_not_proceed" ? (
         <div style={{ marginBottom: 16 }}>
@@ -364,7 +414,7 @@ function ResultPanel({ result, onReset }) {
                           background: "#FFFBEB", border: "1px solid #FDE68A",
                           fontSize: 12.5, color: "#92400E", lineHeight: 1.55 }}>
               <b>Review before trading:</b>{" "}
-              {[...violations, ...flags.filter(f => f.type === "conflict" || f.type === "caution")]
+              {[...violations, ...flags.filter(f => (f.type === "conflict" || f.type === "caution") && f.detail !== "missing_sector_data")]
                 .map(x => x.message).join(" · ")}
             </div>
           )}
@@ -406,34 +456,31 @@ function ResultPanel({ result, onReset }) {
         </>
       )}
 
-      {/* Allocation gaps (collapsible) */}
+      {/* Allocation shift table */}
       {gapRows.length > 0 && (
-        <div style={{ ...glass, padding: "14px 18px", marginBottom: 12, borderRadius: 12 }}>
-          <button onClick={() => setShowGaps(!showGaps)} type="button" style={{
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            width: "100%", background: "none", border: "none", cursor: "pointer", padding: 0,
-          }}>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
-                           textTransform: "uppercase", color: TEXT_DIM }}>
-              Allocation Shift ({gapRows.length} buckets)
-            </span>
-            <span style={{ fontSize: 11, color: TEXT_DIM }}>{showGaps ? "Hide" : "Show"}</span>
-          </button>
-          {showGaps && (
-            <div style={{ marginTop: 14 }}>
-              {gapRows.map(([b, g]) => (
-                <AllocationRow key={b}
-                  label={g.label} current={g.current_pct}
-                  target={g.target_pct} gap={g.gap_pct} />
-              ))}
-              <div style={{ display: "flex", gap: 16, marginTop: 10, fontSize: 11, color: TEXT_DIM }}>
-                <span><span style={{ display: "inline-block", width: 10, height: 6,
-                                     background: TEXT_DIM, opacity: 0.4, borderRadius: 2, marginRight: 4 }} />Current</span>
-                <span><span style={{ display: "inline-block", width: 10, height: 6,
-                                     background: GREEN, opacity: 0.7, borderRadius: 2, marginRight: 4 }} />Target</span>
-              </div>
-            </div>
-          )}
+        <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, marginBottom: 12 }}>
+          <div style={{ padding: "10px 16px", borderBottom: `1px solid ${BORDER}`,
+                        display: "grid", gridTemplateColumns: "1fr auto auto auto", gap: "0 12px",
+                        alignItems: "center" }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: TEXT_DIM,
+                           textTransform: "uppercase", letterSpacing: "0.08em" }}>Bucket</span>
+            <span style={{ fontSize: 10, fontWeight: 700, color: TEXT_DIM,
+                           textTransform: "uppercase", letterSpacing: "0.08em", textAlign: "right" }}>Now</span>
+            <span />
+            <span style={{ fontSize: 10, fontWeight: 700, color: TEXT_DIM,
+                           textTransform: "uppercase", letterSpacing: "0.08em" }}>Target</span>
+          </div>
+          <div style={{ padding: "0 16px" }}>
+            {gapRows.map(([b, g]) => (
+              <AllocationRow key={b}
+                label={g.label} current={g.current_pct}
+                target={g.target_pct} gap={g.gap_pct} />
+            ))}
+          </div>
+          <div style={{ padding: "8px 16px", display: "flex", gap: 14, fontSize: 10.5, color: TEXT_DIM }}>
+            <span style={{ color: GREEN }}>▲ Increase</span>
+            <span style={{ color: RED }}>▼ Decrease</span>
+          </div>
         </div>
       )}
     </div>

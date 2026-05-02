@@ -4,6 +4,7 @@ import { GOLD, GOLD_BG, GOLD_BORDER, BORDER,
          GREEN, GREEN_BG, GREEN_BORDER,
          FONT_SERIF, fmt$ } from "../theme.js";
 import { apiFetch, saveInvestorProfile } from "../api.js";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { QUESTIONS, deriveProfile } from "./OnboardingScreen.jsx";
 import InfoTip from "../components/InfoTip.jsx";
 import { TrendingUp, TrendingDown, CheckCircle2, AlertCircle, User, X, ChevronRight, ChevronLeft } from "lucide-react";
@@ -98,6 +99,66 @@ function ProfileEditModal({ onSave, onClose }) {
   );
 }
 
+/* ─── Before / after allocation pie ────────────────────────────── */
+const PIE_COLORS = ["#F59E0B","#6366F1","#10B981","#0891B2","#EC4899","#84cc16","#f97316","#8B5CF6","#14B8A6","#F43F5E"];
+
+function AllocPie({ title, slices }) {
+  return (
+    <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <div style={{ fontSize: 10.5, fontWeight: 700, color: TEXT_DIM, textTransform: "uppercase",
+                    letterSpacing: "0.07em", textAlign: "center", marginBottom: 6, width: "100%" }}>{title}</div>
+      <ResponsiveContainer width="100%" height={220}>
+        <PieChart>
+          <Pie data={slices} dataKey="value" cx="50%" cy="50%"
+               innerRadius={60} outerRadius={92} paddingAngle={2} strokeWidth={0}>
+            {slices.map((s, i) => <Cell key={i} fill={s.color} />)}
+          </Pie>
+          <Tooltip contentStyle={{ background: SURFACE, border: `1px solid ${BORDER}`,
+                                    fontSize: 12, color: TEXT }}
+                   formatter={(v, n) => [`${v}%`, n]} />
+        </PieChart>
+      </ResponsiveContainer>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "3px 8px",
+                    justifyContent: "center", marginTop: 2 }}>
+        {slices.map((s, i) => (
+          <div key={i} style={{ display: "flex", alignItems: "center", gap: 3,
+                                fontSize: 10.5, color: TEXT_DIM }}>
+            <div style={{ width: 7, height: 7, background: s.color, flexShrink: 0 }} />
+            {s.name} <span style={{ color: TEXT, fontWeight: 600 }}>{s.value}%</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function RebalancePieChart({ snapshot, profileAware }) {
+  if (!snapshot?.length) return null;
+  const beforeSlices = snapshot.map((s, i) => ({
+    name: profileAware ? s.label : s.symbol,
+    value: parseFloat(s.current_pct?.toFixed(1) ?? 0),
+    color: PIE_COLORS[i % PIE_COLORS.length],
+  })).filter(s => s.value > 0);
+  const afterSlices = snapshot.map((s, i) => ({
+    name: profileAware ? s.label : s.symbol,
+    value: parseFloat(s.target_pct?.toFixed(1) ?? 0),
+    color: PIE_COLORS[i % PIE_COLORS.length],
+  })).filter(s => s.value > 0);
+  return (
+    <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, marginTop: 20 }}>
+      <div style={{ padding: "11px 18px", borderBottom: `1px solid ${BORDER}` }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: TEXT_DIM,
+                      textTransform: "uppercase", letterSpacing: "0.08em" }}>Allocation — current vs target</div>
+      </div>
+      <div style={{ padding: "16px 18px", display: "flex", gap: 12, alignItems: "flex-start" }}>
+        <AllocPie title="Current" slices={beforeSlices} />
+        <div style={{ width: 1, background: BORDER, alignSelf: "stretch", flexShrink: 0 }} />
+        <AllocPie title="Target" slices={afterSlices} />
+      </div>
+    </div>
+  );
+}
+
 const GOAL_LABELS = {
   wealth_growth: "Wealth Growth", retirement: "Retirement", home_purchase: "Home Purchase",
   family_future: "Family Future", emergency: "Emergency Fund", learning: "Learning to Invest",
@@ -112,14 +173,14 @@ function DriftBar({ current, target, label }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-        <span style={{ fontWeight: 700, fontSize: 13, color: TEXT }}>{label}</span>
+        <span style={{ fontWeight: 700, fontSize: 13, color: "#0A1628" }}>{label}</span>
         <span style={{ fontSize: 11.5, color: over ? "#fb923c" : TEXT_DIM }}>
           {over ? `+${drift}% over` : `-${drift}% under`} target
         </span>
       </div>
-      <div style={{ position: "relative", height: 8, background: "rgba(0,0,0,0.07)", overflow: "visible" }}>
-        <div style={{ position: "absolute", left: `${(target / max) * 100}%`, top: -3,
-                      width: 2, height: 14, background: TEXT_DIM, zIndex: 2 }} />
+      <div style={{ position: "relative", height: 11, background: "rgba(0,0,0,0.07)", overflow: "visible" }}>
+        <div style={{ position: "absolute", left: `${(target / max) * 100}%`, top: -4,
+                      width: 4, height: 19, background: "#0A1628", zIndex: 2, opacity: 0.7 }} />
         <div style={{ position: "absolute", left: 0, height: "100%",
                       width: `${(current / max) * 100}%`, background: barColor,
                       transition: "width 0.6s ease" }} />
@@ -206,49 +267,53 @@ export default function RebalanceScreen({ portfolio, prices }) {
 
   return (
     <div style={{ padding: "28px 32px", color: TEXT, width: "100%", boxSizing: "border-box" }}>
-      <h1 style={{ margin: "0 0 4px", fontSize: 22, fontWeight: 700, letterSpacing: "-0.01em", fontFamily: FONT_SERIF }}>
-        Rebalance
-        <InfoTip title="What is Rebalancing?">
-          Over time, winning positions grow and losers shrink, pushing your
-          portfolio away from your chosen allocation. Rebalancing trims the
-          winners and tops up the losers to bring you back to target. We
-          suggest trades when any holding drifts more than ~3% off.
-        </InfoTip>
-      </h1>
-      <p style={{ margin: "0 0 20px", fontSize: 13, color: TEXT_DIM }}>
-        Keep your portfolio aligned with your target allocation.
-      </p>
-
-      {/* Profile banner */}
-      <div style={{ padding: "13px 18px", marginBottom: 20,
-                    background: GOLD_BG, border: `1px solid ${GOLD_BORDER}`,
-                    display: "flex", alignItems: "center", gap: 12 }}>
-        <User size={15} color={GOLD} />
-        <span style={{ fontSize: 13, color: TEXT_DIM, flex: 1 }}>
-          {profileAware ? (
-            <>Targets based on your{" "}
-              <b style={{ color: TEXT, textTransform: "capitalize" }}>{profile}</b> risk profile
-              {goal && GOAL_LABELS[goal] ? (
-                <> and <b style={{ color: TEXT }}>{GOAL_LABELS[goal]}</b> goal</>
-              ) : null}
-            </>
-          ) : "No investor profile set — update to get personalised targets."}
-        </span>
+      {/* Heading row with Update Profile */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+                    marginBottom: 6 }}>
+        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, letterSpacing: "-0.01em", fontFamily: FONT_SERIF }}>
+          Rebalance
+          <InfoTip title="What is Rebalancing?">
+            Over time, winning positions grow and losers shrink, pushing your
+            portfolio away from your chosen allocation. Rebalancing trims the
+            winners and tops up the losers to bring you back to target. We
+            suggest trades when any holding drifts more than ~3% off.
+          </InfoTip>
+        </h1>
         <button type="button" onClick={() => setEditProfile(true)} style={{
-          background: "none", border: `1px solid ${GOLD_BORDER}`, padding: "4px 10px",
-          color: TEXT_DIM, fontSize: 11.5, cursor: "pointer", fontFamily: "inherit",
-          whiteSpace: "nowrap", flexShrink: 0,
-        }}>Update profile</button>
+          display: "flex", alignItems: "center", gap: 6,
+          background: GOLD, border: "none", padding: "7px 14px",
+          color: SURFACE, fontSize: 12, fontWeight: 700, cursor: "pointer",
+          fontFamily: "inherit", whiteSpace: "nowrap", flexShrink: 0,
+        }}>
+          <User size={12} />
+          Update profile
+        </button>
       </div>
 
+      {/* Profile subtitle */}
+      <p style={{ margin: "0 0 20px", fontSize: 13, color: TEXT_DIM }}>
+        {profileAware ? (
+          <>
+            Profile:{" "}
+            <b style={{ color: TEXT, textTransform: "capitalize" }}>{profile}</b>
+            {goal && GOAL_LABELS[goal] ? (
+              <> &middot; Goal: <b style={{ color: TEXT }}>{GOAL_LABELS[goal]}</b></>
+            ) : null}
+          </>
+        ) : (
+          <>No investor profile set — <span style={{ color: GOLD, cursor: "pointer", fontWeight: 600 }}
+               onClick={() => setEditProfile(true)}>set one</span> for personalised targets.</>
+        )}
+      </p>
+
       {/* Status banner */}
-      <div style={{ padding: "16px 20px", marginBottom: 24,
-                    background: allGood ? GREEN_BG : "rgba(249,115,22,0.08)",
-                    border: `1px solid ${allGood ? GREEN_BORDER : "rgba(249,115,22,0.25)"}`,
+      <div style={{ padding: "14px 18px", marginBottom: 24,
+                    background: allGood ? GREEN_BG : `rgba(249,115,22,0.14)`,
+                    border: `2px solid ${allGood ? GREEN_BORDER : "rgba(249,115,22,0.5)"}`,
                     display: "flex", alignItems: "center", gap: 14 }}>
         {allGood ? <CheckCircle2 size={20} color={GREEN} /> : <AlertCircle size={20} color="#fb923c" />}
         <div>
-          <div style={{ fontWeight: 700, fontSize: 14, color: allGood ? GREEN : "#fdba74" }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: allGood ? GREEN : "#fb923c" }}>
             {allGood
               ? "Your portfolio is well balanced"
               : `${data.suggestion_count} area${data.suggestion_count !== 1 ? "s" : ""} need attention`}
@@ -261,84 +326,144 @@ export default function RebalanceScreen({ portfolio, prices }) {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, alignItems: "start" }}>
-        {/* Snapshot */}
-        <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: "22px 22px",
-                      boxShadow: "0 2px 12px rgba(0,0,0,0.08)", display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 12.5, fontWeight: 700, color: TEXT, marginBottom: 18,
-                        textTransform: "uppercase", letterSpacing: "0.05em" }}>
-            {profileAware ? "Asset Mix vs Target" : "Current vs Target"}
-            <InfoTip title="Drift bars">
-              Each bar shows a holding's current allocation vs its target. The
-              vertical tick marks the target. Blue = on or below target,
-              orange = overweight. Bigger drift means more urgent rebalancing.
-            </InfoTip>
-          </div>
-          <div style={{ overflowY: "auto", maxHeight: 420, paddingRight: 4 }}>
-            {snapshot && snapshot.map((s) => (
-              <div key={profileAware ? s.bucket : s.symbol} style={{ marginBottom: 18 }}>
-                <DriftBar
-                  current={s.current_pct}
-                  target={s.target_pct}
-                  label={profileAware ? s.label : s.symbol}
-                />
-              </div>
-            ))}
-          </div>
-          <div style={{ display: "flex", gap: 20, marginTop: 4, fontSize: 11.5 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <div style={{ width: 20, height: 5, background: "#6366F1" }} />
-              <span style={{ color: TEXT_DIM }}>Current</span>
+      {/* ── Top row: current donut | target donut | actions ── */}
+      {(() => {
+        const mkSlices = (pctKey) => (snapshot || []).map((s, i) => ({
+          name: profileAware ? s.label : s.symbol,
+          value: parseFloat((s[pctKey] || 0).toFixed(1)),
+          color: PIE_COLORS[i % PIE_COLORS.length],
+        })).filter(s => s.value > 0);
+        const beforeSlices = mkSlices("current_pct");
+        const afterSlices  = mkSlices("target_pct");
+        return (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, marginBottom: 20 }}>
+            {/* Current donut */}
+            <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: "16px 18px" }}>
+              <AllocPie title="Current allocation" slices={beforeSlices} />
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <div style={{ width: 2, height: 12, background: TEXT_DIM }} />
-              <span style={{ color: TEXT_DIM }}>Target</span>
+            {/* Target donut */}
+            <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: "16px 18px" }}>
+              <AllocPie title="Target allocation" slices={afterSlices} />
+            </div>
+            {/* Recommended actions */}
+            <div style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+              {allGood ? (
+                <div style={{ padding: "28px 24px", textAlign: "center", height: "100%",
+                              display: "flex", flexDirection: "column", alignItems: "center",
+                              justifyContent: "center" }}>
+                  <div style={{ width: 48, height: 48, background: GREEN_BG, border: `1px solid ${GREEN_BORDER}`,
+                                display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
+                    <CheckCircle2 size={22} color={GREEN} />
+                  </div>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: TEXT, marginBottom: 6 }}>All on track</div>
+                  <div style={{ fontSize: 12.5, color: TEXT_DIM, lineHeight: 1.6 }}>
+                    Your mix matches your profile.
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <div style={{ padding: "11px 16px", borderBottom: `1px solid ${BORDER}`,
+                                fontSize: 11, fontWeight: 700, color: TEXT_DIM,
+                                textTransform: "uppercase", letterSpacing: "0.08em" }}>Recommended Actions</div>
+                  <div style={{ padding: "12px 14px", display: "flex", flexDirection: "column", gap: 10,
+                                maxHeight: 340, overflowY: "auto" }}>
+                    {data.suggestions.map((s) => (
+                      <SuggestionCard key={profileAware ? s.bucket : s.symbol} s={s} profileAware={profileAware} />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        </div>
+        );
+      })()}
 
-        {/* Suggestions */}
-        <div>
-          {allGood ? (
-            <div style={{ background: SURFACE, border: `1px solid ${BORDER}`,
-                          padding: "28px 24px", textAlign: "center",
-                          boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
-              <div style={{ width: 56, height: 56, background: GREEN_BG, border: `1px solid ${GREEN_BORDER}`,
-                            display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-                <CheckCircle2 size={26} color={GREEN} />
-              </div>
-              <div style={{ fontWeight: 700, fontSize: 15, color: TEXT, marginBottom: 8 }}>All on track</div>
-              <div style={{ fontSize: 13, color: TEXT_DIM, lineHeight: 1.65 }}>
-                Your mix matches your profile. Check back after the next market move or new purchase.
-              </div>
-            </div>
-          ) : (
-            <div>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: TEXT_DIM, marginBottom: 14,
-                            textTransform: "uppercase", letterSpacing: "0.05em" }}>Recommended Actions</div>
-              {data.suggestions.map((s) => (
-                <SuggestionCard key={profileAware ? s.bucket : s.symbol} s={s} profileAware={profileAware} />
-              ))}
-              <div style={{ marginTop: 4, padding: "13px 16px", fontSize: 12.5,
-                            background: GOLD_BG, border: `1px solid ${GOLD_BORDER}`, color: TEXT_DIM, lineHeight: 1.6 }}>
-                These are suggestions only — consult a financial adviser before trading.
-              </div>
-            </div>
-          )}
+      {/* ── Drift bars (full width below) ── */}
+      <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: "20px 24px",
+                    marginBottom: 0 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: TEXT_DIM, marginBottom: 16,
+                      textTransform: "uppercase", letterSpacing: "0.08em" }}>
+          {profileAware ? "Asset Mix vs Target" : "Current vs Target"}
+          <InfoTip title="Drift bars">
+            Each bar shows a holding's current allocation vs its target.
+            The vertical tick marks the target. Blue = on or below, orange = overweight.
+          </InfoTip>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+                      gap: "14px 32px" }}>
+          {snapshot && snapshot.map((s) => (
+            <DriftBar key={profileAware ? s.bucket : s.symbol}
+              current={s.current_pct} target={s.target_pct}
+              label={profileAware ? s.label : s.symbol}
+            />
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: 20, marginTop: 14, fontSize: 11.5 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ width: 20, height: 5, background: "#6366F1" }} />
+            <span style={{ color: TEXT_DIM }}>Current</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ width: 2, height: 12, background: TEXT_DIM }} />
+            <span style={{ color: TEXT_DIM }}>Target</span>
+          </div>
         </div>
       </div>
 
-      {/* Explainer */}
-      <div style={{ marginTop: 24, padding: "18px 22px",
-                    background: SURFACE, border: `1px solid ${BORDER}` }}>
-        <div style={{ fontSize: 11.5, fontWeight: 700, color: TEXT_DIM, marginBottom: 8,
-                      textTransform: "uppercase", letterSpacing: "0.06em" }}>What is rebalancing?</div>
-        <p style={{ margin: 0, fontSize: 13, color: TEXT_DIM, lineHeight: 1.75 }}>
-          Over time, faster-growing assets become a larger share of your portfolio than you intended.
-          Rebalancing means trimming what grew too much and adding to what lagged — keeping your risk
-          level matched to your goals and profile.
-        </p>
-      </div>
+      {/* At-a-glance stats */}
+      {!allGood && data.suggestions?.length > 0 && (() => {
+        const totalMove   = data.suggestions.reduce((s, x) => s + (x.trade_value || 0), 0);
+        const maxDrift    = [...(snapshot || [])].sort((a, b) =>
+                              Math.abs(b.current_pct - b.target_pct) - Math.abs(a.current_pct - a.target_pct))[0];
+        const sellCount   = data.suggestions.filter(s => s.action === "sell").length;
+        const buyCount    = data.suggestions.filter(s => s.action === "buy").length;
+        const healthPct   = Math.max(0, 100 - parseFloat(data.total_drift || 0) * 4).toFixed(0);
+        const statStyle   = { background: SURFACE, border: `1px solid ${BORDER}`,
+                              padding: "14px 18px", flex: 1, minWidth: 0 };
+        const labelStyle  = { fontSize: 10, fontWeight: 700, color: TEXT_DIM,
+                              textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 };
+        const valueStyle  = { fontSize: 18, fontWeight: 700, color: TEXT, fontFamily: FONT_SERIF };
+        return (
+          <div style={{ marginTop: 20, display: "flex", gap: 12, flexWrap: "wrap" }}>
+            <div style={statStyle}>
+              <div style={labelStyle}>Total to move</div>
+              <div style={valueStyle}>{fmt$(totalMove)}</div>
+              <div style={{ fontSize: 11, color: TEXT_DIM, marginTop: 3 }}>across {data.suggestions.length} trade{data.suggestions.length !== 1 ? "s" : ""}</div>
+            </div>
+            <div style={statStyle}>
+              <div style={labelStyle}>Trade breakdown</div>
+              <div style={{ display: "flex", gap: 10, alignItems: "baseline", marginTop: 2 }}>
+                <span style={{ ...valueStyle, color: "#EF4444" }}>{sellCount}</span>
+                <span style={{ fontSize: 12, color: TEXT_DIM }}>sell{sellCount !== 1 ? "s" : ""}</span>
+                <span style={{ ...valueStyle, color: GREEN }}>{buyCount}</span>
+                <span style={{ fontSize: 12, color: TEXT_DIM }}>buy{buyCount !== 1 ? "s" : ""}</span>
+              </div>
+              <div style={{ fontSize: 11, color: TEXT_DIM, marginTop: 3 }}>suggested by Meridian</div>
+            </div>
+            {maxDrift && (
+              <div style={statStyle}>
+                <div style={labelStyle}>Biggest drift</div>
+                <div style={valueStyle}>{profileAware ? maxDrift.label : maxDrift.symbol}</div>
+                <div style={{ fontSize: 11, color: "#fb923c", marginTop: 3 }}>
+                  {Math.abs(maxDrift.current_pct - maxDrift.target_pct).toFixed(1)}% off target
+                </div>
+              </div>
+            )}
+            <div style={statStyle}>
+              <div style={labelStyle}>Portfolio health</div>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
+                <span style={{ ...valueStyle, color: healthPct >= 70 ? GREEN : healthPct >= 40 ? "#F59E0B" : "#EF4444" }}>{healthPct}</span>
+                <span style={{ fontSize: 13, color: TEXT_DIM }}>/100</span>
+              </div>
+              <div style={{ height: 3, background: BORDER, marginTop: 6 }}>
+                <div style={{ height: "100%", width: `${healthPct}%`,
+                              background: healthPct >= 70 ? GREEN : healthPct >= 40 ? "#F59E0B" : "#EF4444",
+                              transition: "width 0.5s" }} />
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {editProfile && (
         <ProfileEditModal

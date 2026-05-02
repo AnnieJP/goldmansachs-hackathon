@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { GOLD, GOLD_BG, GOLD_BORDER, BORDER, BORDER_MED,
          SURFACE, SURFACE_2, BG, TEXT, TEXT_SEC, TEXT_DIM,
          GREEN, RED, FONT_SERIF } from "../theme.js";
 import { apiFetch } from "../api.js";
 import { ShieldCheck, AlertTriangle, Activity, BarChart3, Layers, Shield, Clock } from "lucide-react";
 import InfoTip from "../components/InfoTip.jsx";
+import TypeBadge from "../components/TypeBadge.jsx";
 
 /* ─── Modern circular risk meter ────────────────────────────────── */
 function HealthRing({ score }) {
@@ -121,7 +122,7 @@ function RiskGauge({ score }) {
     ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI * 2);
     ctx.fillStyle = TEXT; ctx.fill();
   }, [score]);
-  return <canvas ref={ref} style={{ width: "100%", maxWidth: 300, height: 160, display: "block", margin: "0 auto" }} />;
+  return <canvas ref={ref} style={{ width: "100%", maxWidth: 380, height: 200, display: "block", margin: "0 auto" }} />;
 }
 
 /* ─── Beta bar ──────────────────────────────────────────────────── */
@@ -180,8 +181,8 @@ export default function RiskScreen({ portfolio, prices }) {
         How much volatility is hiding in your portfolio?
       </p>
 
-      {/* ── 3-Box Visual Section ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, marginBottom: 32 }}>
+      {/* ── 2-Box Visual Section ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 32 }}>
 
         {/* Box 1 — Risk Analysis */}
         <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: "16px 20px" }}>
@@ -191,13 +192,13 @@ export default function RiskScreen({ portfolio, prices }) {
           <div style={{ fontSize: 11, color: TEXT_DIM, textAlign: "center", marginBottom: 12, lineHeight: 1.4 }}>
             Portfolio risk assessment
           </div>
-          <div style={{ height: 140, display: "flex", justifyContent: "center", alignItems: "center" }}>
-            <div style={{ width: 140, height: 140 }}>
+          <div style={{ height: 200, display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <div style={{ width: 220, height: 200 }}>
               <RiskGauge score={data.risk_score} />
             </div>
           </div>
-          <div style={{ marginTop: 12, textAlign: "center" }}>
-            <div style={{ fontSize: 17, fontWeight: 700, color: TEXT, fontFamily: FONT_SERIF }}>{data.risk_score}/10</div>
+          <div style={{ marginTop: 8, textAlign: "center" }}>
+            <div style={{ fontSize: 22, fontWeight: 700, color: TEXT, fontFamily: FONT_SERIF }}>{data.risk_score}/10</div>
             <div style={{ fontSize: 12, color: TEXT_DIM }}>
               Risk Score
               <InfoTip title="Risk Score (0–10)" placement="top">
@@ -269,51 +270,6 @@ export default function RiskScreen({ portfolio, prices }) {
           </div>
         </div>
 
-        {/* Box 3 — Risk Tips */}
-        <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: "16px 20px" }}>
-          <h3 style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 700, color: TEXT, fontFamily: FONT_SERIF }}>
-            Risk Tips
-          </h3>
-          <div style={{ fontSize: 11, color: TEXT_DIM, marginBottom: 12, lineHeight: 1.4 }}>
-            Ways to manage your investment risk
-          </div>
-          <div style={{ maxHeight: 200, overflowY: "auto" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8,
-                               padding: "6px",
-                               background: `${GREEN}15` }}>
-                <Layers size={14} color={GREEN} style={{ flexShrink: 0 }} />
-                <div style={{ fontSize: 11, color: TEXT_DIM }}>
-                  Diversify across different companies and industries
-                </div>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8,
-                               padding: "6px",
-                               background: `${GOLD}15` }}>
-                <Shield size={14} color={GOLD} style={{ flexShrink: 0 }} />
-                <div style={{ fontSize: 11, color: TEXT_DIM }}>
-                  Include bonds and stable investments
-                </div>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8,
-                               padding: "6px",
-                               background: `${RED}15` }}>
-                <Clock size={14} color={RED} style={{ flexShrink: 0 }} />
-                <div style={{ fontSize: 11, color: TEXT_DIM }}>
-                  Focus on long-term investment goals
-                </div>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8,
-                               padding: "6px",
-                               background: `${GOLD}15` }}>
-                <BarChart3 size={14} color={GOLD} style={{ flexShrink: 0 }} />
-                <div style={{ fontSize: 11, color: TEXT_DIM }}>
-                  Check portfolio balance quarterly
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       
@@ -350,10 +306,18 @@ export default function RiskScreen({ portfolio, prices }) {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "rgba(255,255,255,0.02)" }}>
-              {["Holding", "Type", "Weight", "Volatility", "Portfolio Impact"].map((h) => (
-                <th key={h} style={{ padding: "10px 18px", textAlign: "left", fontSize: 11,
+              {[
+                { label: "Holding" },
+                { label: "Type" },
+                { label: "Weight", tip: "Your share of the total portfolio. A 30% weight means $3 of every $10 invested is in this holding." },
+                { label: "Volatility" },
+                { label: "Portfolio Impact", tip: "How much this holding's price swings affect your overall portfolio. High weight combined with high volatility = large impact." },
+              ].map(({ label, tip }) => (
+                <th key={label} style={{ padding: "10px 18px", textAlign: "left", fontSize: 11,
                                       fontWeight: 600, color: TEXT_DIM, textTransform: "uppercase",
-                                      letterSpacing: "0.06em", borderBottom: `1px solid ${BORDER}` }}>{h}</th>
+                                      letterSpacing: "0.06em", borderBottom: `1px solid ${BORDER}` }}>
+                  {label}{tip && <InfoTip title={label}>{tip}</InfoTip>}
+                </th>
               ))}
             </tr>
           </thead>
@@ -366,7 +330,7 @@ export default function RiskScreen({ portfolio, prices }) {
                   <div style={{ fontWeight: 700, fontSize: 13.5 }}>{h.symbol}</div>
                   <div style={{ fontSize: 11, color: TEXT_DIM, marginTop: 2 }}>{h.name}</div>
                 </td>
-                <td style={{ padding: "12px 18px", fontSize: 12, color: TEXT_DIM, textTransform: "uppercase" }}>{h.type}</td>
+                <td style={{ padding: "12px 18px" }}><TypeBadge type={h.type} /></td>
                 <td style={{ padding: "12px 18px", fontSize: 13, fontVariantNumeric: "tabular-nums" }}>{h.weight_pct}%</td>
                 <td style={{ padding: "12px 18px" }}>
                   <BetaBar beta={h.beta} />
@@ -383,17 +347,102 @@ export default function RiskScreen({ portfolio, prices }) {
         </table>
       </div>
 
-      {/* Tips */}
-      <div style={{ marginTop: 20, padding: "18px 20px", borderRadius: 14,
-                    background: GOLD_BG, border: `1px solid ${GOLD_BORDER}` }}>
-        <div style={{ fontSize: 11.5, fontWeight: 700, color: GOLD, marginBottom: 10,
-                      textTransform: "uppercase", letterSpacing: "0.06em" }}>Quick tips</div>
-        <ul style={{ margin: 0, paddingLeft: 18, color: TEXT_DIM, fontSize: 13, lineHeight: 1.85 }}>
-          <li>A diversified portfolio spans stocks, bonds, and ETFs across different sectors.</li>
-          <li>Bonds (low beta) buffer volatility — they tend to rise when equities fall.</li>
-          <li>Any single holding over 20–25% of your portfolio raises concentration risk.</li>
-        </ul>
+      {/* Portfolio insights */}
+      <PortfolioFacts data={data} />
+    </div>
+  );
+}
+
+/* ─── Dynamic portfolio insights ticker ─────────────────────────── */
+const FACT_ICONS = [Activity, ShieldCheck, BarChart3, AlertTriangle, Layers, Shield, Clock];
+
+function PortfolioFacts({ data }) {
+  const facts = useMemo(() => {
+    const list = [];
+    const holdings = data.holdings_risk || [];
+    const beta  = data.portfolio_beta;
+    const score = data.risk_score;
+
+    if (beta != null) {
+      const label = beta < 0.7 ? "low" : beta < 1.1 ? "moderate" : beta < 1.4 ? "elevated" : "high";
+      list.push({ text: `Your portfolio beta is ${beta.toFixed(2)} — ${label} sensitivity to market swings.`, icon: Activity });
+    }
+    if (score != null) {
+      const tier = score <= 3 ? "conservative" : score <= 6 ? "balanced" : "aggressive";
+      list.push({ text: `Risk score ${score}/10 — your portfolio sits in the ${tier} range.`, icon: ShieldCheck });
+    }
+    if (holdings.length > 0) {
+      const heaviest = [...holdings].sort((a, b) => b.weight_pct - a.weight_pct)[0];
+      list.push({ text: `${heaviest.symbol} is your largest position at ${heaviest.weight_pct}% of your portfolio.`, icon: BarChart3 });
+
+      const mostVolatile = [...holdings].sort((a, b) => b.beta - a.beta)[0];
+      list.push({ text: `${mostVolatile.symbol} is your most volatile holding — beta ${mostVolatile.beta.toFixed(2)}.`, icon: AlertTriangle });
+
+      const mostStable = [...holdings].filter(h => h.beta > 0).sort((a, b) => a.beta - b.beta)[0];
+      if (mostStable && mostStable.symbol !== mostVolatile.symbol) {
+        list.push({ text: `${mostStable.symbol} is your most stable holding — beta ${mostStable.beta.toFixed(2)}.`, icon: Shield });
+      }
+
+      const types = [...new Set(holdings.map(h => h.type))];
+      list.push({ text: `You hold ${holdings.length} position${holdings.length !== 1 ? "s" : ""} across ${types.length} asset type${types.length !== 1 ? "s" : ""}: ${types.join(", ")}.`, icon: Layers });
+
+      const highBeta = holdings.filter(h => h.beta > 1.3);
+      if (highBeta.length > 0)
+        list.push({ text: `${highBeta.length} of your holding${highBeta.length !== 1 ? "s move" : " moves"} more than 30% harder than the market on big days.`, icon: AlertTriangle });
+
+      const lowBeta = holdings.filter(h => h.beta < 0.6);
+      if (lowBeta.length > 0)
+        list.push({ text: `${lowBeta.map(h => h.symbol).join(", ")} act${lowBeta.length === 1 ? "s" : ""} as a stability anchor in your portfolio.`, icon: Shield });
+    }
+    if (data.expected_return != null)
+      list.push({ text: `Estimated annual return based on your current allocation: ${(data.expected_return * 100).toFixed(1)}%.`, icon: Clock });
+
+    list.push({ text: "Bonds and low-beta assets buffer volatility — they tend to rise when equities fall.", icon: Shield });
+    list.push({ text: "Any single holding above 25% of your portfolio raises concentration risk.", icon: Layers });
+    list.push({ text: "Rebalancing quarterly keeps your risk level aligned with your goals.", icon: Clock });
+
+    return list;
+  }, [data]);
+
+  const [idx,     setIdx]     = useState(0);
+  const [visible, setVisible] = useState(true);
+  const total = facts.length;
+
+  useEffect(() => {
+    if (total <= 1) return;
+    const iv = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => { setIdx(i => (i + 1) % total); setVisible(true); }, 380);
+    }, 4500);
+    return () => clearInterval(iv);
+  }, [total]);
+
+  if (!facts.length) return null;
+  const { text, icon: Icon } = facts[idx];
+  const riskColor = data.risk_score <= 3 ? GREEN : data.risk_score <= 6 ? "#F59E0B" : RED;
+
+  return (
+    <div style={{ marginTop: 20, background: SURFACE, border: `1px solid ${BORDER}` }}>
+      {/* header bar */}
+      <div style={{ padding: "12px 20px", borderBottom: `1px solid ${BORDER}` }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: TEXT_DIM,
+                      textTransform: "uppercase", letterSpacing: "0.08em" }}>Portfolio Insights</div>
       </div>
+
+      {/* content */}
+      <div style={{ padding: "18px 20px", minHeight: 72,
+                    display: "flex", alignItems: "center", gap: 16,
+                    opacity: visible ? 1 : 0,
+                    transform: visible ? "translateY(0)" : "translateY(6px)",
+                    transition: "opacity 0.38s ease, transform 0.38s ease" }}>
+        <div style={{ width: 36, height: 36, flexShrink: 0,
+                      background: `${riskColor}18`, border: `1px solid ${riskColor}40`,
+                      display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Icon size={16} color={riskColor} />
+        </div>
+        <p style={{ margin: 0, fontSize: 13.5, color: TEXT_DIM, lineHeight: 1.7 }}>{text}</p>
+      </div>
+
     </div>
   );
 }
