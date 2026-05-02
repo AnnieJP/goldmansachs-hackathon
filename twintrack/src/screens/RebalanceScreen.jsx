@@ -282,7 +282,7 @@ export default function RebalanceScreen({ portfolio, prices }) {
         <button type="button" onClick={() => setEditProfile(true)} style={{
           display: "flex", alignItems: "center", gap: 6,
           background: GOLD, border: "none", padding: "7px 14px",
-          color: SURFACE, fontSize: 12, fontWeight: 700, cursor: "pointer",
+          color: TEXT, fontSize: 12, fontWeight: 700, cursor: "pointer",
           fontFamily: "inherit", whiteSpace: "nowrap", flexShrink: 0,
         }}>
           <User size={12} />
@@ -378,89 +378,91 @@ export default function RebalanceScreen({ portfolio, prices }) {
         );
       })()}
 
-      {/* ── Drift bars (full width below) ── */}
-      <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: "20px 24px",
-                    marginBottom: 0 }}>
-        <div style={{ fontSize: 11, fontWeight: 700, color: TEXT_DIM, marginBottom: 16,
-                      textTransform: "uppercase", letterSpacing: "0.08em" }}>
-          {profileAware ? "Asset Mix vs Target" : "Current vs Target"}
-          <InfoTip title="Drift bars">
-            Each bar shows a holding's current allocation vs its target.
-            The vertical tick marks the target. Blue = on or below, orange = overweight.
-          </InfoTip>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-                      gap: "14px 32px" }}>
-          {snapshot && snapshot.map((s) => (
-            <DriftBar key={profileAware ? s.bucket : s.symbol}
-              current={s.current_pct} target={s.target_pct}
-              label={profileAware ? s.label : s.symbol}
-            />
-          ))}
-        </div>
-        <div style={{ display: "flex", gap: 20, marginTop: 14, fontSize: 11.5 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <div style={{ width: 20, height: 5, background: "#6366F1" }} />
-            <span style={{ color: TEXT_DIM }}>Current</span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <div style={{ width: 2, height: 12, background: TEXT_DIM }} />
-            <span style={{ color: TEXT_DIM }}>Target</span>
-          </div>
-        </div>
-      </div>
-
-      {/* At-a-glance stats */}
-      {!allGood && data.suggestions?.length > 0 && (() => {
-        const totalMove   = data.suggestions.reduce((s, x) => s + (x.trade_value || 0), 0);
-        const maxDrift    = [...(snapshot || [])].sort((a, b) =>
-                              Math.abs(b.current_pct - b.target_pct) - Math.abs(a.current_pct - a.target_pct))[0];
-        const sellCount   = data.suggestions.filter(s => s.action === "sell").length;
-        const buyCount    = data.suggestions.filter(s => s.action === "buy").length;
-        const healthPct   = Math.max(0, 100 - parseFloat(data.total_drift || 0) * 4).toFixed(0);
-        const statStyle   = { background: SURFACE, border: `1px solid ${BORDER}`,
-                              padding: "14px 18px", flex: 1, minWidth: 0 };
-        const labelStyle  = { fontSize: 10, fontWeight: 700, color: TEXT_DIM,
-                              textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 };
-        const valueStyle  = { fontSize: 18, fontWeight: 700, color: TEXT, fontFamily: FONT_SERIF };
+      {/* ── Drift bars (left) + stats (right) ── */}
+      {(() => {
+        const totalMove = data.suggestions?.reduce((s, x) => s + (x.trade_value || 0), 0) ?? 0;
+        const maxDrift  = [...(snapshot || [])].sort((a, b) =>
+                            Math.abs(b.current_pct - b.target_pct) - Math.abs(a.current_pct - a.target_pct))[0];
+        const sellCount = (data.suggestions || []).filter(s => s.action === "sell").length;
+        const buyCount  = (data.suggestions || []).filter(s => s.action === "buy").length;
+        const healthPct = Math.max(0, 100 - parseFloat(data.total_drift || 0) * 2).toFixed(0);
+        const labelStyle = { fontSize: 10.5, fontWeight: 700, color: TEXT_DIM,
+                             textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 };
+        const valueStyle = { fontSize: 26, fontWeight: 700, color: TEXT, fontFamily: FONT_SERIF };
+        const statCard   = { background: SURFACE, border: `1px solid ${BORDER}`, padding: "20px 24px" };
         return (
-          <div style={{ marginTop: 20, display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <div style={statStyle}>
-              <div style={labelStyle}>Total to move</div>
-              <div style={valueStyle}>{fmt$(totalMove)}</div>
-              <div style={{ fontSize: 11, color: TEXT_DIM, marginTop: 3 }}>across {data.suggestions.length} trade{data.suggestions.length !== 1 ? "s" : ""}</div>
-            </div>
-            <div style={statStyle}>
-              <div style={labelStyle}>Trade breakdown</div>
-              <div style={{ display: "flex", gap: 10, alignItems: "baseline", marginTop: 2 }}>
-                <span style={{ ...valueStyle, color: "#EF4444" }}>{sellCount}</span>
-                <span style={{ fontSize: 12, color: TEXT_DIM }}>sell{sellCount !== 1 ? "s" : ""}</span>
-                <span style={{ ...valueStyle, color: GREEN }}>{buyCount}</span>
-                <span style={{ fontSize: 12, color: TEXT_DIM }}>buy{buyCount !== 1 ? "s" : ""}</span>
+          <div style={{ display: "grid", gridTemplateColumns: "3fr 2fr", gap: 20, alignItems: "start" }}>
+            {/* Left: ticker drift bars */}
+            <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: "20px 24px" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: TEXT_DIM, marginBottom: 16,
+                            textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                {profileAware ? "Asset Mix vs Target" : "Current vs Target"}
+                <InfoTip title="Drift bars">
+                  Each bar shows a holding's current allocation vs its target.
+                  The vertical tick marks the target. Blue = on or below, orange = overweight.
+                </InfoTip>
               </div>
-              <div style={{ fontSize: 11, color: TEXT_DIM, marginTop: 3 }}>suggested by Meridian</div>
-            </div>
-            {maxDrift && (
-              <div style={statStyle}>
-                <div style={labelStyle}>Biggest drift</div>
-                <div style={valueStyle}>{profileAware ? maxDrift.label : maxDrift.symbol}</div>
-                <div style={{ fontSize: 11, color: "#fb923c", marginTop: 3 }}>
-                  {Math.abs(maxDrift.current_pct - maxDrift.target_pct).toFixed(1)}% off target
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                {snapshot && snapshot.map((s) => (
+                  <DriftBar key={profileAware ? s.bucket : s.symbol}
+                    current={s.current_pct} target={s.target_pct}
+                    label={profileAware ? s.label : s.symbol}
+                  />
+                ))}
+              </div>
+              <div style={{ display: "flex", gap: 20, marginTop: 16, fontSize: 11.5 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <div style={{ width: 20, height: 5, background: "#6366F1" }} />
+                  <span style={{ color: TEXT_DIM }}>Current</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <div style={{ width: 4, height: 14, background: "#0A1628", opacity: 0.7 }} />
+                  <span style={{ color: TEXT_DIM }}>Target</span>
                 </div>
               </div>
-            )}
-            <div style={statStyle}>
-              <div style={labelStyle}>Portfolio health</div>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-                <span style={{ ...valueStyle, color: healthPct >= 70 ? GREEN : healthPct >= 40 ? "#F59E0B" : "#EF4444" }}>{healthPct}</span>
-                <span style={{ fontSize: 13, color: TEXT_DIM }}>/100</span>
-              </div>
-              <div style={{ height: 3, background: BORDER, marginTop: 6 }}>
-                <div style={{ height: "100%", width: `${healthPct}%`,
-                              background: healthPct >= 70 ? GREEN : healthPct >= 40 ? "#F59E0B" : "#EF4444",
-                              transition: "width 0.5s" }} />
-              </div>
             </div>
+
+            {/* Right: 4 stat cards stacked */}
+            {!allGood && data.suggestions?.length > 0 ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <div style={statCard}>
+                  <div style={labelStyle}>Total to move</div>
+                  <div style={valueStyle}>{fmt$(totalMove)}</div>
+                  <div style={{ fontSize: 11, color: TEXT_DIM, marginTop: 3 }}>across {data.suggestions.length} trade{data.suggestions.length !== 1 ? "s" : ""}</div>
+                </div>
+                <div style={statCard}>
+                  <div style={labelStyle}>Trade breakdown</div>
+                  <div style={{ display: "flex", gap: 10, alignItems: "baseline", marginTop: 2 }}>
+                    <span style={{ ...valueStyle, color: "#EF4444" }}>{sellCount}</span>
+                    <span style={{ fontSize: 12, color: TEXT_DIM }}>sell{sellCount !== 1 ? "s" : ""}</span>
+                    <span style={{ ...valueStyle, color: GREEN }}>{buyCount}</span>
+                    <span style={{ fontSize: 12, color: TEXT_DIM }}>buy{buyCount !== 1 ? "s" : ""}</span>
+                  </div>
+                  <div style={{ fontSize: 11, color: TEXT_DIM, marginTop: 3 }}>suggested by Meridian</div>
+                </div>
+                {maxDrift && (
+                  <div style={statCard}>
+                    <div style={labelStyle}>Biggest drift</div>
+                    <div style={valueStyle}>{profileAware ? maxDrift.label : maxDrift.symbol}</div>
+                    <div style={{ fontSize: 11, color: "#fb923c", marginTop: 3 }}>
+                      {Math.abs(maxDrift.current_pct - maxDrift.target_pct).toFixed(1)}% off target
+                    </div>
+                  </div>
+                )}
+                <div style={statCard}>
+                  <div style={labelStyle}>Portfolio health</div>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
+                    <span style={{ ...valueStyle, color: healthPct >= 70 ? GREEN : healthPct >= 40 ? "#F59E0B" : "#EF4444" }}>{healthPct}</span>
+                    <span style={{ fontSize: 13, color: TEXT_DIM }}>/100</span>
+                  </div>
+                  <div style={{ height: 3, background: BORDER, marginTop: 6 }}>
+                    <div style={{ height: "100%", width: `${healthPct}%`,
+                                  background: healthPct >= 70 ? GREEN : healthPct >= 40 ? "#F59E0B" : "#EF4444",
+                                  transition: "width 0.5s" }} />
+                  </div>
+                </div>
+              </div>
+            ) : <div />}
           </div>
         );
       })()}
