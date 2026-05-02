@@ -1,8 +1,5 @@
 import { useState } from "react";
-import {
-  GOLD, GOLD_BG, GOLD_BORDER, ACCENT_DIM,
-  SURFACE, BG, TEXT, TEXT_DIM,
-} from "../theme.js";
+import { GOLD, GOLD_BG, GOLD_BORDER, BORDER, BORDER_MED, SURFACE, SURFACE_2, BG, TEXT, TEXT_SEC, TEXT_DIM, RED } from "../theme.js";
 import { login, signup } from "../api.js";
 
 export default function LoginScreen({ onLogin }) {
@@ -42,91 +39,94 @@ export default function LoginScreen({ onLogin }) {
 
   return (
     <div style={{
-      minHeight: "100vh", background: BG, display: "flex", alignItems: "center",
-      justifyContent: "center", padding: "32px",
-      fontFamily: "'DM Sans','Segoe UI',sans-serif",
+      minHeight: "100vh", background: BG, display: "flex",
+      alignItems: "center", justifyContent: "center", padding: 24,
+      position: "relative", overflow: "hidden",
     }}>
+      {/* Ambient background blobs */}
+      <div style={{ position: "absolute", top: "-20%", left: "-10%", width: "55%", height: "55%",
+                    background: "radial-gradient(circle, rgba(245,158,11,0.07) 0%, transparent 70%)",
+                    pointerEvents: "none" }} />
+      <div style={{ position: "absolute", bottom: "-10%", right: "-5%", width: "45%", height: "45%",
+                    background: "radial-gradient(circle, rgba(16,185,129,0.06) 0%, transparent 70%)",
+                    pointerEvents: "none" }} />
+
       <div style={{
-        width: "100%", maxWidth: 400, background: SURFACE,
-        border: `1px solid ${ACCENT_DIM}`, borderRadius: 14,
-        padding: "36px 32px 28px", boxShadow: "0 20px 60px rgba(0,0,0,0.45)",
+        width: "100%", maxWidth: 420, position: "relative", zIndex: 1,
+        background: SURFACE,
+        border: `1px solid ${BORDER}`,
+        borderRadius: 20,
+        padding: "40px 36px 32px",
+        boxShadow: "0 8px 40px rgba(10,22,40,0.10)",
       }}>
-        <div style={{
-          display: "inline-flex", alignItems: "center", gap: 8,
-          padding: "5px 14px", borderRadius: 99,
-          background: GOLD_BG, border: `1px solid ${GOLD_BORDER}`,
-          marginBottom: 22,
-        }}>
-          <span style={{ width: 6, height: 6, borderRadius: "50%", background: GOLD }} />
-          <span style={{
-            fontSize: 10.5, fontWeight: 700, letterSpacing: "0.14em",
-            textTransform: "uppercase", color: GOLD,
-          }}>Folio</span>
+        {/* Logo */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
+          <div style={{
+            width: 38, height: 38, borderRadius: 11, background: GOLD_BG,
+            border: `1px solid ${GOLD_BORDER}`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 18,
+          }}>◈</div>
+          <div>
+            <div style={{ fontSize: 17, fontWeight: 800, color: TEXT, letterSpacing: "-0.02em" }}>Folio</div>
+            <div style={{ fontSize: 11, color: TEXT_DIM }}>Portfolio Dashboard</div>
+          </div>
         </div>
 
-        <h1 style={{
-          fontSize: 24, fontWeight: 800, color: TEXT, margin: 0,
-          letterSpacing: "-0.02em",
-        }}>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: TEXT, margin: "0 0 6px", letterSpacing: "-0.02em" }}>
           {isSignup ? "Create your account" : "Welcome back"}
         </h1>
-        <p style={{ fontSize: 12.5, color: TEXT_DIM, marginTop: 6, marginBottom: 20 }}>
-          {isSignup
-            ? "Sign up with your email to start tracking your portfolio."
-            : "Sign in to access your portfolio."}
+        <p style={{ fontSize: 13, color: TEXT_DIM, marginTop: 0, marginBottom: 24, lineHeight: 1.5 }}>
+          {isSignup ? "Start tracking your wealth in one place." : "Sign in to access your portfolio."}
         </p>
 
-        <div style={{
-          display: "flex", padding: 3, borderRadius: 10,
-          background: BG, border: `1px solid ${ACCENT_DIM}`, marginBottom: 22,
-        }}>
+        {/* Mode toggle */}
+        <div style={{ display: "flex", padding: 3, borderRadius: 11, background: BG,
+                      border: `1px solid ${BORDER}`, marginBottom: 24 }}>
           <ModeTab active={!isSignup} onClick={() => switchMode("signin")}>Sign in</ModeTab>
           <ModeTab active={isSignup}  onClick={() => switchMode("signup")}>Sign up</ModeTab>
         </div>
 
         <form onSubmit={handleSubmit}>
           {isSignup && (
-            <Field label="Name" value={displayName} onChange={setName}
-                   autoComplete="name" autoFocus />
+            <Field label="Full Name" value={displayName} onChange={setName}
+                   autoComplete="name" autoFocus placeholder="Jane Smith" />
           )}
-          <Field label="Email" type="email" value={email} onChange={setEmail}
-                 autoComplete="email" autoFocus={!isSignup} />
+          <Field label="Email address" type="email" value={email} onChange={setEmail}
+                 autoComplete="email" autoFocus={!isSignup} placeholder="you@example.com" />
           <Field label="Password" type="password" value={password} onChange={setPassword}
                  autoComplete={isSignup ? "new-password" : "current-password"}
-                 hint={isSignup ? "At least 6 characters" : null} />
+                 placeholder={isSignup ? "At least 6 characters" : "Your password"} />
 
           {error && (
             <div style={{
-              fontSize: 12, color: "#f87171",
-              background: "rgba(248,113,113,0.08)",
-              border: "1px solid rgba(248,113,113,0.25)",
-              borderRadius: 8, padding: "8px 10px", marginTop: 4, marginBottom: 14,
+              fontSize: 12.5, color: RED,
+              background: "rgba(185,28,28,0.06)",
+              border: `1px solid ${RED}33`,
+              borderRadius: 9, padding: "10px 12px", marginBottom: 16,
             }}>
               {error}
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={!canSubmit || submitting}
-            style={{
-              width: "100%", padding: "11px 0", borderRadius: 8,
-              background: GOLD, color: BG, border: "none",
-              fontWeight: 700, fontSize: 13.5, letterSpacing: "0.02em",
-              cursor: canSubmit && !submitting ? "pointer" : "not-allowed",
-              opacity: canSubmit && !submitting ? 1 : 0.55,
-              fontFamily: "inherit", marginTop: 4,
-            }}>
+          <button type="submit" disabled={!canSubmit || submitting} style={{
+            width: "100%", padding: "12px 0", borderRadius: 10,
+            background: canSubmit && !submitting ? GOLD : GOLD_BG,
+            color: canSubmit && !submitting ? SURFACE : TEXT_DIM,
+            border: `1px solid ${canSubmit && !submitting ? GOLD : GOLD_BORDER}`,
+            fontWeight: 700, fontSize: 14, letterSpacing: "0.01em",
+            cursor: canSubmit && !submitting ? "pointer" : "not-allowed",
+            boxShadow: "none",
+            transition: "all 0.2s",
+          }}>
             {submitting
               ? (isSignup ? "Creating account…" : "Signing in…")
               : (isSignup ? "Create account" : "Sign in")}
           </button>
         </form>
 
-        <div style={{
-          marginTop: 18, paddingTop: 14, borderTop: `1px solid ${ACCENT_DIM}`,
-          fontSize: 11.5, color: TEXT_DIM, textAlign: "center",
-        }}>
+        <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${BORDER}`,
+                      fontSize: 12.5, color: TEXT_DIM, textAlign: "center" }}>
           {isSignup ? (
             <>Already have an account?{" "}
               <LinkBtn onClick={() => switchMode("signin")}>Sign in</LinkBtn></>
@@ -143,12 +143,13 @@ export default function LoginScreen({ onLogin }) {
 function ModeTab({ active, onClick, children }) {
   return (
     <button type="button" onClick={onClick} style={{
-      flex: 1, padding: "8px 0", borderRadius: 7, border: "none",
+      flex: 1, padding: "9px 0", borderRadius: 8, border: "none",
       background: active ? GOLD_BG : "transparent",
       color: active ? GOLD : TEXT_DIM,
-      fontWeight: active ? 700 : 500, fontSize: 12.5,
-      fontFamily: "inherit", cursor: "pointer", letterSpacing: "0.02em",
+      fontWeight: active ? 700 : 500, fontSize: 13,
+      cursor: "pointer", letterSpacing: "0.01em",
       transition: "background 0.15s, color 0.15s",
+      boxShadow: active ? `inset 0 0 0 1px ${GOLD_BORDER}` : "none",
     }}>{children}</button>
   );
 }
@@ -163,13 +164,13 @@ function LinkBtn({ onClick, children }) {
   );
 }
 
-function Field({ label, value, onChange, type = "text", autoComplete, autoFocus, hint }) {
+function Field({ label, value, onChange, type = "text", autoComplete, autoFocus, placeholder }) {
   const [focused, setFocused] = useState(false);
   return (
-    <div style={{ marginBottom: 14 }}>
+    <div style={{ marginBottom: 16 }}>
       <label style={{
-        display: "block", fontSize: 11, fontWeight: 600, letterSpacing: "0.08em",
-        textTransform: "uppercase", color: TEXT_DIM, marginBottom: 6,
+        display: "block", fontSize: 11.5, fontWeight: 600, letterSpacing: "0.04em",
+        color: TEXT_DIM, marginBottom: 7,
       }}>{label}</label>
       <input
         type={type}
@@ -177,19 +178,18 @@ function Field({ label, value, onChange, type = "text", autoComplete, autoFocus,
         onChange={(e) => onChange(e.target.value)}
         autoComplete={autoComplete}
         autoFocus={autoFocus}
+        placeholder={placeholder}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         style={{
-          width: "100%", padding: "10px 12px", borderRadius: 8,
+          width: "100%", padding: "11px 14px", borderRadius: 10,
           background: BG, color: TEXT,
-          border: `1px solid ${focused ? GOLD_BORDER : ACCENT_DIM}`,
-          fontSize: 13.5, fontFamily: "inherit", outline: "none",
+          border: `1px solid ${focused ? GOLD_BORDER : BORDER}`,
+          fontSize: 14, outline: "none",
           transition: "border-color 0.15s", boxSizing: "border-box",
+          boxShadow: focused ? `0 0 0 3px ${GOLD_BG}` : "none",
         }}
       />
-      {hint && (
-        <div style={{ fontSize: 10.5, color: TEXT_DIM, marginTop: 4 }}>{hint}</div>
-      )}
     </div>
   );
 }

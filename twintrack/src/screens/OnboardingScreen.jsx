@@ -1,7 +1,9 @@
 import { useState } from "react";
 import {
   GOLD, GOLD_BG, GOLD_BORDER,
-  ACCENT_DIM, BG, TEXT, TEXT_DIM,
+  ACCENT_DIM, BORDER, BORDER_MED,
+  SURFACE, BG, TEXT, TEXT_DIM,
+  FONT_SERIF,
 } from "../theme.js";
 import { saveInvestorProfile } from "../api.js";
 import { ImportModal } from "./PortfolioScreen.jsx";
@@ -166,12 +168,11 @@ export default function OnboardingScreen({ currentUser, onComplete }) {
   /* shared card style — translucent, blurred */
   const card = {
     width: "100%", maxWidth: 540,
-    background: "rgba(13,31,60,0.82)",
-    backdropFilter: "blur(20px)",
-    border: `1px solid ${ACCENT_DIM}`,
+    background: SURFACE,
+    border: `1px solid ${BORDER}`,
     borderRadius: 18,
     padding: "44px 40px",
-    boxShadow: "0 32px 80px rgba(0,0,0,0.55)",
+    boxShadow: "0 8px 40px rgba(10,22,40,0.10)",
     opacity: visible ? 1 : 0,
     transform: visible ? "translateY(0px)" : "translateY(14px)",
     transition: "opacity 0.22s ease, transform 0.22s ease",
@@ -186,7 +187,7 @@ export default function OnboardingScreen({ currentUser, onComplete }) {
       display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center",
       padding: "32px 24px",
-      fontFamily: "'DM Sans','Segoe UI',sans-serif",
+      fontFamily: FONT_SERIF,
     }}>
       {/* Progress bar */}
       {showProgress && (
@@ -200,7 +201,7 @@ export default function OnboardingScreen({ currentUser, onComplete }) {
             </span>
             <span style={{ color: GOLD, fontWeight: 700 }}>{Math.round(progressPct)}%</span>
           </div>
-          <div style={{ height: 3, background: ACCENT_DIM, borderRadius: 99, overflow: "hidden" }}>
+          <div style={{ height: 3, background: BORDER_MED, borderRadius: 99, overflow: "hidden" }}>
             <div style={{
               height: "100%", borderRadius: 99, background: GOLD,
               width: `${progressPct}%`,
@@ -253,7 +254,7 @@ export default function OnboardingScreen({ currentUser, onComplete }) {
               style={{
                 flex: 1, padding: "13px 0",
                 borderRadius: 10, border: "none",
-                background: isQuestion && selected === -1 ? ACCENT_DIM : GOLD,
+                background: isQuestion && selected === -1 ? BORDER_MED : GOLD,
                 color: isQuestion && selected === -1 ? TEXT_DIM : BG,
                 fontWeight: 700, fontSize: 14, letterSpacing: "0.02em",
                 cursor: (isQuestion && selected === -1) || saving ? "not-allowed" : "pointer",
@@ -272,9 +273,9 @@ export default function OnboardingScreen({ currentUser, onComplete }) {
             onClick={() => goTo(LAST_QUESTION_STEP)}
             style={{
               width: "100%", marginTop: 10, padding: "11px 0",
-              borderRadius: 10, border: `1px solid ${ACCENT_DIM}`,
+              borderRadius: 10, border: `1px solid ${BORDER}`,
               background: "transparent", color: TEXT_DIM,
-              fontWeight: 600, fontSize: 13.5, cursor: "pointer",
+              fontWeight: 600, fontSize: 14, cursor: "pointer",
               fontFamily: "inherit",
             }}>
             ← Back
@@ -288,7 +289,7 @@ export default function OnboardingScreen({ currentUser, onComplete }) {
             style={{
               width: "100%", marginTop: 28, padding: "13px 0",
               borderRadius: 10, border: "none",
-              background: GOLD, color: BG,
+              background: GOLD, color: SURFACE,
               fontWeight: 700, fontSize: 14, cursor: "pointer",
               fontFamily: "inherit",
             }}>
@@ -350,8 +351,8 @@ function QuestionSlide({ q, qNum, selected, onSelect }) {
               onClick={() => onSelect(i)}
               style={{
                 padding: "12px 16px", borderRadius: 10, textAlign: "left",
-                border: `1.5px solid ${active ? GOLD_BORDER : ACCENT_DIM}`,
-                background: active ? GOLD_BG : "rgba(13,31,60,0.35)",
+                border: `1.5px solid ${active ? GOLD_BORDER : BORDER}`,
+                background: active ? GOLD_BG : "transparent",
                 color: active ? GOLD : TEXT,
                 fontWeight: active ? 600 : 400, fontSize: 13.5,
                 cursor: "pointer", fontFamily: "inherit",
@@ -360,7 +361,7 @@ function QuestionSlide({ q, qNum, selected, onSelect }) {
               }}>
               <span style={{
                 width: 15, height: 15, borderRadius: "50%", flexShrink: 0,
-                border: `2px solid ${active ? GOLD : ACCENT_DIM}`,
+                border: `2px solid ${active ? GOLD : BORDER_MED}`,
                 background: active ? GOLD : "transparent",
                 transition: "border-color 0.15s, background 0.15s",
               }} />
@@ -391,7 +392,7 @@ function UploadSlide({ onUpload, onSkip }) {
         onClick={onUpload}
         style={{
           width: "100%", padding: "13px 0", borderRadius: 10,
-          border: "none", background: GOLD, color: BG,
+          border: "none", background: GOLD, color: SURFACE,
           fontWeight: 700, fontSize: 14, cursor: "pointer",
           fontFamily: "inherit", marginBottom: 10,
         }}>
@@ -402,7 +403,7 @@ function UploadSlide({ onUpload, onSkip }) {
         onClick={onSkip}
         style={{
           width: "100%", padding: "11px 0", borderRadius: 10,
-          border: `1px solid ${ACCENT_DIM}`, background: "transparent",
+          border: `1px solid ${BORDER}`, background: "transparent",
           color: TEXT_DIM, fontWeight: 500, fontSize: 13.5,
           cursor: "pointer", fontFamily: "inherit",
         }}>
