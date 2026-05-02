@@ -566,7 +566,7 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
                                            padding: "8px 6px",
                                            background: i % 2 === 0 ? "transparent" : SURFACE_2 }}>
                     <div style={{ width: 10, height: 10, flexShrink: 0,
-                                  background: HOLDING_COLORS[i % HOLDING_COLORS.length] }} />
+                                  background: TYPE_COLOR[h.type] || TEXT_DIM }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{h.symbol}</div>
                       <div style={{ fontSize: 11, color: TEXT_DIM, overflow: "hidden",
