@@ -204,7 +204,7 @@ function ResultPanel({ result, onReset }) {
               <div style={{ marginBottom: 12 }}>
                 <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.08em",
                               textTransform: "uppercase", color: TEXT_DIM, marginBottom: 8 }}>
-                  Risk Change After Rebalancing
+                  How rebalancing changes your risk level
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   {/* Current beta bar */}
@@ -212,7 +212,10 @@ function ResultPanel({ result, onReset }) {
                     <div style={{ display: "flex", justifyContent: "space-between",
                                   fontSize: 11, color: TEXT_DIM, marginBottom: 4 }}>
                       <span>Current</span>
-                      <b style={{ color: TEXT }}>{math.portfolio_beta}</b>
+                      <b style={{ color: TEXT }}>
+                        {math.portfolio_beta < 0.7 ? "Low" : math.portfolio_beta < 1.1 ? "Moderate" : math.portfolio_beta < 1.4 ? "Elevated" : "High"}
+                        <span style={{ fontWeight: 400, color: TEXT_DIM, fontSize: 10, marginLeft: 4 }}>({math.portfolio_beta})</span>
+                      </b>
                     </div>
                     <div style={{ height: 6, background: BORDER, borderRadius: 99 }}>
                       <div style={{ height: "100%", borderRadius: 99,
@@ -229,11 +232,12 @@ function ResultPanel({ result, onReset }) {
                       <span>After rebalance</span>
                       <b style={{ color: math.post_rebalance_beta < math.portfolio_beta ? GREEN
                                        : math.post_rebalance_beta > math.portfolio_beta ? RED : TEXT }}>
-                        {math.post_rebalance_beta}
+                        {math.post_rebalance_beta < 0.7 ? "Low" : math.post_rebalance_beta < 1.1 ? "Moderate" : math.post_rebalance_beta < 1.4 ? "Elevated" : "High"}
+                        <span style={{ fontWeight: 400, color: TEXT_DIM, fontSize: 10, marginLeft: 4 }}>({math.post_rebalance_beta})</span>
                         {" "}
                         <span style={{ fontWeight: 400, fontSize: 10 }}>
-                          {math.post_rebalance_beta < math.portfolio_beta ? "↓ lower risk"
-                         : math.post_rebalance_beta > math.portfolio_beta ? "↑ higher risk" : "unchanged"}
+                          {math.post_rebalance_beta < math.portfolio_beta ? "↓ less volatile"
+                         : math.post_rebalance_beta > math.portfolio_beta ? "↑ more volatile" : "unchanged"}
                         </span>
                       </b>
                     </div>
@@ -250,11 +254,11 @@ function ResultPanel({ result, onReset }) {
             {/* Stats row */}
             <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
               <span style={{ fontSize: 12, color: TEXT_DIM }}>
-                Risk-free rate <b style={{ color: TEXT }}>{(math.risk_free_rate * 100).toFixed(2)}%</b>
+                T-bill base rate <b style={{ color: TEXT }}>{(math.risk_free_rate * 100).toFixed(2)}%</b>
               </span>
               <span style={{ fontSize: 12, color: TEXT_DIM }}>
-                Expected return <b style={{ color: TEXT }}>
-                  {(math.portfolio_expected_annual * 100).toFixed(1)}%/yr
+                Est. annual return <b style={{ color: TEXT }}>
+                  {(math.portfolio_expected_annual * 100).toFixed(1)}%
                 </b>
               </span>
               {math.return_gap && (
@@ -295,7 +299,6 @@ function ResultPanel({ result, onReset }) {
           </div>
           <div style={{ marginLeft: "auto", fontSize: 11.5, color: TEXT_DIM }}>
             {trades.length} trade{trades.length !== 1 ? "s" : ""} suggested
-            {" · "}Engine: <b>{result.planner_engine}</b>
           </div>
         </div>
       )}

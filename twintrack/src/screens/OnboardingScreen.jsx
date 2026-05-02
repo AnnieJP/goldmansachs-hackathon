@@ -6,6 +6,7 @@ import {
   FONT_SERIF,
 } from "../theme.js";
 import { saveInvestorProfile } from "../api.js";
+import { Sparkles, FolderOpen } from "lucide-react";
 import { ImportModal } from "./PortfolioScreen.jsx";
 
 /* ─── Questions ─────────────────────────────────────────────────── */
@@ -396,7 +397,7 @@ function UploadSlide({ onUpload, onSkip }) {
           fontWeight: 700, fontSize: 14, cursor: "pointer",
           fontFamily: "inherit", marginBottom: 10,
         }}>
-        📂 Upload my statement
+        Upload my statement
       </button>
       <button
         type="button"
@@ -416,7 +417,7 @@ function UploadSlide({ onUpload, onSkip }) {
 function DoneSlide({ name }) {
   return (
     <>
-      <div style={{ fontSize: 42, marginBottom: 16, lineHeight: 1 }}>🎉</div>
+      <Sparkles size={42} color={GOLD} style={{ marginBottom: 16 }} />
       <h2 style={{
         fontSize: 26, fontWeight: 900, color: TEXT,
         margin: "0 0 12px", letterSpacing: "-0.03em",

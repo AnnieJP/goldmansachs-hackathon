@@ -4,6 +4,7 @@ import { GOLD, GOLD_BG, GOLD_BORDER, BORDER, BORDER_MED,
          GREEN, RED, FONT_SERIF, HOLDING_COLORS, fmt$, fmtPct } from "../theme.js";
 import { apiFetch } from "../api.js";
 import InfoTip from "../components/InfoTip.jsx";
+import { BarChart3, TrendingUp, TrendingDown, Plus, Pencil, Trash2, FileText, Upload, Check, X, ChevronDown, CheckCircle2 } from "lucide-react";
 
 /* ─── Industry Mapping ──────────────────────────────────────────── */
 const INDUSTRY_MAPPING = {
@@ -221,7 +222,7 @@ export function ImportModal({ onImport, onClose }) {
             <div style={{ fontSize: 12, color: TEXT_DIM, marginTop: 3 }}>Upload an account statement or holdings export PDF</div>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: TEXT_DIM,
-                                             fontSize: 20, cursor: "pointer", lineHeight: 1 }}>✕</button>
+                                             fontSize: 20, cursor: "pointer", lineHeight: 1, display: "flex", alignItems: "center" }}><X size={16} /></button>
         </div>
 
         <div style={{ padding: "20px 24px", overflowY: "auto", flex: 1 }}>
@@ -232,7 +233,7 @@ export function ImportModal({ onImport, onClose }) {
                    onDrop={(e) => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); }}>
               <input type="file" accept=".pdf" style={{ display: "none" }}
                      onChange={(e) => handleFile(e.target.files[0])} />
-              <div style={{ fontSize: 32, marginBottom: 10 }}>📄</div>
+              <FileText size={32} color={TEXT_DIM} style={{ marginBottom: 10 }} />
               {stage === "parsing"
                 ? <div style={{ color: GOLD, fontWeight: 600, fontSize: 14 }}>Parsing {filename}…</div>
                 : <>
@@ -291,7 +292,7 @@ export function ImportModal({ onImport, onClose }) {
 
           {stage === "done" && (
             <div style={{ textAlign: "center", padding: "32px 0" }}>
-              <div style={{ fontSize: 40, marginBottom: 12 }}>✓</div>
+              <CheckCircle2 size={40} color={GREEN} style={{ marginBottom: 12 }} />
               <div style={{ fontWeight: 700, fontSize: 16, color: TEXT }}>Import complete</div>
               <div style={{ fontSize: 13, color: TEXT_DIM, marginTop: 6 }}>
                 {selected.size} holding{selected.size !== 1 ? "s" : ""} added to your portfolio.
@@ -403,7 +404,7 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
             color: TEXT_DIM, fontWeight: 600, fontSize: 13.5, cursor: "pointer",
             fontFamily: "inherit", whiteSpace: "nowrap",
           }}>
-            📄 Import PDF
+            Import PDF
           </button>
           <button onClick={() => setModal("add")} type="button" style={{
             padding: "10px 20px", border: "none", background: GOLD,
@@ -592,7 +593,7 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
                 return (
                   <tr key={h.id}
                       style={{ borderTop: `1px solid ${BORDER}`, background: i % 2 === 0 ? "transparent" : SURFACE_2,
-                               transition: "background 0.12s" }}
+                               transition: "background 0.12s", verticalAlign: "middle" }}
                       onMouseEnter={(e) => e.currentTarget.style.background = `${GOLD_BG}`}
                       onMouseLeave={(e) => e.currentTarget.style.background = i % 2 === 0 ? "transparent" : SURFACE_2}>
                     <td style={{ padding: "13px 16px" }}>
@@ -618,18 +619,18 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
                                       width: `${Math.min(100, h.currentPct || 0)}%` }} />
                       </div>
                     </td>
-                    <td style={{ padding: "13px 16px" }}>
-                      <div style={{ display: "flex", gap: 6 }}>
+                    <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
+                      <div style={{ display: "flex", gap: 6, alignItems: "center", justifyContent: "center" }}>
                         <button onClick={() => setModal(h)} type="button" style={{
                           padding: "5px 10px", border: `1px solid ${BORDER}`,
                           background: "transparent", color: TEXT_DIM, cursor: "pointer", fontSize: 11.5,
                           fontFamily: "inherit",
                         }}>Edit</button>
                         <button onClick={() => removeHolding(h.id)} type="button" style={{
-                          padding: "5px 8px", border: `1px solid ${RED}40`,
-                          background: "transparent", color: RED, cursor: "pointer", fontSize: 11.5,
-                          fontFamily: "inherit",
-                        }}>✕</button>
+                          padding: "5px 7px", border: `1px solid ${RED}40`,
+                          background: "transparent", color: RED, cursor: "pointer",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                        }}><X size={12} /></button>
                       </div>
                     </td>
                   </tr>
