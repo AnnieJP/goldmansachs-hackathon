@@ -4,6 +4,7 @@ import { GOLD, GOLD_BG, GOLD_BORDER, BORDER, BORDER_MED,
          GREEN, RED, RED_BG, RED_BORDER,
          FONT_SERIF, fmt$, fmtPct } from "../theme.js";
 import { apiFetch } from "../api.js";
+import InfoTip from "../components/InfoTip.jsx";
 import { TrendingUp, TrendingDown, Sparkles, ChevronRight } from "lucide-react";
 
 const SCENARIOS = [
@@ -37,7 +38,15 @@ export default function ScenarioScreen({ portfolio, prices }) {
 
   return (
     <div style={{ padding: "32px 36px", color: TEXT, maxWidth: 920 }}>
-      <h1 style={{ margin: "0 0 4px", fontSize: 22, fontWeight: 700, letterSpacing: "-0.01em", fontFamily: FONT_SERIF }}>What-If Simulator</h1>
+      <h1 style={{ margin: "0 0 4px", fontSize: 22, fontWeight: 700, letterSpacing: "-0.01em", fontFamily: FONT_SERIF }}>
+        What-If Simulator
+        <InfoTip title="What-If Simulator">
+          Apply a historical-style market shock to your portfolio and see where
+          it would land. Each scenario uses realistic shock sizes (e.g. a 2008-style
+          crash = stocks -22%, bonds +4%) applied to the current value of every
+          holding based on its asset type.
+        </InfoTip>
+      </h1>
       <p style={{ margin: "0 0 26px", fontSize: 13, color: TEXT_DIM }}>
         Pick a scenario and see exactly how your portfolio would react.
       </p>
@@ -88,15 +97,21 @@ export default function ScenarioScreen({ portfolio, prices }) {
           {/* Summary row */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 20 }}>
             {[
-              { label: "Portfolio now",   value: fmt$(data.current_value),   sub: null },
+              { label: "Portfolio now",   value: fmt$(data.current_value),   sub: null,
+                tip: "Your portfolio's current market value before applying the scenario shock." },
               { label: "Projected value", value: fmt$(data.projected_value),
                 sub: `${fmt$(data.projected_value - data.current_value)} (${fmtPct(data.impact_pct)})`,
-                pos: data.projected_value >= data.current_value },
-              { label: "Max drawdown",    value: data.max_drawdown,          sub: null },
-            ].map(({ label, value, sub, pos }) => (
+                pos: data.projected_value >= data.current_value,
+                tip: "What your portfolio would be worth if this scenario played out. Calculated by applying the scenario's shock to each holding based on its asset type." },
+              { label: "Max drawdown",    value: data.max_drawdown,          sub: null,
+                tip: "Worst-case peak-to-trough loss during the scenario. Useful for gauging how painful the worst moment could feel before any recovery." },
+            ].map(({ label, value, sub, pos, tip }) => (
               <div key={label} style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 14,
                                          padding: "18px 20px", boxShadow: "0 2px 12px rgba(0,0,0,0.2)" }}>
-                <div style={{ fontSize: 11.5, color: TEXT_DIM, marginBottom: 8, letterSpacing: "0.03em" }}>{label}</div>
+                <div style={{ fontSize: 11.5, color: TEXT_DIM, marginBottom: 8, letterSpacing: "0.03em" }}>
+                  {label}
+                  {tip && <InfoTip title={label} text={tip} />}
+                </div>
                 <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.02em", color: TEXT }}>{value}</div>
                 {sub && (
                   <div style={{ fontSize: 12.5, fontWeight: 600, marginTop: 5,
@@ -129,7 +144,14 @@ export default function ScenarioScreen({ portfolio, prices }) {
           <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 16, overflow: "hidden",
                         boxShadow: "0 2px 12px rgba(0,0,0,0.2)" }}>
             <div style={{ padding: "16px 20px", borderBottom: `1px solid ${BORDER}` }}>
-              <div style={{ fontSize: 13.5, fontWeight: 700, color: TEXT }}>Impact per holding</div>
+              <div style={{ fontSize: 13.5, fontWeight: 700, color: TEXT }}>
+                Impact per holding
+                <InfoTip title="Impact per holding">
+                  How much each individual position would gain or lose under this
+                  scenario. Shocks are applied by asset type (stocks, ETFs, bonds,
+                  funds) so a bond fund behaves differently from a tech stock.
+                </InfoTip>
+              </div>
             </div>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>

@@ -3,6 +3,7 @@ import { GOLD, GOLD_BG, GOLD_BORDER, BORDER, BORDER_MED,
          SURFACE, SURFACE_2, BG, TEXT, TEXT_DIM,
          GREEN, RED, FONT_SERIF, HOLDING_COLORS, fmt$, fmtPct } from "../theme.js";
 import { apiFetch } from "../api.js";
+import InfoTip from "../components/InfoTip.jsx";
 
 /* ─── Industry Mapping ──────────────────────────────────────────── */
 const INDUSTRY_MAPPING = {
@@ -171,7 +172,7 @@ export function ImportModal({ onImport, onClose }) {
     reader.onload = async (e) => {
       try {
         const b64 = e.target.result.split(",")[1];
-        const res = await fetch("/api/portfolio/import-pdf", {
+        const res = await apiFetch("/api/portfolio/import-pdf", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ pdf_b64: b64 }),
         });
@@ -198,7 +199,7 @@ export function ImportModal({ onImport, onClose }) {
   const confirmImport = async () => {
     setStage("importing");
     for (const h of parsed.filter((h) => selected.has(h.id))) {
-      await fetch("/api/portfolio/add", {
+      await apiFetch("/api/portfolio/add", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(h),
       });
@@ -378,6 +379,11 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
         <div>
           <h1 style={{ margin: "0 0 8px", fontSize: 26, fontWeight: 700, letterSpacing: "-0.01em", fontFamily: FONT_SERIF }}>
             My Holdings
+            <InfoTip title="My Holdings">
+              All the positions in your portfolio, with live prices, cost basis,
+              and unrealised gain/loss. Import a brokerage PDF to auto-populate,
+              or add holdings manually.
+            </InfoTip>
           </h1>
           <div style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
             <span style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-0.03em", fontFamily: FONT_SERIF }}>
@@ -416,6 +422,10 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
         <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: 24 }}>
           <h3 style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 700, color: TEXT, textAlign: "center", fontFamily: FONT_SERIF }}>
             Portfolio Overview
+            <InfoTip title="Portfolio Overview">
+              Donut chart showing what share of your total portfolio each holding
+              represents. Hover a slice to read its allocation percentage.
+            </InfoTip>
           </h3>
           <div style={{ fontSize: 11, color: TEXT_DIM, textAlign: "center", marginBottom: 16, lineHeight: 1.4 }}>
             Allocation by holding
@@ -438,6 +448,11 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
         <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: 24 }}>
           <h3 style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 700, color: TEXT, fontFamily: FONT_SERIF }}>
             Top Holdings
+            <InfoTip title="Top Holdings">
+              Your biggest positions ranked by current market value. If any single
+              holding exceeds ~25% of your portfolio, consider trimming it to
+              reduce concentration risk.
+            </InfoTip>
           </h3>
           <div style={{ fontSize: 11, color: TEXT_DIM, marginBottom: 16, lineHeight: 1.4 }}>
             Largest positions by allocation
@@ -487,6 +502,11 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
         <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: 24 }}>
           <h3 style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 700, color: TEXT, fontFamily: FONT_SERIF }}>
             Industry Mix
+            <InfoTip title="Industry Mix" placement="left">
+              Your holdings grouped by industry (Tech, Healthcare, Bonds, etc.).
+              A well-diversified portfolio spreads exposure across several
+              sectors so no single industry downturn can tank it.
+            </InfoTip>
           </h3>
           <div style={{ fontSize: 11, color: TEXT_DIM, marginBottom: 16, lineHeight: 1.4 }}>
             Diversification across sectors

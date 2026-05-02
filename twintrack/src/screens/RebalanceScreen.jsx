@@ -4,6 +4,7 @@ import { GOLD, GOLD_BG, GOLD_BORDER, BORDER, BORDER_MED,
          GREEN, GREEN_BG, GREEN_BORDER, RED, RED_BG, RED_BORDER,
          FONT_SERIF, fmt$, fmtPct } from "../theme.js";
 import { apiFetch } from "../api.js";
+import InfoTip from "../components/InfoTip.jsx";
 import { ArrowUpDown, TrendingUp, TrendingDown, CheckCircle2, AlertCircle } from "lucide-react";
 
 /* ─── Drift bar ─────────────────────────────────────────────────── */
@@ -101,7 +102,15 @@ export default function RebalanceScreen({ portfolio, prices }) {
 
   return (
     <div style={{ padding: "32px 36px", color: TEXT, maxWidth: 900 }}>
-      <h1 style={{ margin: "0 0 4px", fontSize: 22, fontWeight: 700, letterSpacing: "-0.01em", fontFamily: FONT_SERIF }}>Rebalance</h1>
+      <h1 style={{ margin: "0 0 4px", fontSize: 22, fontWeight: 700, letterSpacing: "-0.01em", fontFamily: FONT_SERIF }}>
+        Rebalance
+        <InfoTip title="What is Rebalancing?">
+          Over time, winning positions grow and losers shrink, pushing your
+          portfolio away from your chosen allocation. Rebalancing trims the
+          winners and tops up the losers to bring you back to target. We
+          suggest trades when any holding drifts more than ~3% off.
+        </InfoTip>
+      </h1>
       <p style={{ margin: "0 0 26px", fontSize: 13, color: TEXT_DIM }}>
         Keep your portfolio aligned with your target allocation.
       </p>
@@ -133,7 +142,14 @@ export default function RebalanceScreen({ portfolio, prices }) {
         <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 16, padding: "22px 22px",
                       boxShadow: "0 2px 12px rgba(0,0,0,0.2)" }}>
           <div style={{ fontSize: 12.5, fontWeight: 700, color: TEXT, marginBottom: 18,
-                        textTransform: "uppercase", letterSpacing: "0.05em" }}>Current vs Target</div>
+                        textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            Current vs Target
+            <InfoTip title="Drift bars">
+              Each bar shows a holding's current allocation vs its target. The
+              vertical tick marks the target. Blue = on or below target,
+              orange = overweight. Bigger drift means more urgent rebalancing.
+            </InfoTip>
+          </div>
           {data.allocation_snapshot.map((s) => (
             <div key={s.symbol} style={{ marginBottom: 20 }}>
               <DriftBar current={s.current_pct} target={s.target_pct} symbol={s.symbol} />
