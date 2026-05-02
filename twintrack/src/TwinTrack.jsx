@@ -383,9 +383,20 @@ export default function TwinTrack({ currentUser, onLogout }) {
     <div style={{ minHeight: "100vh", background: BG, display: "flex", alignItems: "center",
                   justifyContent: "center", color: TEXT_DIM, fontSize: 14 }}>
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 28, marginBottom: 12 }}>◈</div>
+        <div style={{
+          width: 28, height: 28, border: "2px solid",
+          borderColor: TEXT_DIM, transform: "rotate(45deg)",
+          margin: "0 auto 18px",
+          animation: "diamondPulse 1.6s ease-in-out infinite",
+        }} />
         Loading your portfolio…
       </div>
+      <style>{`
+        @keyframes diamondPulse {
+          0%, 100% { border-color: rgba(148,163,184,0.15); box-shadow: none; }
+          50%       { border-color: rgba(148,163,184,0.85); box-shadow: 0 0 10px rgba(148,163,184,0.25); }
+        }
+      `}</style>
     </div>
   );
 

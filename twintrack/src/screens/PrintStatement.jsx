@@ -411,7 +411,7 @@ export default function PrintStatement({ portfolio, prices, enriched }) {
                                           display: "flex", justifyContent: "space-between",
                                           alignItems: "center" }}>
         <div style={{ color: "#1a1a2e", fontFamily: "sans-serif", fontWeight: 700, fontSize: 15 }}>
-          📄 Print Preview — {today}
+          Print Preview — {today}
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => window.print()} style={{
@@ -419,7 +419,7 @@ export default function PrintStatement({ portfolio, prices, enriched }) {
             background: "#1a1a2e", color: "#fff", fontWeight: 700, fontSize: 13.5,
             fontFamily: "sans-serif",
           }}>
-            🖨️  Print / Save PDF
+            Print / Save PDF
           </button>
         </div>
       </div>

@@ -234,6 +234,10 @@ def load_user_scenarios(email: str) -> list:
             return []
     return []
 
+def save_user_scenarios(email: str, records: list) -> None:
+    SCENARIOS_DIR.mkdir(parents=True, exist_ok=True)
+    _scenarios_path(email).write_text(json.dumps(records, indent=2), encoding="utf-8")
+
 def save_user_scenario(email: str, record: dict) -> None:
     SCENARIOS_DIR.mkdir(parents=True, exist_ok=True)
     path      = _scenarios_path(email)
@@ -596,6 +600,171 @@ def calc_rebalance(portfolio: dict, prices: dict) -> dict:
     }
 
 # ── Scenario simulation ───────────────────────────────────────────────────────
+# ── Profile-aware bucket rebalance ────────────────────────────────────────────
+_BUCKET_FRIENDLY = {
+    "us_equity_broad":  "US Stocks",
+    "us_equity_growth": "Growth Stocks",
+    "us_equity_value":  "Value Stocks",
+    "dividend":         "Dividend Stocks",
+    "international":    "International",
+    "bonds_medium":     "Bonds",
+    "bonds_short":      "Short-Term Bonds",
+    "bonds_long":       "Long-Term Bonds",
+    "bonds_tips":       "Inflation-Protected",
+    "bonds_corporate":  "Corporate Bonds",
+    "defensive":        "Defensive Stocks",
+    "real_estate":      "Real Estate",
+    "commodities":      "Commodities & Gold",
+    "financials":       "Financials",
+    "cash":             "Cash",
+}
+
+_BUCKET_BETAS = {
+    "us_equity_broad": 1.0,  "us_equity_growth": 1.4, "us_equity_value": 0.85,
+    "dividend": 0.7,          "international": 0.9,    "bonds_medium": 0.1,
+    "bonds_short": 0.05,      "bonds_long": 0.15,      "bonds_tips": 0.1,
+    "bonds_corporate": 0.2,   "defensive": 0.5,        "real_estate": 0.85,
+    "commodities": 0.6,       "financials": 1.2,       "cash": 0.0,
+}
+
+def estimate_post_rebalance_beta(portfolio: dict, trades: list, betas: dict, prices: dict):
+    from reasoning.rebalancer import _holding_bucket
+    holdings = portfolio.get("holdings", [])
+    cash = float(portfolio.get("cash", 0))
+    pos: dict = {}
+    total = cash
+    for h in holdings:
+        price = float(prices.get(h["symbol"]) or h.get("avg_cost") or 0)
+        val = h["shares"] * price
+        total += val
+        bucket = _holding_bucket(h["symbol"], h.get("type", "stock"))
+        b = betas.get(h["symbol"], _BUCKET_BETAS.get(bucket, 1.0))
+        pos[h["symbol"]] = {"value": val, "beta": b}
+    if total == 0:
+        return None
+    for t in trades:
+        sym    = t.get("ticker", "")
+        val    = float(t.get("value", 0))
+        bucket = t.get("bucket", "us_equity_broad")
+        b      = betas.get(sym, _BUCKET_BETAS.get(bucket, 1.0))
+        if t.get("action") == "sell":
+            if sym in pos:
+                pos[sym]["value"] = max(0.0, pos[sym]["value"] - val)
+        else:
+            if sym in pos:
+                ov = pos[sym]["value"]
+                nv = ov + val
+                pos[sym]["beta"]  = (pos[sym]["beta"] * ov + b * val) / nv if nv else b
+                pos[sym]["value"] = nv
+            else:
+                pos[sym] = {"value": val, "beta": b}
+    total_new = cash + sum(p["value"] for p in pos.values())
+    if total_new == 0:
+        return None
+    return round(sum(p["value"] * p["beta"] for p in pos.values()) / total_new, 2)
+
+def calc_rebalance_profile(portfolio: dict, prices: dict, investor_profile: dict) -> dict:
+    from reasoning.rebalancer import _BASE_ALLOC, _GOAL_NUDGE, _holding_bucket
+
+    _type_map  = {"conservative": "conservative", "balanced": "moderate",
+                  "growth": "moderate", "aggressive_growth": "aggressive"}
+    _level_map = {"low": "conservative", "medium": "moderate",
+                  "medium_high": "moderate", "high": "aggressive"}
+    raw = (investor_profile.get("risk_profile")
+           or _type_map.get(investor_profile.get("investor_type", ""))
+           or _level_map.get(investor_profile.get("risk_level", ""))
+           or "moderate")
+    risk_profile = raw if raw in ("conservative", "moderate", "aggressive") else "moderate"
+    goal         = investor_profile.get("goal", "")
+
+    base  = dict(_BASE_ALLOC.get(risk_profile, _BASE_ALLOC["moderate"]))
+    nudge = _GOAL_NUDGE.get(goal, {})
+    for k, v in nudge.items():
+        base[k] = base.get(k, 0) + v
+
+    total_pct = sum(max(0, v) for v in base.values()) or 100
+    target_alloc = {k: round(max(0, v) / total_pct * 100, 1) for k, v in base.items()}
+
+    holdings  = portfolio.get("holdings", [])
+    cash      = float(portfolio.get("cash", 0))
+    total_val = cash
+    valued    = []
+    for h in holdings:
+        price = prices.get(h["symbol"]) or h.get("avg_cost", 0)
+        val   = h["shares"] * price
+        total_val += val
+        valued.append({**h, "current_value": val})
+    if total_val == 0:
+        total_val = 1
+
+    bucket_vals: dict = {}
+    for h in valued:
+        b = _holding_bucket(h["symbol"], h.get("type", "stock"))
+        bucket_vals[b] = bucket_vals.get(b, 0) + h["current_value"]
+    if cash > 0:
+        bucket_vals["cash"] = bucket_vals.get("cash", 0) + cash
+
+    current_pct = {k: round(v / total_val * 100, 1) for k, v in bucket_vals.items()}
+
+    all_buckets = set(list(target_alloc.keys()) + list(current_pct.keys()))
+    snapshot = []
+    for b in all_buckets:
+        cur = current_pct.get(b, 0)
+        tgt = target_alloc.get(b, 0)
+        if cur == 0 and tgt == 0:
+            continue
+        if cur < 0.5 and tgt < 1:
+            continue
+        snapshot.append({
+            "bucket":      b,
+            "label":       _BUCKET_FRIENDLY.get(b, b.replace("_", " ").title()),
+            "current_pct": cur,
+            "target_pct":  tgt,
+            "drift":       round(cur - tgt, 1),
+        })
+    snapshot.sort(key=lambda x: -abs(x["drift"]))
+
+    THRESHOLD = 5.0
+    suggestions = []
+    for s in snapshot:
+        if abs(s["drift"]) < THRESHOLD or len(suggestions) >= 3:
+            continue
+        action    = "sell" if s["drift"] > 0 else "buy"
+        trade_val = round(abs(s["drift"] / 100) * total_val, 2)
+        pct_word  = f"{abs(s['drift']):.0f}%"
+        if action == "sell":
+            plain  = f"Trim {s['label']} by ≈ ${trade_val:,.0f}"
+            reason = (f"{s['label']} is {s['current_pct']}% of your portfolio — "
+                      f"{pct_word} above your {s['target_pct']}% target for a {risk_profile} investor.")
+        else:
+            plain  = f"Add more {s['label']} — ≈ ${trade_val:,.0f} needed"
+            reason = (f"{s['label']} is only {s['current_pct']}% of your portfolio — "
+                      f"{pct_word} below your {s['target_pct']}% target for a {risk_profile} investor.")
+        suggestions.append({
+            "bucket":       s["bucket"],
+            "label":        s["label"],
+            "action":       action,
+            "current_pct":  s["current_pct"],
+            "target_pct":   s["target_pct"],
+            "drift":        s["drift"],
+            "trade_value":  trade_val,
+            "plain_action": plain,
+            "reason":       reason,
+        })
+
+    return {
+        "needs_rebalancing": len(suggestions) > 0,
+        "suggestion_count":  len(suggestions),
+        "total_drift":       round(sum(abs(s["drift"]) for s in snapshot if abs(s["drift"]) >= THRESHOLD), 1),
+        "bucket_snapshot":   snapshot,
+        "suggestions":       suggestions,
+        "total_value":       round(total_val, 2),
+        "profile_used":      risk_profile,
+        "goal_used":         goal,
+        "profile_aware":     True,
+    }
+
+
 def calc_scenario(portfolio: dict, prices: dict, scenario_id: str) -> dict:
     sc = SCENARIOS.get(scenario_id)
     if sc is None:
@@ -1237,6 +1406,20 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(match)
         self._json({"error": "Not found"}, 404)
 
+    def do_DELETE(self):
+        p = request_path(self)
+        if p.startswith("/api/user-scenarios/"):
+            email = self._require_auth()
+            if not email: return
+            sid = p.split("/api/user-scenarios/")[1]
+            scenarios = load_user_scenarios(email)
+            new_list = [s for s in scenarios if s.get("id") != sid]
+            if len(new_list) == len(scenarios):
+                return self._json({"error": "Not found"}, 404)
+            save_user_scenarios(email, new_list)
+            return self._json({"ok": True})
+        self._json({"error": "Not found"}, 404)
+
     def do_POST(self):
         p = request_path(self)
         try:
@@ -1326,7 +1509,13 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(calc_risk(body.get("portfolio", {}), body.get("prices", {})))
 
         if p == "/api/rebalance":
-            return self._json(calc_rebalance(body.get("portfolio", {}), body.get("prices", {})))
+            with _users_lock:
+                profile = load_users().get(email, {}).get("investor_profile")
+            portfolio = body.get("portfolio", {})
+            prices_b  = body.get("prices", {})
+            if profile:
+                return self._json(calc_rebalance_profile(portfolio, prices_b, profile))
+            return self._json(calc_rebalance(portfolio, prices_b))
 
         if p == "/api/scenario":
             return self._json(calc_scenario(
@@ -1562,6 +1751,11 @@ class Handler(BaseHTTPRequestHandler):
             portfolio, prices, betas, profile, scenario_id, asp, crash_sector,
         )
 
+        # 7b. Post-rebalance beta estimate
+        post_beta = estimate_post_rebalance_beta(
+            portfolio, rebalance_plan.get("trades", []), betas, prices
+        )
+
         # 8. Scenario simulation (price shock)
         scenario_result = None
         if scenario_id and scenario_id in SCENARIOS:
@@ -1603,6 +1797,7 @@ class Handler(BaseHTTPRequestHandler):
             "recommendations": enriched_recs,
             "math": {
                 "portfolio_beta":            capm_data["portfolio_beta"],
+                "post_rebalance_beta":       post_beta,
                 "risk_free_rate":            capm_data["risk_free_rate"],
                 "portfolio_expected_annual": capm_data["portfolio_expected_annual"],
                 "return_gap":                rg,

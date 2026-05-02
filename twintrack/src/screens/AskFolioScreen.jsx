@@ -23,9 +23,9 @@ const STARTERS = [
 ];
 
 const VERDICT_CONFIG = {
-  proceed:              { color: GREEN,    bg: GREEN_BG,  border: GREEN_BORDER, Icon: CheckCircle2,  label: "Proceed"               },
-  proceed_with_caution: { color: "#B45309", bg: "#FEF3C7", border: "#FDE68A",   Icon: AlertTriangle, label: "Proceed with Caution"  },
-  do_not_proceed:       { color: RED,      bg: RED_BG,    border: RED_BORDER,   Icon: ShieldAlert,   label: "Do Not Proceed"        },
+  proceed:              { color: GREEN,    bg: GREEN_BG,  border: GREEN_BORDER, Icon: CheckCircle2,  label: "Safe to Rebalance",      sub: "This trade plan looks good to execute."             },
+  proceed_with_caution: { color: "#B45309", bg: "#FEF3C7", border: "#FDE68A",   Icon: AlertTriangle, label: "Rebalance with Care",    sub: ""                                                   },
+  do_not_proceed:       { color: RED,      bg: RED_BG,    border: RED_BORDER,   Icon: ShieldAlert,   label: "Don't Rebalance Yet",   sub: "" },
 };
 
 /* ── Verdict badge ─────────────────────────────────────────────── */
@@ -33,14 +33,17 @@ function VerdictBadge({ verdict }) {
   const cfg = VERDICT_CONFIG[verdict] || VERDICT_CONFIG.proceed;
   const { Icon } = cfg;
   return (
-    <div style={{
-      display: "inline-flex", alignItems: "center", gap: 7,
-      padding: "6px 14px", borderRadius: 99,
-      background: cfg.bg, border: `1px solid ${cfg.border}`,
-      color: cfg.color, fontSize: 13, fontWeight: 700,
-    }}>
-      <Icon size={14} strokeWidth={2.2} />
-      {cfg.label}
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 4 }}>
+      <div style={{
+        display: "inline-flex", alignItems: "center", gap: 7,
+        padding: "6px 14px", borderRadius: 99,
+        background: cfg.bg, border: `1px solid ${cfg.border}`,
+        color: cfg.color, fontSize: 13, fontWeight: 700,
+      }}>
+        <Icon size={14} strokeWidth={2.2} />
+        {cfg.label}
+      </div>
+      <span style={{ fontSize: 11, color: cfg.color, opacity: 0.8, paddingLeft: 2 }}>{cfg.sub}</span>
     </div>
   );
 }
@@ -54,7 +57,7 @@ function TradeCard({ trade }) {
   return (
     <div style={{
       ...glass,
-      padding: "14px 16px", marginBottom: 8,
+      padding: "14px 16px", marginBottom: 0,
       borderLeft: `3px solid ${color}`,
       display: "flex", gap: 14, alignItems: "flex-start",
     }}>
@@ -139,7 +142,6 @@ function AllocationRow({ label, current, target, gap }) {
 /* ── Result panel ──────────────────────────────────────────────── */
 function ResultPanel({ result, onReset }) {
   const [showGaps, setShowGaps] = useState(false);
-  const [showSignals, setShowSignals] = useState(false);
 
   const rebalance     = result.rebalance || {};
   const trades        = rebalance.trades || [];
@@ -159,7 +161,7 @@ function ResultPanel({ result, onReset }) {
     .sort(([, a], [, b]) => Math.abs(b.gap_pct) - Math.abs(a.gap_pct));
 
   return (
-    <div style={{ maxWidth: 760, margin: "0 auto" }}>
+    <div style={{ width: "100%" }}>
       {/* Header row */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
                     marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
@@ -196,30 +198,81 @@ function ResultPanel({ result, onReset }) {
           {result.reasoning || result.narrative}
         </p>
         {math.portfolio_beta > 0 && (
-          <div style={{ marginTop: 10, display: "flex", gap: 20, flexWrap: "wrap",
-                        paddingTop: 10, borderTop: `1px solid ${BORDER}` }}>
-            <span style={{ fontSize: 12, color: TEXT_DIM }}>
-              Beta <b style={{ color: TEXT }}>{math.portfolio_beta}</b>
-            </span>
-            <span style={{ fontSize: 12, color: TEXT_DIM }}>
-              Risk-free rate <b style={{ color: TEXT }}>{(math.risk_free_rate * 100).toFixed(2)}%</b>
-            </span>
-            <span style={{ fontSize: 12, color: TEXT_DIM }}>
-              Expected return <b style={{ color: TEXT }}>
-                {(math.portfolio_expected_annual * 100).toFixed(1)}%/yr
-              </b>
-            </span>
-            {math.return_gap && (
+          <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${BORDER}` }}>
+            {/* Before / After beta comparison */}
+            {math.post_rebalance_beta != null && (
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.08em",
+                              textTransform: "uppercase", color: TEXT_DIM, marginBottom: 8 }}>
+                  How rebalancing changes your risk level
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  {/* Current beta bar */}
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between",
+                                  fontSize: 11, color: TEXT_DIM, marginBottom: 4 }}>
+                      <span>Current</span>
+                      <b style={{ color: TEXT }}>
+                        {math.portfolio_beta < 0.7 ? "Low" : math.portfolio_beta < 1.1 ? "Moderate" : math.portfolio_beta < 1.4 ? "Elevated" : "High"}
+                        <span style={{ fontWeight: 400, color: TEXT_DIM, fontSize: 10, marginLeft: 4 }}>({math.portfolio_beta})</span>
+                      </b>
+                    </div>
+                    <div style={{ height: 6, background: BORDER, borderRadius: 99 }}>
+                      <div style={{ height: "100%", borderRadius: 99,
+                        width: `${Math.min(100, math.portfolio_beta / 2 * 100)}%`,
+                        background: math.portfolio_beta > 1.2 ? RED : math.portfolio_beta > 0.8 ? GOLD : GREEN,
+                      }} />
+                    </div>
+                  </div>
+                  <ArrowRight size={14} color={TEXT_DIM} style={{ flexShrink: 0 }} />
+                  {/* Post-rebalance beta bar */}
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between",
+                                  fontSize: 11, color: TEXT_DIM, marginBottom: 4 }}>
+                      <span>After rebalance</span>
+                      <b style={{ color: math.post_rebalance_beta < math.portfolio_beta ? GREEN
+                                       : math.post_rebalance_beta > math.portfolio_beta ? RED : TEXT }}>
+                        {math.post_rebalance_beta < 0.7 ? "Low" : math.post_rebalance_beta < 1.1 ? "Moderate" : math.post_rebalance_beta < 1.4 ? "Elevated" : "High"}
+                        <span style={{ fontWeight: 400, color: TEXT_DIM, fontSize: 10, marginLeft: 4 }}>({math.post_rebalance_beta})</span>
+                        {" "}
+                        <span style={{ fontWeight: 400, fontSize: 10 }}>
+                          {math.post_rebalance_beta < math.portfolio_beta ? "↓ less volatile"
+                         : math.post_rebalance_beta > math.portfolio_beta ? "↑ more volatile" : "unchanged"}
+                        </span>
+                      </b>
+                    </div>
+                    <div style={{ height: 6, background: BORDER, borderRadius: 99 }}>
+                      <div style={{ height: "100%", borderRadius: 99,
+                        width: `${Math.min(100, math.post_rebalance_beta / 2 * 100)}%`,
+                        background: math.post_rebalance_beta > 1.2 ? RED : math.post_rebalance_beta > 0.8 ? GOLD : GREEN,
+                      }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            {/* Stats row */}
+            <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
               <span style={{ fontSize: 12, color: TEXT_DIM }}>
-                Goal <b style={{
-                  color: math.return_gap === "achievable" ? GREEN
-                       : math.return_gap === "high" ? "#B45309" : RED,
-                }}>
-                  {math.return_gap === "achievable" ? "On track"
-                 : math.return_gap === "high" ? "Ambitious" : "Unrealistic"}
+                T-bill base rate <b style={{ color: TEXT }}>{(math.risk_free_rate * 100).toFixed(2)}%</b>
+              </span>
+              <span style={{ fontSize: 12, color: TEXT_DIM }}>
+                Est. annual return <b style={{ color: TEXT }}>
+                  {(math.portfolio_expected_annual * 100).toFixed(1)}%
                 </b>
               </span>
-            )}
+              {math.return_gap && (
+                <span style={{ fontSize: 12, color: TEXT_DIM }}>
+                  Goal <b style={{
+                    color: math.return_gap === "achievable" ? GREEN
+                         : math.return_gap === "high" ? "#B45309" : RED,
+                  }}>
+                    {math.return_gap === "achievable" ? "On track"
+                   : math.return_gap === "high" ? "Ambitious" : "Unrealistic"}
+                  </b>
+                </span>
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -246,26 +299,111 @@ function ResultPanel({ result, onReset }) {
           </div>
           <div style={{ marginLeft: "auto", fontSize: 11.5, color: TEXT_DIM }}>
             {trades.length} trade{trades.length !== 1 ? "s" : ""} suggested
-            {" · "}Engine: <b>{result.planner_engine}</b>
           </div>
         </div>
       )}
 
-      {/* Trade plan */}
-      {trades.length > 0 ? (
+      {/* Trade plan — only shown when it's safe to act */}
+      {verdict === "do_not_proceed" ? (
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
-                        textTransform: "uppercase", color: TEXT_DIM, marginBottom: 10 }}>
-            Trade Plan — {sells.length} sell{sells.length !== 1 ? "s" : ""}, {buys.length} buy{buys.length !== 1 ? "s" : ""}
-          </div>
-          {sells.map((t, i) => <TradeCard key={i} trade={t} />)}
-          {buys.map((t, i) => <TradeCard key={i} trade={t} />)}
+          {/* Opportunities still surfaced */}
+          {flags.filter(f => f.type === "opportunity").length > 0 && (
+            <div style={{ ...glass, padding: "14px 18px", borderRadius: 12, marginBottom: 10 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
+                            textTransform: "uppercase", color: GREEN, marginBottom: 8 }}>
+                Things to watch
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {flags.filter(f => f.type === "opportunity").map((f, i) => (
+                  <div key={i} style={{ padding: "8px 12px", borderRadius: 8,
+                    background: GREEN_BG, border: `1px solid ${GREEN_BORDER}`,
+                    fontSize: 12.5, color: GREEN, lineHeight: 1.5 }}>
+                    {f.message}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {/* Simulated trade plan */}
+          {trades.length > 0 && (
+            <div style={{ marginTop: 6 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
+                            textTransform: "uppercase", color: TEXT_DIM, marginBottom: 10 }}>
+                Simulated Plan — {sells.length} sell{sells.length !== 1 ? "s" : ""}, {buys.length} buy{buys.length !== 1 ? "s" : ""}
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12,
+                            alignItems: "start", opacity: 0.65 }}>
+                <div>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: RED, letterSpacing: "0.07em",
+                                textTransform: "uppercase", marginBottom: 8 }}>Sells</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8,
+                                maxHeight: 400, overflowY: "auto", paddingRight: 4 }}>
+                    {sells.length > 0
+                      ? sells.map((t, i) => <TradeCard key={i} trade={t} />)
+                      : <div style={{ fontSize: 12.5, color: TEXT_DIM, padding: "10px 0" }}>No sells</div>}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: GREEN, letterSpacing: "0.07em",
+                                textTransform: "uppercase", marginBottom: 8 }}>Buys</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8,
+                                maxHeight: 400, overflowY: "auto", paddingRight: 4 }}>
+                    {buys.length > 0
+                      ? buys.map((t, i) => <TradeCard key={i} trade={t} />)
+                      : <div style={{ fontSize: 12.5, color: TEXT_DIM, padding: "10px 0" }}>No buys</div>}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
-        <div style={{ ...glass, padding: "16px 18px", marginBottom: 16, borderRadius: 12,
-                      color: TEXT_DIM, fontSize: 13, textAlign: "center" }}>
-          No specific trades suggested — your portfolio is already close to target allocation.
-        </div>
+        <>
+          {verdict === "proceed_with_caution" && (flags.length > 0 || violations.length > 0) && (
+            <div style={{ ...glass, padding: "12px 16px", marginBottom: 12, borderRadius: 10,
+                          background: "#FFFBEB", border: "1px solid #FDE68A",
+                          fontSize: 12.5, color: "#92400E", lineHeight: 1.55 }}>
+              <b>Review before trading:</b>{" "}
+              {[...violations, ...flags.filter(f => f.type === "conflict" || f.type === "caution")]
+                .map(x => x.message).join(" · ")}
+            </div>
+          )}
+          {trades.length > 0 ? (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
+                            textTransform: "uppercase", color: TEXT_DIM, marginBottom: 10 }}>
+                Trade Plan — {sells.length} sell{sells.length !== 1 ? "s" : ""}, {buys.length} buy{buys.length !== 1 ? "s" : ""}
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, alignItems: "start" }}>
+                <div>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: RED, letterSpacing: "0.07em",
+                                textTransform: "uppercase", marginBottom: 8 }}>Sells</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8,
+                                maxHeight: 400, overflowY: "auto", paddingRight: 4 }}>
+                    {sells.length > 0
+                      ? sells.map((t, i) => <TradeCard key={i} trade={t} />)
+                      : <div style={{ fontSize: 12.5, color: TEXT_DIM, padding: "10px 0" }}>No sells</div>}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: GREEN, letterSpacing: "0.07em",
+                                textTransform: "uppercase", marginBottom: 8 }}>Buys</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8,
+                                maxHeight: 400, overflowY: "auto", paddingRight: 4 }}>
+                    {buys.length > 0
+                      ? buys.map((t, i) => <TradeCard key={i} trade={t} />)
+                      : <div style={{ fontSize: 12.5, color: TEXT_DIM, padding: "10px 0" }}>No buys</div>}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div style={{ ...glass, padding: "16px 18px", marginBottom: 16, borderRadius: 12,
+                          color: TEXT_DIM, fontSize: 13, textAlign: "center" }}>
+              No specific trades suggested — your portfolio is already close to target allocation.
+            </div>
+          )}
+        </>
       )}
 
       {/* Allocation gaps (collapsible) */}
@@ -294,67 +432,6 @@ function ResultPanel({ result, onReset }) {
                 <span><span style={{ display: "inline-block", width: 10, height: 6,
                                      background: GREEN, opacity: 0.7, borderRadius: 2, marginRight: 4 }} />Target</span>
               </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Risk signals (collapsible) */}
-      {(flags.length > 0 || violations.length > 0) && (
-        <div style={{ ...glass, padding: "14px 18px", borderRadius: 12 }}>
-          <button onClick={() => setShowSignals(!showSignals)} type="button" style={{
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            width: "100%", background: "none", border: "none", cursor: "pointer", padding: 0,
-          }}>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
-                           textTransform: "uppercase", color: TEXT_DIM }}>
-              Risk Signals ({flags.length + violations.length})
-              <InfoTip title="Risk Signals" placement="top">
-                Violations and conflicts surfaced by the reasoning engine — e.g.
-                selling a holding you don't own, ignoring target allocations, or
-                trading against the scenario's direction. Review before acting.
-              </InfoTip>
-            </span>
-            <span style={{ fontSize: 11, color: TEXT_DIM }}>{showSignals ? "Hide" : "Show"}</span>
-          </button>
-          {showSignals && (
-            <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
-              {violations.map((v, i) => (
-                <div key={i} style={{
-                  padding: "8px 12px", borderRadius: 8,
-                  background: RED_BG, border: `1px solid ${RED_BORDER}`,
-                  fontSize: 12.5, color: RED, lineHeight: 1.5,
-                }}>
-                  <b>Violation:</b> {v.message}
-                </div>
-              ))}
-              {flags.filter((f) => f.type === "conflict").map((f, i) => (
-                <div key={i} style={{
-                  padding: "8px 12px", borderRadius: 8,
-                  background: RED_BG, border: `1px solid ${RED_BORDER}`,
-                  fontSize: 12.5, color: RED, lineHeight: 1.5,
-                }}>
-                  <b>Conflict:</b> {f.message}
-                </div>
-              ))}
-              {flags.filter((f) => f.type === "caution").map((f, i) => (
-                <div key={i} style={{
-                  padding: "8px 12px", borderRadius: 8,
-                  background: "#FFFBEB", border: "1px solid #FDE68A",
-                  fontSize: 12.5, color: "#92400E", lineHeight: 1.5,
-                }}>
-                  <b>Caution:</b> {f.message}
-                </div>
-              ))}
-              {flags.filter((f) => f.type === "opportunity").map((f, i) => (
-                <div key={i} style={{
-                  padding: "8px 12px", borderRadius: 8,
-                  background: GREEN_BG, border: `1px solid ${GREEN_BORDER}`,
-                  fontSize: 12.5, color: GREEN, lineHeight: 1.5,
-                }}>
-                  <b>Opportunity:</b> {f.message}
-                </div>
-              ))}
             </div>
           )}
         </div>
@@ -400,9 +477,9 @@ export default function AskFolioScreen({ portfolio, prices, onNavigate, initialR
   // ── Result view ──────────────────────────────────────────────────
   if (result) {
     return (
-      <div style={{ background: BG, minHeight: "100vh", padding: "32px 36px" }}>
+      <div style={{ background: BG, minHeight: "100vh", padding: "32px 48px" }}>
         <ResultPanel result={result} onReset={() => setResult(null)} />
-        <div style={{ maxWidth: 760, margin: "20px auto 0", textAlign: "right" }}>
+        <div style={{ marginTop: 20, textAlign: "right" }}>
           <button onClick={() => onNavigate("history")} type="button" style={{
             display: "inline-flex", alignItems: "center", gap: 6,
             fontSize: 12.5, color: TEXT_DIM, background: "none", border: "none",
@@ -418,8 +495,8 @@ export default function AskFolioScreen({ portfolio, prices, onNavigate, initialR
 
   // ── Input view ───────────────────────────────────────────────────
   return (
-    <div style={{ background: BG, minHeight: "100vh", padding: "48px 36px" }}>
-      <div style={{ maxWidth: 680, margin: "0 auto" }}>
+    <div style={{ background: BG, minHeight: "100vh", padding: "48px 56px" }}>
+      <div style={{ maxWidth: 860, margin: "0 auto" }}>
 
         {/* Header */}
         <div style={{ marginBottom: 36 }}>

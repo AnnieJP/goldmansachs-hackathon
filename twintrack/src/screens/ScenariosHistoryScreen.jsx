@@ -7,12 +7,12 @@ import {
   FONT_SERIF, glass,
 } from "../theme.js";
 import { apiFetch } from "../api.js";
-import { CheckCircle2, AlertTriangle, ShieldAlert, MessageSquare, ChevronRight } from "lucide-react";
+import { CheckCircle2, AlertTriangle, ShieldAlert, MessageSquare, ChevronRight, Trash2 } from "lucide-react";
 
 const VERDICT_CONFIG = {
-  proceed:              { color: GREEN,    bg: GREEN_BG,  border: GREEN_BORDER, Icon: CheckCircle2,  label: "Proceed"              },
-  proceed_with_caution: { color: "#B45309", bg: "#FEF3C7", border: "#FDE68A",  Icon: AlertTriangle, label: "Proceed with Caution" },
-  do_not_proceed:       { color: RED,      bg: RED_BG,    border: RED_BORDER,  Icon: ShieldAlert,   label: "Do Not Proceed"       },
+  proceed:              { color: GREEN,    bg: GREEN_BG,  border: GREEN_BORDER, Icon: CheckCircle2,  label: "Safe to Rebalance"   },
+  proceed_with_caution: { color: "#B45309", bg: "#FEF3C7", border: "#FDE68A",  Icon: AlertTriangle, label: "Rebalance with Care" },
+  do_not_proceed:       { color: RED,      bg: RED_BG,    border: RED_BORDER,  Icon: ShieldAlert,   label: "Don't Rebalance Yet" },
 };
 
 function VerdictChip({ verdict }) {
@@ -34,6 +34,7 @@ function VerdictChip({ verdict }) {
 export default function ScenariosHistoryScreen({ onNavigate }) {
   const [scenarios, setScenarios] = useState([]);
   const [loading,   setLoading]   = useState(true);
+  const [deleting,  setDeleting]  = useState(null);
 
   useEffect(() => {
     apiFetch("/api/user-scenarios")
@@ -42,6 +43,16 @@ export default function ScenariosHistoryScreen({ onNavigate }) {
       .catch(() => setScenarios([]))
       .finally(() => setLoading(false));
   }, []);
+
+  const deleteScenario = async (e, id) => {
+    e.stopPropagation();
+    setDeleting(id);
+    try {
+      await apiFetch(`/api/user-scenarios/${id}`, { method: "DELETE" });
+      setScenarios((prev) => prev.filter((s) => s.id !== id));
+    } catch (_) {}
+    setDeleting(null);
+  };
 
   return (
     <div style={{ background: BG, minHeight: "100vh", padding: "32px 36px" }}>
@@ -144,7 +155,24 @@ export default function ScenariosHistoryScreen({ onNavigate }) {
                       <span style={{ fontSize: 11.5, color: TEXT_DIM }}>{dateStr}</span>
                     </div>
                   </div>
-                  <ChevronRight size={15} color={TEXT_DIM} style={{ flexShrink: 0 }} />
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                    <button
+                      type="button"
+                      onClick={(e) => deleteScenario(e, s.id)}
+                      disabled={deleting === s.id}
+                      style={{
+                        padding: "5px 7px", borderRadius: 6, border: `1px solid ${BORDER}`,
+                        background: "none", cursor: "pointer", color: TEXT_DIM,
+                        opacity: deleting === s.id ? 0.4 : 1,
+                        transition: "color 0.15s, border-color 0.15s",
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = RED; e.currentTarget.style.borderColor = RED_BORDER; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = TEXT_DIM; e.currentTarget.style.borderColor = BORDER; }}
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                    <ChevronRight size={15} color={TEXT_DIM} />
+                  </div>
                 </button>
               );
             })}

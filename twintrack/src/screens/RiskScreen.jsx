@@ -3,7 +3,7 @@ import { GOLD, GOLD_BG, GOLD_BORDER, BORDER, BORDER_MED,
          SURFACE, SURFACE_2, BG, TEXT, TEXT_SEC, TEXT_DIM,
          GREEN, RED, FONT_SERIF } from "../theme.js";
 import { apiFetch } from "../api.js";
-import { ShieldCheck, AlertTriangle, Activity, BarChart3 } from "lucide-react";
+import { ShieldCheck, AlertTriangle, Activity, BarChart3, Layers, Shield, Clock } from "lucide-react";
 import InfoTip from "../components/InfoTip.jsx";
 
 /* ─── Modern circular risk meter ────────────────────────────────── */
@@ -225,10 +225,13 @@ export default function RiskScreen({ portfolio, prices }) {
                 <div style={{ width: 10, height: 10, flexShrink: 0,
                               background: GOLD }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{data.portfolio_beta.toFixed(2)}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>
+                    {data.portfolio_beta < 0.7 ? "Low" : data.portfolio_beta < 1.1 ? "Moderate" : data.portfolio_beta < 1.4 ? "Elevated" : "High"}
+                    <span style={{ fontWeight: 400, fontSize: 11, color: TEXT_DIM, marginLeft: 6 }}>({data.portfolio_beta.toFixed(2)})</span>
+                  </div>
                   <div style={{ fontSize: 11, color: TEXT_DIM }}>
-                    Market Sensitivity
-                    <InfoTip title="Portfolio Beta">
+                    Market Sensitivity (Beta)
+                    <InfoTip title="What is Beta?">
                       Beta measures how your portfolio moves vs. the overall market.
                       Beta of <b>1.0</b> tracks the market; <b>1.5</b> means 50% more
                       volatile; <b>0.5</b> means half as volatile. Calculated as a
@@ -279,7 +282,7 @@ export default function RiskScreen({ portfolio, prices }) {
               <div style={{ display: "flex", alignItems: "center", gap: 8,
                                padding: "6px",
                                background: `${GREEN}15` }}>
-                <div style={{ fontSize: 14, flexShrink: 0 }}>🥚</div>
+                <Layers size={14} color={GREEN} style={{ flexShrink: 0 }} />
                 <div style={{ fontSize: 11, color: TEXT_DIM }}>
                   Diversify across different companies and industries
                 </div>
@@ -287,7 +290,7 @@ export default function RiskScreen({ portfolio, prices }) {
               <div style={{ display: "flex", alignItems: "center", gap: 8,
                                padding: "6px",
                                background: `${GOLD}15` }}>
-                <div style={{ fontSize: 14, flexShrink: 0 }}>🛡️</div>
+                <Shield size={14} color={GOLD} style={{ flexShrink: 0 }} />
                 <div style={{ fontSize: 11, color: TEXT_DIM }}>
                   Include bonds and stable investments
                 </div>
@@ -295,7 +298,7 @@ export default function RiskScreen({ portfolio, prices }) {
               <div style={{ display: "flex", alignItems: "center", gap: 8,
                                padding: "6px",
                                background: `${RED}15` }}>
-                <div style={{ fontSize: 14, flexShrink: 0 }}>⏰</div>
+                <Clock size={14} color={RED} style={{ flexShrink: 0 }} />
                 <div style={{ fontSize: 11, color: TEXT_DIM }}>
                   Focus on long-term investment goals
                 </div>
@@ -303,7 +306,7 @@ export default function RiskScreen({ portfolio, prices }) {
               <div style={{ display: "flex", alignItems: "center", gap: 8,
                                padding: "6px",
                                background: `${GOLD}15` }}>
-                <div style={{ fontSize: 14, flexShrink: 0 }}>📊</div>
+                <BarChart3 size={14} color={GOLD} style={{ flexShrink: 0 }} />
                 <div style={{ fontSize: 11, color: TEXT_DIM }}>
                   Check portfolio balance quarterly
                 </div>
@@ -341,13 +344,13 @@ export default function RiskScreen({ portfolio, prices }) {
             </InfoTip>
           </div>
           <div style={{ fontSize: 12, color: TEXT_DIM, marginTop: 3 }}>
-            Beta &gt; 1.0 means that holding amplifies market moves.
+            A score above 1.0 means this holding swings more than the overall market.
           </div>
         </div>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "rgba(255,255,255,0.02)" }}>
-              {["Holding", "Type", "Weight", "Beta", "Contribution"].map((h) => (
+              {["Holding", "Type", "Weight", "Volatility", "Portfolio Impact"].map((h) => (
                 <th key={h} style={{ padding: "10px 18px", textAlign: "left", fontSize: 11,
                                       fontWeight: 600, color: TEXT_DIM, textTransform: "uppercase",
                                       letterSpacing: "0.06em", borderBottom: `1px solid ${BORDER}` }}>{h}</th>

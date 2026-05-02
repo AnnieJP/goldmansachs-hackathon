@@ -5,15 +5,15 @@ import { GOLD, GOLD_BG, GOLD_BORDER, BORDER, BORDER_MED,
          FONT_SERIF, fmt$, fmtPct } from "../theme.js";
 import { apiFetch } from "../api.js";
 import InfoTip from "../components/InfoTip.jsx";
-import { TrendingUp, TrendingDown, Sparkles, ChevronRight } from "lucide-react";
+import { TrendingUp, TrendingDown, Sparkles, ChevronRight, Zap, Wallet, Landmark, AlertTriangle } from "lucide-react";
 
 const SCENARIOS = [
-  { id: "market_crash",   label: "Market Crash",   icon: "💥", desc: "Markets fall 20%",      color: "#EF4444" },
-  { id: "high_inflation", label: "High Inflation",  icon: "📈", desc: "Inflation hits 6%+",    color: "#F97316" },
-  { id: "need_cash",      label: "Need Cash",       icon: "💸", desc: "Liquidate in 3 months", color: "#F59E0B" },
-  { id: "bull_run",       label: "Bull Run",        icon: "🚀", desc: "Markets surge 30%",     color: "#10B981" },
-  { id: "rate_hike",      label: "Rate Hike",       icon: "🏦", desc: "Fed raises rates 2%",   color: "#6366F1" },
-  { id: "recession",      label: "Recession",       icon: "📉", desc: "GDP contracts 2 qtrs",  color: "#EC4899" },
+  { id: "market_crash",   label: "Market Crash",   Icon: TrendingDown,   desc: "Markets fall 20%",      color: "#EF4444" },
+  { id: "high_inflation", label: "High Inflation",  Icon: Zap,            desc: "Inflation hits 6%+",    color: "#F97316" },
+  { id: "need_cash",      label: "Need Cash",       Icon: Wallet,         desc: "Liquidate in 3 months", color: "#F59E0B" },
+  { id: "bull_run",       label: "Bull Run",        Icon: TrendingUp,     desc: "Markets surge 30%",     color: "#10B981" },
+  { id: "rate_hike",      label: "Rate Hike",       Icon: Landmark,       desc: "Fed raises rates 2%",   color: "#6366F1" },
+  { id: "recession",      label: "Recession",       Icon: AlertTriangle,  desc: "GDP contracts 2 qtrs",  color: "#EC4899" },
 ];
 
 export default function ScenarioScreen({ portfolio, prices }) {
@@ -67,7 +67,7 @@ export default function ScenarioScreen({ portfolio, prices }) {
             onMouseEnter={(e) => { if (!active) { e.currentTarget.style.borderColor = s.color + "30"; e.currentTarget.style.background = s.color + "08"; } }}
             onMouseLeave={(e) => { if (!active) { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.background = SURFACE; } }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 28 }}>{s.icon}</span>
+                <s.Icon size={24} color={s.color} strokeWidth={1.8} />
                 {active && loading && <span style={{ fontSize: 11, color: s.color }}>Running…</span>}
                 {active && !loading && data && <ChevronRight size={14} color={s.color} />}
               </div>
@@ -87,7 +87,7 @@ export default function ScenarioScreen({ portfolio, prices }) {
 
       {loading && (
         <div style={{ textAlign: "center", padding: "48px 0", color: TEXT_DIM, fontSize: 14 }}>
-          <div style={{ fontSize: 28, marginBottom: 10 }}>{sc?.icon}</div>
+          {sc && <sc.Icon size={28} color={sc.color} strokeWidth={1.8} style={{ marginBottom: 10 }} />}
           Simulating {sc?.label}…
         </div>
       )}
