@@ -222,7 +222,7 @@ export default function OnboardingScreen({ currentUser, onComplete }) {
         }}>
           <span style={{ width: 5, height: 5, borderRadius: "50%", background: GOLD, display: "inline-block" }} />
           <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: GOLD }}>
-            Folio
+            Meridian
           </span>
         </div>
 
