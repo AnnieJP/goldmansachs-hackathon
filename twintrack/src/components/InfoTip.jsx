@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
+import { createPortal } from "react-dom";
 import { SURFACE, TEXT, TEXT_DIM, BORDER, GOLD, GOLD_BG, GOLD_BORDER, FONT_SERIF } from "../theme.js";
 
 /**
@@ -13,14 +14,22 @@ import { SURFACE, TEXT, TEXT_DIM, BORDER, GOLD, GOLD_BG, GOLD_BORDER, FONT_SERIF
  *
  * Or:  <InfoTip text="Short description" />
  */
+const POPOVER_WIDTH = 280;
+const MARGIN = 8;
+
 export default function InfoTip({ title, text, children, size = 12, placement = "auto" }) {
   const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState(null);
   const wrapRef = useRef(null);
+  const popRef = useRef(null);
 
+  // Outside-click + Escape
   useEffect(() => {
     if (!open) return;
     const onDocClick = (e) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
+      const inWrap = wrapRef.current && wrapRef.current.contains(e.target);
+      const inPop  = popRef.current  && popRef.current.contains(e.target);
+      if (!inWrap && !inPop) setOpen(false);
     };
     const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
     document.addEventListener("mousedown", onDocClick);
@@ -31,23 +40,58 @@ export default function InfoTip({ title, text, children, size = 12, placement = 
     };
   }, [open]);
 
-  // Simple placement: default below-right; if user specifies, honour it.
+  // Compute viewport-relative coordinates for the popover
+  const computeCoords = () => {
+    const btn = wrapRef.current?.querySelector(".info-tip-btn");
+    if (!btn) return;
+    const r = btn.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // Decide vertical: prefer below; flip above if not enough room.
+    const popHeight = popRef.current?.offsetHeight || 120;
+    const placeAbove =
+      placement === "top" ||
+      (placement === "auto" && r.bottom + popHeight + MARGIN > vh && r.top - popHeight - MARGIN > 0);
+    const top = placeAbove ? r.top - popHeight - 6 : r.bottom + 6;
+
+    // Decide horizontal: align to button's left, but keep inside viewport.
+    let left = r.left;
+    if (placement === "left") left = r.right - POPOVER_WIDTH;
+    if (left + POPOVER_WIDTH + MARGIN > vw) left = vw - POPOVER_WIDTH - MARGIN;
+    if (left < MARGIN) left = MARGIN;
+
+    setCoords({ top, left });
+  };
+
+  useLayoutEffect(() => {
+    if (!open) { setCoords(null); return; }
+    computeCoords();
+    const onScrollResize = () => computeCoords();
+    window.addEventListener("scroll", onScrollResize, true);
+    window.addEventListener("resize", onScrollResize);
+    return () => {
+      window.removeEventListener("scroll", onScrollResize, true);
+      window.removeEventListener("resize", onScrollResize);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
   const popStyle = {
-    position: "absolute",
-    zIndex: 50,
-    top: placement === "top" ? "auto" : `calc(100% + 6px)`,
-    bottom: placement === "top" ? `calc(100% + 6px)` : "auto",
-    left: placement === "left" ? "auto" : 0,
-    right: placement === "left" ? 0 : "auto",
-    minWidth: 240,
-    maxWidth: 320,
+    position: "fixed",
+    top: coords?.top ?? -9999,
+    left: coords?.left ?? -9999,
+    zIndex: 9999,
+    width: POPOVER_WIDTH,
     background: SURFACE,
     border: `1px solid ${BORDER}`,
-    boxShadow: "0 8px 24px rgba(10,22,40,0.12)",
+    boxShadow: "0 8px 24px rgba(10,22,40,0.18)",
     padding: "12px 14px",
     fontFamily: FONT_SERIF,
     textAlign: "left",
     whiteSpace: "normal",
+    visibility: coords ? "visible" : "hidden",
+    pointerEvents: "auto",
   };
 
   const YELLOW = "#E8B84A";
@@ -85,8 +129,8 @@ export default function InfoTip({ title, text, children, size = 12, placement = 
         ?
       </button>
 
-      {open && (
-        <div role="tooltip" style={popStyle}>
+      {open && createPortal(
+        <div ref={popRef} role="tooltip" style={popStyle}>
           {title && (
             <div style={{
               fontSize: 12,
@@ -102,7 +146,8 @@ export default function InfoTip({ title, text, children, size = 12, placement = 
           <div style={{ fontSize: 12.5, color: TEXT_DIM, lineHeight: 1.5 }}>
             {children || text}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </span>
   );
