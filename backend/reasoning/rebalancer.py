@@ -73,6 +73,62 @@ _GOAL_NUDGE: dict[str, dict[str, float]] = {
     "learning":       {},
 }
 
+# Scenario → which buckets to prioritise for selling (only these are eligible if scenario is set)
+_SCENARIO_SELL_BUCKETS: dict[str, list[str]] = {
+    "market_crash":  ["us_equity_growth", "us_equity_broad", "real_estate", "financials", "international"],
+    "recession":     ["us_equity_growth", "us_equity_broad", "real_estate", "financials", "international"],
+    "tech_selloff":  ["us_equity_growth"],
+    "rate_hike":     ["bonds_long", "bonds_medium", "real_estate"],
+    "bull_market":   ["bonds_medium", "bonds_short", "bonds_tips", "bonds_corporate", "cash"],
+}
+
+# Scenario → ordered list of buckets to buy into (top of list = highest priority)
+_SCENARIO_BUY_ORDER: dict[str, list[str]] = {
+    "market_crash":  ["bonds_short", "bonds_medium", "commodities", "defensive", "bonds_tips", "dividend"],
+    "recession":     ["bonds_medium", "defensive", "dividend", "bonds_short", "bonds_tips"],
+    "tech_selloff":  ["defensive", "dividend", "us_equity_value", "bonds_medium", "international"],
+    "rate_hike":     ["bonds_short", "bonds_tips", "financials", "us_equity_value", "commodities"],
+    "bull_market":   ["us_equity_broad", "us_equity_growth", "international", "real_estate", "financials"],
+}
+
+# Sector keyword → the bucket that sector maps to
+_SECTOR_BUCKET: dict[str, str] = {
+    "tech":          "us_equity_growth",
+    "technology":    "us_equity_growth",
+    "healthcare":    "defensive",
+    "energy":        "commodities",
+    "financials":    "financials",
+    "real_estate":   "real_estate",
+    "utilities":     "defensive",
+    "consumer":      "us_equity_broad",
+    "industrials":   "us_equity_broad",
+    "materials":     "commodities",
+    "international": "international",
+    "bonds":         "bonds_medium",
+}
+
+# All buckets considered "safe" when a specific sector crashes
+_ALL_BUCKETS = [
+    "us_equity_broad", "us_equity_growth", "us_equity_value", "dividend",
+    "international", "bonds_short", "bonds_medium", "bonds_long", "bonds_tips",
+    "bonds_corporate", "defensive", "real_estate", "commodities", "financials",
+]
+
+
+def _sector_sell_buy(crash_sector: str) -> tuple[list[str], list[str]]:
+    """Return (sell_eligible, buy_priority) for a sector-specific crash."""
+    affected = _SECTOR_BUCKET.get(crash_sector)
+    if not affected:
+        return [], []
+    # Only sell the affected bucket; buy everything except it, ordered by safety
+    sell = [affected]
+    safe_order = ["bonds_short", "bonds_medium", "bonds_tips", "bonds_corporate",
+                  "defensive", "dividend", "bonds_long", "commodities",
+                  "us_equity_value", "us_equity_broad", "international",
+                  "financials", "real_estate", "us_equity_growth"]
+    buy = [b for b in safe_order if b != affected]
+    return sell, buy
+
 # Ticker → canonical bucket override
 _TICKER_BUCKET: dict[str, str] = {
     "BND": "bonds_medium",  "AGG": "bonds_medium",  "IEF": "bonds_medium",
@@ -124,12 +180,13 @@ def _target_allocation(risk_str: str, goal: str, scenario: str | None) -> dict[s
 # ── Main entry point ───────────────────────────────────────────────────────────
 
 def generate_rebalance_plan(
-    portfolio:  dict,
-    prices:     dict,
-    betas:      dict,
-    profile:    dict,
-    scenario:   str | None,
-    asp_result: dict,
+    portfolio:    dict,
+    prices:       dict,
+    betas:        dict,
+    profile:      dict,
+    scenario:     str | None,
+    asp_result:   dict,
+    crash_sector: str | None = None,
 ) -> tuple[dict, str]:
     """
     Returns (plan_dict, reasoning_paragraph).
@@ -181,12 +238,23 @@ def generate_rebalance_plan(
         }
 
     # ── 5. Generate sell trades (overweight holdings) ─────────────────────
+    # Sector-specific crash overrides generic scenario sell/buy lists
+    if crash_sector and crash_sector not in ("broad", ""):
+        sell_eligible, scenario_buy_override = _sector_sell_buy(crash_sector)
+    else:
+        sell_eligible        = _SCENARIO_SELL_BUCKETS.get(scenario) if scenario else None
+        scenario_buy_override = None
+
     trades: list[dict] = []
     for h in valued:
         b   = _holding_bucket(h["symbol"], h.get("type", "stock"))
         gap = gap_analysis.get(b, {}).get("gap_pct", 0)
         cur = gap_analysis.get(b, {}).get("current_pct", 0)
         tgt = gap_analysis.get(b, {}).get("target_pct", 0)
+
+        # Scenario filter: only sell from scenario-relevant buckets when a scenario is active
+        if sell_eligible is not None and b not in sell_eligible:
+            continue
 
         if gap < -3 and h["current_value"] > 0 and h["current_price"] > 0:
             overweight_val = abs(gap / 100) * total
@@ -206,12 +274,23 @@ def generate_rebalance_plan(
             })
 
     # ── 6. Generate buy trades (underweight buckets) ───────────────────────
-    sell_proceeds        = sum(t["value"] for t in trades if t["action"] == "sell")
-    buy_budget           = cash + sell_proceeds
-    underweight: list[tuple[str, float]] = sorted(
-        [(b, g["gap_pct"]) for b, g in gap_analysis.items() if g["gap_pct"] > 3 and b != "cash"],
-        key=lambda x: -x[1],
-    )
+    sell_proceeds = sum(t["value"] for t in trades if t["action"] == "sell")
+    buy_budget    = cash + sell_proceeds
+    candidates    = [(b, g["gap_pct"]) for b, g in gap_analysis.items()
+                     if g["gap_pct"] > 3 and b != "cash"]
+
+    buy_order = scenario_buy_override or (_SCENARIO_BUY_ORDER.get(scenario) if scenario else None)
+    if buy_order:
+        def _buy_sort_key(item: tuple[str, float]) -> tuple[int, float]:
+            b, gap = item
+            try:
+                priority = buy_order.index(b)
+            except ValueError:
+                priority = len(buy_order)
+            return (priority, -gap)
+        underweight: list[tuple[str, float]] = sorted(candidates, key=_buy_sort_key)
+    else:
+        underweight = sorted(candidates, key=lambda x: -x[1])
     total_pos_gap = sum(g for _, g in underweight) or 1
 
     for b, gap_pct in underweight:

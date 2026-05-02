@@ -358,10 +358,10 @@ function ResultPanel({ result, onReset }) {
 }
 
 /* ── Main screen ───────────────────────────────────────────────── */
-export default function AskFolioScreen({ portfolio, prices, onNavigate }) {
+export default function AskFolioScreen({ portfolio, prices, onNavigate, initialResult = null }) {
   const [input,   setInput]   = useState("");
   const [loading, setLoading] = useState(false);
-  const [result,  setResult]  = useState(null);
+  const [result,  setResult]  = useState(initialResult);
   const [error,   setError]   = useState(null);
   const textRef = useRef(null);
 

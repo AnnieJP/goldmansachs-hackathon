@@ -61,7 +61,7 @@ const NAV = [
 ];
 
 /* ─── Sidebar ───────────────────────────────────────────────────── */
-function Sidebar({ screen, setScreen, enriched, pricesLoading, onRefresh, currentUser, onLogout }) {
+function Sidebar({ screen, onNavigate, enriched, pricesLoading, onRefresh, currentUser, onLogout }) {
   const gain     = enriched?.gainLoss    ?? 0;
   const total    = enriched?.totalValue  ?? 0;
   const gainPct  = enriched?.gainLossPct ?? 0;
@@ -124,7 +124,7 @@ function Sidebar({ screen, setScreen, enriched, pricesLoading, onRefresh, curren
         {NAV.map(({ id, Icon, label }) => {
           const active = screen === id;
           return (
-            <button key={id} onClick={() => setScreen(id)} type="button" style={{
+            <button key={id} onClick={() => onNavigate(id)} type="button" style={{
               display: "flex", alignItems: "center", gap: 11, width: "100%",
               padding: "10px 12px", borderRadius: 10, border: "none",
               cursor: "pointer", marginBottom: 2, textAlign: "left",
@@ -336,6 +336,7 @@ function PageHeader({ title, subtitle, actions }) {
 /* ─── Main component ────────────────────────────────────────────── */
 export default function TwinTrack({ currentUser, onLogout }) {
   const [screen,        setScreen]        = useState("portfolio");
+  const [screenData,    setScreenData]    = useState(null);
   const [portfolio,     setPortfolio]     = useState(null);
   const [prices,        setPrices]        = useState({});
   const [loading,       setLoading]       = useState(true);
@@ -402,8 +403,8 @@ export default function TwinTrack({ currentUser, onLogout }) {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: BG }}>
-      <Sidebar screen={screen} setScreen={setScreen} enriched={enriched}
-               pricesLoading={pricesLoading} onRefresh={() => loadPrices()}
+      <Sidebar screen={screen} onNavigate={(id) => { setScreenData(null); setScreen(id); }}
+               enriched={enriched} pricesLoading={pricesLoading} onRefresh={() => loadPrices()}
                currentUser={currentUser} onLogout={onLogout} />
       <main style={{ flex: 1, overflowY: "auto", minHeight: "100vh" }}>
         {screen === "portfolio" && (
@@ -412,8 +413,11 @@ export default function TwinTrack({ currentUser, onLogout }) {
         )}
         {screen === "risk"      && <RiskScreen      portfolio={portfolio} prices={prices} />}
         {screen === "rebalance" && <RebalanceScreen portfolio={portfolio} prices={prices} />}
-        {screen === "askfolio"  && <AskFolioScreen  portfolio={portfolio} prices={prices} onNavigate={setScreen} />}
-        {screen === "history"   && <ScenariosHistoryScreen onNavigate={setScreen} />}
+        {screen === "askfolio"  && <AskFolioScreen  portfolio={portfolio} prices={prices}
+                                     initialResult={screenData}
+                                     onNavigate={(id, data = null) => { setScreenData(data); setScreen(id); }} />}
+        {screen === "history"   && <ScenariosHistoryScreen
+                                     onNavigate={(id, data = null) => { setScreenData(data); setScreen(id); }} />}
       </main>
     </div>
   );

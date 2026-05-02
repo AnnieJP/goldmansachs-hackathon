@@ -699,6 +699,7 @@ You are a financial intent extractor for a portfolio management app.
 Given a user message, return ONLY a JSON object with these fields (omit any field whose value is null):
 
   scenario         : "market_crash" | "recession" | "tech_selloff" | "rate_hike" | "bull_market"
+  crash_sector     : "tech" | "healthcare" | "energy" | "financials" | "real_estate" | "utilities" | "consumer" | "industrials" | "materials" | "international" | "bonds" | "broad"
   target_value     : number   (dollar amount the user wants to reach)
   timeline_months  : number   (how many months until they want to reach the target or make a withdrawal)
   goal_type        : "growth" | "income" | "preservation"
@@ -715,47 +716,70 @@ Rules:
 - If they mention tech stocks falling, NASDAQ drop → scenario: tech_selloff
 - If they mention rate hikes, Fed tightening, interest rates rising → scenario: rate_hike
 - If they mention bull market, rally, boom, markets rising → scenario: bull_market
+- crash_sector: extract the SPECIFIC sector mentioned as crashing or falling. Examples:
+    "tech market crash" → crash_sector: tech
+    "healthcare crash" → crash_sector: healthcare
+    "energy selloff" → crash_sector: energy
+    "bank collapse" → crash_sector: financials
+    "broad market crash" or no specific sector → crash_sector: broad
 - Extract dollar amounts like "$25k" as 25000, "50k", "50,000", "$1.5 million" as the number (no $ needed)
 - Convert year timelines to months (e.g. "2 years" → 24)
 - "retiring in 6 months" or "need money in 3 months" → withdrawal_months
 - Return ONLY the JSON — no explanation, no markdown fences."""
 
+_INTENT_KEY_FIELDS = {"scenario", "target_value", "timeline_months", "withdrawal_months", "crash_sector"}
+
+
+def _intent_is_weak(intent: dict) -> bool:
+    """Return True if regex extracted nothing actionable — Claude should try to fill the gaps."""
+    return not any(k in intent for k in _INTENT_KEY_FIELDS)
+
+
+def _claude_intent(message: str) -> dict:
+    """Call Claude Haiku to extract intent. Returns {} on any failure."""
+    api_key = os.getenv("ANTHROPIC_API_KEY", "")
+    if not api_key:
+        return {}
+    try:
+        import anthropic
+        client = anthropic.Anthropic(api_key=api_key)
+        resp = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=300,
+            system=_INTENT_SYSTEM,
+            messages=[{"role": "user", "content": message}],
+        )
+        text = resp.content[0].text.strip()
+        if text.startswith("```"):
+            text = re.sub(r"```(?:json)?\s*|\s*```", "", text).strip()
+        parsed = json.loads(text)
+        result: dict = {}
+        for k, v in parsed.items():
+            if v is None:
+                continue
+            if k in ("target_value", "timeline_months", "withdrawal_months"):
+                result[k] = float(v) if k == "target_value" else int(v)
+            else:
+                result[k] = v
+        return result
+    except Exception:
+        return {}
+
+
 def parse_intent(message: str) -> dict:
     """
-    Use Claude to extract structured intent from natural language.
-    Falls back to regex if the API key is unavailable or the call fails.
+    Regex + ASP is primary. Claude fills in only when regex extracts nothing useful.
+    Regex results always win on any field both parsers find.
     """
-    api_key = os.getenv("ANTHROPIC_API_KEY", "")
-    if api_key:
-        try:
-            import anthropic
-            client = anthropic.Anthropic(api_key=api_key)
-            resp = client.messages.create(
-                model="claude-haiku-4-5-20251001",
-                max_tokens=300,
-                system=_INTENT_SYSTEM,
-                messages=[{"role": "user", "content": message}],
-            )
-            text = resp.content[0].text.strip()
-            # Strip markdown fences if model adds them anyway
-            if text.startswith("```"):
-                text = re.sub(r"```(?:json)?\s*|\s*```", "", text).strip()
-            parsed = json.loads(text)
-            # Keep only non-null values; coerce numeric fields to correct types
-            result: dict = {}
-            for k, v in parsed.items():
-                if v is None:
-                    continue
-                if k in ("target_value", "timeline_months", "withdrawal_months"):
-                    result[k] = float(v) if k == "target_value" else int(v)
-                else:
-                    result[k] = v
-            return result
-        except Exception:
-            pass  # fall through to regex backup
+    regex_result = _parse_intent_regex(message)
 
-    # ── Regex fallback (no API key or LLM error) ──────────────────────────
-    return _parse_intent_regex(message)
+    if _intent_is_weak(regex_result):
+        claude_result = _claude_intent(message)
+        # Merge: regex values take priority; Claude fills missing fields only
+        merged = {**claude_result, **regex_result}
+        return merged
+
+    return regex_result
 
 
 def _parse_intent_regex(message: str) -> dict:
@@ -774,6 +798,25 @@ def _parse_intent_regex(message: str) -> dict:
         if pat.search(msg):
             intent["scenario"] = sc_id
             break
+
+    _SECTOR_RE = {
+        "tech":          re.compile(r"tech|technology|nasdaq|software|semiconductor|ai\b|semiconductor", re.I),
+        "healthcare":    re.compile(r"health(?:care)?|pharma|biotech|medical|hospital|drug", re.I),
+        "energy":        re.compile(r"energy|oil|gas|petroleum|fossil|renewabl", re.I),
+        "financials":    re.compile(r"financ|bank(?:ing)?|insurance|wall\s*street|lender", re.I),
+        "real_estate":   re.compile(r"real\s*estate|property|reit|housing|mortgage", re.I),
+        "utilities":     re.compile(r"utilit|electric|water\s*utility|power\s*grid", re.I),
+        "consumer":      re.compile(r"consumer|retail|spending|discretionary|staples", re.I),
+        "industrials":   re.compile(r"industrial|manufactur|aerospace|defense|transport", re.I),
+        "materials":     re.compile(r"materials?|mining|steel|copper|commodity|commodities", re.I),
+        "international": re.compile(r"international|global|china|europe|emerging\s*market", re.I),
+    }
+    for sector, pat in _SECTOR_RE.items():
+        if pat.search(msg):
+            intent["crash_sector"] = sector
+            break
+    if "scenario" in intent and "crash_sector" not in intent:
+        intent["crash_sector"] = "broad"
 
     amt = re.search(r"\$\s*([0-9,]+(?:\.[0-9]+)?)\s*(k|thousand|million|m\b)?", msg, re.I)
     if not amt:
@@ -1094,6 +1137,10 @@ class Handler(BaseHTTPRequestHandler):
                     "verdict":       s.get("verdict"),
                     "verdict_label": s.get("verdict_label"),
                     "trade_count":   s.get("trade_count", 0),
+                    "reasoning":     s.get("reasoning"),
+                    "narrative":     s.get("narrative"),
+                    "rebalance":     s.get("rebalance"),
+                    "flags":         s.get("flags", []),
                 }
                 for s in scenarios
             ]
@@ -1419,8 +1466,9 @@ class Handler(BaseHTTPRequestHandler):
         asp = _run_planner(portfolio, prices, betas, market_ctx, goal_ctx, capm_data)
 
         # 7. Concrete rebalance plan
+        crash_sector = intent.get("crash_sector")
         rebalance_plan, reasoning = _generate_rebalance_plan(
-            portfolio, prices, betas, profile, scenario_id, asp,
+            portfolio, prices, betas, profile, scenario_id, asp, crash_sector,
         )
 
         # 8. Scenario simulation (price shock)
