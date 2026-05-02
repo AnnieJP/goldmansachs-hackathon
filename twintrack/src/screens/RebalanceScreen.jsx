@@ -3,9 +3,100 @@ import { GOLD, GOLD_BG, GOLD_BORDER, BORDER,
          SURFACE, BG, TEXT, TEXT_DIM,
          GREEN, GREEN_BG, GREEN_BORDER,
          FONT_SERIF, fmt$ } from "../theme.js";
-import { apiFetch } from "../api.js";
+import { apiFetch, saveInvestorProfile } from "../api.js";
+import { QUESTIONS, deriveProfile } from "./OnboardingScreen.jsx";
 import InfoTip from "../components/InfoTip.jsx";
-import { TrendingUp, TrendingDown, CheckCircle2, AlertCircle, User } from "lucide-react";
+import { TrendingUp, TrendingDown, CheckCircle2, AlertCircle, User, X, ChevronRight, ChevronLeft } from "lucide-react";
+
+/* ─── Profile edit modal ────────────────────────────────────────── */
+function ProfileEditModal({ onSave, onClose }) {
+  const [step,    setStep]    = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [saving,  setSaving]  = useState(false);
+  const q = QUESTIONS[step];
+  const answered = answers[step] !== undefined;
+  const isLast   = step === QUESTIONS.length - 1;
+
+  const pick = (i) => setAnswers((a) => ({ ...a, [step]: i }));
+  const next = async () => {
+    if (isLast) {
+      setSaving(true);
+      const profile = deriveProfile(Object.values(answers).map(Number));
+      try { await saveInvestorProfile(profile); } catch {}
+      setSaving(false);
+      onSave();
+    } else {
+      setStep((s) => s + 1);
+    }
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(10,22,40,0.45)", zIndex: 200,
+                  display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ background: SURFACE, border: `1px solid ${BORDER}`,
+                    boxShadow: "0 12px 48px rgba(10,22,40,0.14)",
+                    width: 460, maxWidth: "92vw", padding: "28px 28px 24px" }}>
+        {/* Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 15, color: TEXT }}>Update your investor profile</div>
+            <div style={{ fontSize: 11.5, color: TEXT_DIM, marginTop: 3 }}>Question {step + 1} of {QUESTIONS.length}</div>
+          </div>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer",
+                                             color: TEXT_DIM, display: "flex", alignItems: "center" }}>
+            <X size={16} />
+          </button>
+        </div>
+
+        {/* Progress bar */}
+        <div style={{ height: 3, background: BORDER, marginBottom: 22 }}>
+          <div style={{ height: "100%", width: `${((step + 1) / QUESTIONS.length) * 100}%`,
+                        background: GOLD, transition: "width 0.3s" }} />
+        </div>
+
+        {/* Question */}
+        <div style={{ fontSize: 14.5, fontWeight: 600, color: TEXT, marginBottom: 14, lineHeight: 1.45 }}>
+          {q.question}
+        </div>
+
+        {/* Options */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 22 }}>
+          {q.options.map((opt, i) => {
+            const sel = answers[step] === i;
+            return (
+              <button key={i} type="button" onClick={() => pick(i)} style={{
+                padding: "10px 14px", textAlign: "left", border: `1px solid ${sel ? GOLD_BORDER : BORDER}`,
+                background: sel ? GOLD_BG : "transparent", color: sel ? TEXT : TEXT_DIM,
+                fontWeight: sel ? 600 : 400, fontSize: 13.5, cursor: "pointer",
+                fontFamily: "inherit", transition: "all 0.12s",
+              }}>{opt}</button>
+            );
+          })}
+        </div>
+
+        {/* Nav */}
+        <div style={{ display: "flex", gap: 10 }}>
+          {step > 0 && (
+            <button type="button" onClick={() => setStep((s) => s - 1)} style={{
+              padding: "9px 16px", border: `1px solid ${BORDER}`, background: "transparent",
+              color: TEXT_DIM, cursor: "pointer", fontFamily: "inherit", fontSize: 13,
+              display: "flex", alignItems: "center", gap: 6,
+            }}><ChevronLeft size={14} /> Back</button>
+          )}
+          <button type="button" onClick={next} disabled={!answered || saving} style={{
+            flex: 1, padding: "10px 0", border: "none", background: answered ? GOLD : BORDER,
+            color: answered ? SURFACE : TEXT_DIM, fontWeight: 700, fontSize: 13.5,
+            cursor: answered ? "pointer" : "default", fontFamily: "inherit",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+            transition: "background 0.15s",
+          }}>
+            {saving ? "Saving…" : isLast ? "Save profile" : <>{"Next"} <ChevronRight size={14} /></>}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const GOAL_LABELS = {
   wealth_growth: "Wealth Growth", retirement: "Retirement", home_purchase: "Home Purchase",
@@ -84,11 +175,12 @@ function SuggestionCard({ s, profileAware }) {
 
 /* ─── Main screen ───────────────────────────────────────────────── */
 export default function RebalanceScreen({ portfolio, prices }) {
-  const [data,    setData]    = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState(null);
+  const [data,        setData]        = useState(null);
+  const [loading,     setLoading]     = useState(true);
+  const [error,       setError]       = useState(null);
+  const [editProfile, setEditProfile] = useState(false);
 
-  useEffect(() => {
+  const load = () => {
     if (!portfolio || !prices) return;
     setLoading(true);
     apiFetch("/api/rebalance", {
@@ -98,7 +190,9 @@ export default function RebalanceScreen({ portfolio, prices }) {
       .then((r) => r.json())
       .then((d) => { setData(d); setLoading(false); })
       .catch((e) => { setError(e.message); setLoading(false); });
-  }, [portfolio, prices]);
+  };
+
+  useEffect(() => { load(); }, [portfolio, prices]);
 
   if (loading) return <Center>Checking your allocation…</Center>;
   if (error)   return <Center>Could not load rebalancing data</Center>;
@@ -126,21 +220,26 @@ export default function RebalanceScreen({ portfolio, prices }) {
       </p>
 
       {/* Profile banner */}
-      {profileAware && (
-        <div style={{ padding: "13px 18px", marginBottom: 20,
-                      background: GOLD_BG, border: `1px solid ${GOLD_BORDER}`,
-                      display: "flex", alignItems: "center", gap: 12 }}>
-          <User size={15} color={GOLD} />
-          <span style={{ fontSize: 13, color: TEXT_DIM }}>
-            Targets based on your{" "}
-            <b style={{ color: TEXT, textTransform: "capitalize" }}>{profile}</b> risk profile
-            {goal && GOAL_LABELS[goal] ? (
-              <> and <b style={{ color: TEXT }}>{GOAL_LABELS[goal]}</b> goal</>
-            ) : null}
-            {" "}— no manual setup needed.
-          </span>
-        </div>
-      )}
+      <div style={{ padding: "13px 18px", marginBottom: 20,
+                    background: GOLD_BG, border: `1px solid ${GOLD_BORDER}`,
+                    display: "flex", alignItems: "center", gap: 12 }}>
+        <User size={15} color={GOLD} />
+        <span style={{ fontSize: 13, color: TEXT_DIM, flex: 1 }}>
+          {profileAware ? (
+            <>Targets based on your{" "}
+              <b style={{ color: TEXT, textTransform: "capitalize" }}>{profile}</b> risk profile
+              {goal && GOAL_LABELS[goal] ? (
+                <> and <b style={{ color: TEXT }}>{GOAL_LABELS[goal]}</b> goal</>
+              ) : null}
+            </>
+          ) : "No investor profile set — update to get personalised targets."}
+        </span>
+        <button type="button" onClick={() => setEditProfile(true)} style={{
+          background: "none", border: `1px solid ${GOLD_BORDER}`, padding: "4px 10px",
+          color: TEXT_DIM, fontSize: 11.5, cursor: "pointer", fontFamily: "inherit",
+          whiteSpace: "nowrap", flexShrink: 0,
+        }}>Update profile</button>
+      </div>
 
       {/* Status banner */}
       <div style={{ padding: "16px 20px", marginBottom: 24,
@@ -240,6 +339,13 @@ export default function RebalanceScreen({ portfolio, prices }) {
           level matched to your goals and profile.
         </p>
       </div>
+
+      {editProfile && (
+        <ProfileEditModal
+          onClose={() => setEditProfile(false)}
+          onSave={() => { setEditProfile(false); load(); }}
+        />
+      )}
     </div>
   );
 }

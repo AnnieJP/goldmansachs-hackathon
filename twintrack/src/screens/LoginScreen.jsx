@@ -61,12 +61,7 @@ export default function LoginScreen({ onLogin }) {
       }}>
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
-          <div style={{
-            width: 38, height: 38, borderRadius: 11, background: GOLD_BG,
-            border: `1px solid ${GOLD_BORDER}`,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 18,
-          }}>◈</div>
+          <span style={{ fontSize: 30, color: TEXT, lineHeight: 1 }}>◈</span>
           <div>
             <div style={{ fontSize: 17, fontWeight: 800, color: TEXT, letterSpacing: "-0.02em" }}>Folio</div>
             <div style={{ fontSize: 11, color: TEXT_DIM }}>Portfolio Dashboard</div>
@@ -81,8 +76,7 @@ export default function LoginScreen({ onLogin }) {
         </p>
 
         {/* Mode toggle */}
-        <div style={{ display: "flex", padding: 3, borderRadius: 11, background: BG,
-                      border: `1px solid ${BORDER}`, marginBottom: 24 }}>
+        <div style={{ display: "flex", borderBottom: `1px solid ${BORDER}`, marginBottom: 24 }}>
           <ModeTab active={!isSignup} onClick={() => switchMode("signin")}>Sign in</ModeTab>
           <ModeTab active={isSignup}  onClick={() => switchMode("signup")}>Sign up</ModeTab>
         </div>
@@ -143,13 +137,13 @@ export default function LoginScreen({ onLogin }) {
 function ModeTab({ active, onClick, children }) {
   return (
     <button type="button" onClick={onClick} style={{
-      flex: 1, padding: "9px 0", borderRadius: 8, border: "none",
-      background: active ? GOLD_BG : "transparent",
-      color: active ? GOLD : TEXT_DIM,
-      fontWeight: active ? 700 : 500, fontSize: 13,
-      cursor: "pointer", letterSpacing: "0.01em",
-      transition: "background 0.15s, color 0.15s",
-      boxShadow: active ? `inset 0 0 0 1px ${GOLD_BORDER}` : "none",
+      flex: 1, padding: "10px 0", background: "transparent", border: "none",
+      borderBottom: active ? `2px solid ${TEXT}` : "2px solid transparent",
+      marginBottom: -1,
+      color: active ? TEXT : TEXT_DIM,
+      fontWeight: active ? 700 : 400, fontSize: 13.5,
+      cursor: "pointer", letterSpacing: "0",
+      transition: "color 0.15s, border-color 0.15s",
     }}>{children}</button>
   );
 }
