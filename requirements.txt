@@ -3,3 +3,6 @@ pandas
 requests
 python-dotenv
 pypdf
+clingo
+scipy
+anthropic
