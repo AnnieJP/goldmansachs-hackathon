@@ -88,7 +88,7 @@ const inputStyle = {
   boxSizing: "border-box",
 };
 const goldBtn  = { flex: 1, padding: "9px 0", border: "none",
-                   background: GOLD, color: SURFACE, fontWeight: 700,
+                   background: GOLD, color: TEXT, fontWeight: 700,
                    fontSize: 13, cursor: "pointer", fontFamily: "inherit" };
 const ghostBtn = { flex: 1, padding: "9px 0", border: `1px solid ${BORDER}`,
                    background: "transparent", color: TEXT_DIM, fontSize: 13,
@@ -698,8 +698,8 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
           ))}
         </div>
 
-        <div style={{ border: `1px solid ${BORDER}`, overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div style={{ border: `1px solid ${BORDER}`, overflowX: "auto" }}>
+          <table style={{ width: "100%", minWidth: 780, borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: SURFACE_2 }}>
                 {[
