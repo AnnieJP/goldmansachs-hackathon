@@ -31,6 +31,8 @@ backend/data/op/
 backend/data/ms/
 backend/data/cache/
 backend/data/simulations/
+backend/data/users.json
+backend/data/portfolios/
 
 # Editor directories and files
 .vscode/*
