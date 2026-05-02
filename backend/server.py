@@ -626,6 +626,12 @@ class Handler(BaseHTTPRequestHandler):
             email = self._require_auth()
             if not email: return
             return self._json(load_portfolio(email))
+        if p == "/api/user/profile":
+            email = self._require_auth()
+            if not email: return
+            with _users_lock:
+                profile = load_users().get(email, {}).get("investor_profile")
+            return self._json({"profile": profile})
         self._json({"error": "Not found"}, 404)
 
     def do_POST(self):
@@ -727,6 +733,14 @@ class Handler(BaseHTTPRequestHandler):
 
         if p == "/api/portfolio/import-pdf":
             return self._json(import_pdf(body.get("pdf_b64", "")))
+
+        if p == "/api/user/profile":
+            with _users_lock:
+                users = load_users()
+                if email in users:
+                    users[email]["investor_profile"] = body
+                    save_users(users)
+            return self._json({"ok": True})
 
         self._json({"error": "Not found"}, 404)
 
