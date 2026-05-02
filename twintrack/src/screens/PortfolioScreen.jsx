@@ -93,7 +93,7 @@ const ghostBtn = { flex: 1, padding: "10px 0", border: `1px solid ${BORDER}`,
                    background: "transparent", color: TEXT_DIM, fontSize: 13.5,
                    cursor: "pointer", fontFamily: "inherit" };
 
-function HoldingModal({ initial, onSave, onClose }) {
+function HoldingModal({ initial, onSave, onClose, onDelete }) {
   const [form, setForm] = useState(initial || {
     symbol: "", name: "", type: "stock", shares: "", avg_cost: "", target_pct: "",
   });
@@ -137,6 +137,13 @@ function HoldingModal({ initial, onSave, onClose }) {
             <button type="button" onClick={onClose} style={ghostBtn}>Cancel</button>
             <button type="submit" style={goldBtn}>Save holding</button>
           </div>
+          {onDelete && (
+            <button type="button" onClick={onDelete} style={{
+              marginTop: 14, width: "100%", padding: "9px 0", border: "none",
+              background: "none", color: RED, fontSize: 12.5, cursor: "pointer",
+              fontFamily: "inherit", letterSpacing: "0.01em",
+            }}>Delete this holding</button>
+          )}
         </form>
       </div>
     </div>
@@ -710,19 +717,12 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
                                       width: `${Math.min(100, h.currentPct || 0)}%` }} />
                       </div>
                     </td>
-                    <td style={{ padding: "13px 16px", verticalAlign: "middle" }}>
-                      <div style={{ display: "flex", gap: 6, alignItems: "center", justifyContent: "center" }}>
-                        <button onClick={() => setModal(h)} type="button" style={{
-                          padding: "5px 10px", border: `1px solid ${BORDER}`,
-                          background: "transparent", color: TEXT_DIM, cursor: "pointer", fontSize: 11.5,
-                          fontFamily: "inherit",
-                        }}>Edit</button>
-                        <button onClick={() => removeHolding(h.id)} type="button" style={{
-                          padding: "5px 7px", border: `1px solid ${RED}40`,
-                          background: "transparent", color: RED, cursor: "pointer",
-                          display: "flex", alignItems: "center", justifyContent: "center",
-                        }}><X size={12} /></button>
-                      </div>
+                    <td style={{ padding: "10px 20px 10px 12px", verticalAlign: "middle", whiteSpace: "nowrap" }}>
+                      <button onClick={() => setModal(h)} type="button" style={{
+                        padding: "5px 10px", border: `1px solid ${BORDER}`,
+                        background: "transparent", color: TEXT_DIM, cursor: "pointer", fontSize: 11.5,
+                        fontFamily: "inherit",
+                      }}>Edit</button>
                     </td>
                   </tr>
                 );
@@ -733,7 +733,12 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
       </div>
 
       {importing && <ImportModal portfolio={portfolio} onImport={async () => { await onPortfolioChange(); setImporting(false); }} onClose={() => setImporting(false)} />}
-      {modal && <HoldingModal initial={modal === "add" ? null : modal} onSave={saveHolding} onClose={() => setModal(null)} />}
+      {modal && <HoldingModal
+        initial={modal === "add" ? null : modal}
+        onSave={saveHolding}
+        onClose={() => setModal(null)}
+        onDelete={modal !== "add" ? async () => { await removeHolding(modal.id); setModal(null); } : undefined}
+      />}
     </div>
   );
 }

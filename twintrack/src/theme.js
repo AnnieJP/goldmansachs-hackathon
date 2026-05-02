@@ -2,8 +2,20 @@
 export const RADIUS = 0;  /* sharp square corners throughout */
 
 /* ─── Typography ────────────────────────────────────────────────── */
-export const FONT_SERIF = "'Playfair Display', Georgia, serif";
-export const FONT_SANS  = "'Playfair Display', Georgia, serif";
+export const FONT_SANS  = "'Inter', system-ui, sans-serif";
+export const FONT_SERIF = "'Inter', system-ui, sans-serif"; /* Inter for everything */
+
+/* Type scale — use these for consistency across all screens */
+export const TYPE = {
+  h1:    { fontSize: 28, fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2  },
+  h2:    { fontSize: 20, fontWeight: 700, letterSpacing: "-0.015em",lineHeight: 1.3  },
+  h3:    { fontSize: 16, fontWeight: 600, letterSpacing: "-0.01em", lineHeight: 1.4  },
+  h4:    { fontSize: 13.5, fontWeight: 600, letterSpacing: "0",       lineHeight: 1.4  },
+  body:  { fontSize: 14,  fontWeight: 400, letterSpacing: "0",       lineHeight: 1.6  },
+  small: { fontSize: 12,  fontWeight: 400, letterSpacing: "0",       lineHeight: 1.5  },
+  label: { fontSize: 11,  fontWeight: 600, letterSpacing: "0.07em",  lineHeight: 1,   textTransform: "uppercase" },
+  mono:  { fontSize: 13,  fontWeight: 500, fontVariantNumeric: "tabular-nums"        },
+};
 
 /* ─── Background layers ─────────────────────────────────────────── */
 export const BG        = "#F5F0EA";  /* warm cream page bg          */

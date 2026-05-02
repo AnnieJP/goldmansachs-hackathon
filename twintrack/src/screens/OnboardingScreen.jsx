@@ -10,7 +10,7 @@ import { Sparkles, FolderOpen } from "lucide-react";
 import { ImportModal } from "./PortfolioScreen.jsx";
 
 /* ─── Questions ─────────────────────────────────────────────────── */
-const QUESTIONS = [
+export const QUESTIONS = [
   {
     question: "What are you investing for?",
     options: [
@@ -60,7 +60,7 @@ const QUESTIONS = [
 ];
 
 /* ─── Profile derivation ─────────────────────────────────────────── */
-function deriveProfile(answers) {
+export function deriveProfile(answers) {
   const GOALS      = ["wealth_growth", "home_purchase", "family_future", "retirement", "emergency", "learning"];
   const HORIZONS   = ["short_term", "near_term", "medium_term", "long_term", "very_long_term"];
   const PANICS     = ["high", "medium_high", "low", "very_low"];

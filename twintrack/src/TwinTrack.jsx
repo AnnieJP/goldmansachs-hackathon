@@ -79,13 +79,7 @@ function Sidebar({ screen, onNavigate, enriched, pricesLoading, onRefresh, curre
       {/* Logo */}
       <div style={{ padding: "28px 24px 20px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 9, background: GOLD_BG,
-            border: `1px solid ${GOLD_BORDER}`,
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            <span style={{ fontSize: 16 }}>◈</span>
-          </div>
+          <span style={{ fontSize: 28, color: TEXT, lineHeight: 1 }}>◈</span>
           <div>
             <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-0.01em", color: TEXT, fontFamily: FONT_SERIF }}>Folio</div>
             <div style={{ fontSize: 10.5, color: TEXT_DIM, letterSpacing: "0.02em" }}>Portfolio Dashboard</div>
@@ -159,34 +153,31 @@ function Sidebar({ screen, onNavigate, enriched, pricesLoading, onRefresh, curre
       {/* User */}
       {currentUser && (
         <div style={{
-          margin: "0 16px 20px", padding: "12px 14px", borderRadius: 10,
-          border: `1px solid ${BORDER}`, background: "rgba(255,255,255,0.03)",
-          display: "flex", alignItems: "center", gap: 10,
+          margin: "0 16px 20px", padding: "8px 12px",
+          borderTop: `1px solid ${BORDER}`,
+          display: "flex", alignItems: "center", gap: 8,
         }}>
           <div style={{
-            width: 30, height: 30, borderRadius: "50%",
-            background: "linear-gradient(135deg, #F59E0B, #D97706)",
+            width: 22, height: 22, borderRadius: "50%",
+            background: BORDER_MED,
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontWeight: 700, fontSize: 13, color: BG, flexShrink: 0,
+            fontWeight: 700, fontSize: 10, color: TEXT, flexShrink: 0,
           }}>
             {(currentUser.displayName || currentUser.email || "?").slice(0, 1).toUpperCase()}
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 12.5, fontWeight: 600, color: TEXT, lineHeight: 1.3,
-                          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {currentUser.displayName || currentUser.email}
-            </div>
-            <button onClick={onLogout} type="button" style={{
-              background: "none", border: "none", padding: 0, marginTop: 2,
-              color: TEXT_DIM, fontSize: 11, cursor: "pointer", display: "flex",
-              alignItems: "center", gap: 4, transition: "color 0.15s",
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = RED}
-            onMouseLeave={(e) => e.currentTarget.style.color = TEXT_DIM}>
-              <LogOut size={11} />
-              Sign out
-            </button>
+          <div style={{ fontSize: 11.5, fontWeight: 500, color: TEXT_DIM,
+                        overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, minWidth: 0 }}>
+            {currentUser.displayName || currentUser.email}
           </div>
+          <button onClick={onLogout} type="button" style={{
+            background: "none", border: "none", padding: 0,
+            color: TEXT_DIM, cursor: "pointer", display: "flex",
+            alignItems: "center", flexShrink: 0, transition: "color 0.15s",
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.color = RED}
+          onMouseLeave={(e) => e.currentTarget.style.color = TEXT_DIM}>
+            <LogOut size={13} />
+          </button>
         </div>
       )}
     </aside>
