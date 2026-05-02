@@ -361,6 +361,7 @@ _HEADER_SKIP = {
     "Price", "Amount", "Description", "Account", "Balance", "Interest Rate (APY)",
 }
 
+
 def _parse_holdings_text(text: str) -> list:
     """
     Handle PDF extraction where every cell lands on its own line.
@@ -458,13 +459,76 @@ def import_pdf(pdf_b64: str) -> dict:
     except ImportError:
         return {"error": "pypdf not installed — run: pip install pypdf"}
     try:
-        data   = base64.b64decode(pdf_b64)
-        reader = pypdf.PdfReader(io.BytesIO(data))
-        text   = "\n".join(p.extract_text() or "" for p in reader.pages)
-        rows   = _parse_holdings_text(text)
+        data      = base64.b64decode(pdf_b64)
+        reader    = pypdf.PdfReader(io.BytesIO(data))
+        text      = "\n".join(p.extract_text() or "" for p in reader.pages)
+        rows = _parse_holdings_text(text)
         return {"holdings": rows, "count": len(rows)}
     except Exception as exc:
         return {"error": str(exc)}
+
+
+def _merge_portfolio(portfolio: dict, new_holdings: list, brokerage: str, confirmed_removals: list) -> dict:
+    """
+    Merge PDF-parsed holdings from a named brokerage into the existing portfolio.
+
+    - new_holdings: holdings parsed from the PDF (symbol, shares, avg_cost, type …)
+    - brokerage: canonical brokerage name chosen/confirmed by the user
+    - confirmed_removals: symbols the user confirmed should be removed from this brokerage
+
+    Existing fields (symbol, shares, avg_cost, type, target_pct, id) are preserved.
+    A 'sources' array is maintained per holding for weighted-average tracking.
+    """
+    existing      = portfolio.get("holdings", [])
+    new_map       = {h["symbol"]: h for h in new_holdings}
+    rm_set        = set(confirmed_removals or [])
+    brokerage_key = brokerage.strip().lower()
+    result        = []
+
+    def _same_brokerage(stored: str) -> bool:
+        return stored.strip().lower() == brokerage_key
+
+    for h in existing:
+        sym     = h["symbol"]
+        sources = list(h.get("sources") or [])
+
+        if sym in new_map:
+            nh = new_map.pop(sym)
+            # Seed sources from existing data if this holding pre-dates the feature
+            if not sources:
+                sources = [{"brokerage": "Manual", "shares": h["shares"], "avg_cost": h["avg_cost"]}]
+            # Replace or insert this brokerage's source entry (case-insensitive match)
+            sources = [s for s in sources if not _same_brokerage(s["brokerage"])]
+            sources.append({"brokerage": brokerage, "shares": nh["shares"], "avg_cost": nh["avg_cost"]})
+            total = sum(s["shares"] for s in sources)
+            wavg  = round(sum(s["shares"] * s["avg_cost"] for s in sources) / total, 2) if total else h["avg_cost"]
+            result.append({**h, "shares": round(total, 4), "avg_cost": wavg, "sources": sources})
+
+        elif sym in rm_set:
+            remaining = [s for s in sources if not _same_brokerage(s["brokerage"])]
+            if not remaining:
+                continue  # only source was this brokerage → remove holding entirely
+            total = sum(s["shares"] for s in remaining)
+            wavg  = round(sum(s["shares"] * s["avg_cost"] for s in remaining) / total, 2)
+            result.append({**h, "shares": round(total, 4), "avg_cost": wavg, "sources": remaining})
+
+        else:
+            result.append(h)  # unaffected by this import
+
+    # Brand-new tickers not yet in the portfolio
+    for sym, nh in new_map.items():
+        result.append({
+            "id":         nh.get("id") or str(uuid.uuid4()),
+            "symbol":     sym,
+            "name":       nh.get("name", sym),
+            "type":       nh.get("type", "stock"),
+            "shares":     nh["shares"],
+            "avg_cost":   nh["avg_cost"],
+            "target_pct": 0,
+            "sources":    [{"brokerage": brokerage, "shares": nh["shares"], "avg_cost": nh["avg_cost"]}],
+        })
+
+    return {**portfolio, "holdings": result}
 
 # ── Rebalancing ───────────────────────────────────────────────────────────────
 def calc_rebalance(portfolio: dict, prices: dict) -> dict:
@@ -1417,7 +1481,8 @@ class Handler(BaseHTTPRequestHandler):
             port = load_portfolio(email)
             h = dict(body)
             h["id"] = h.get("id") or f"h{uuid.uuid4().hex[:8]}"
-            port["holdings"].append(h)
+            # Merge using "Manual" as source so all entry points stay consistent
+            port = _merge_portfolio(port, [h], "Manual", [])
             save_portfolio(email, port)
             return self._json({"ok": True, "portfolio": port})
 
@@ -1461,6 +1526,15 @@ class Handler(BaseHTTPRequestHandler):
 
         if p == "/api/portfolio/import-pdf":
             return self._json(import_pdf(body.get("pdf_b64", "")))
+
+        if p == "/api/portfolio/import-merge":
+            new_holdings       = body.get("holdings", [])
+            brokerage          = (body.get("brokerage") or "Unknown Brokerage").strip()
+            confirmed_removals = body.get("confirmed_removals", [])
+            port = load_portfolio(email)
+            port = _merge_portfolio(port, new_holdings, brokerage, confirmed_removals)
+            save_portfolio(email, port)
+            return self._json({"ok": True, "portfolio": port})
 
         if p == "/api/user/profile":
             with _users_lock:
