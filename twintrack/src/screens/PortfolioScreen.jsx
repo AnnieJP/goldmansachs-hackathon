@@ -500,26 +500,28 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
             {fmt$(enriched?.cash || 0)} cash · {holdings.length} position{holdings.length !== 1 ? "s" : ""}
           </div>
         </div>
-        <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => setImporting(true)} type="button" style={{
-            padding: "10px 18px", border: `1px solid ${BORDER}`, background: "transparent",
-            color: TEXT_DIM, fontWeight: 600, fontSize: 13.5, cursor: "pointer",
-            fontFamily: "inherit", whiteSpace: "nowrap",
-          }}>
-            Import PDF
-          </button>
-          <button onClick={() => setModal("add")} type="button" style={{
-            padding: "10px 20px", border: "none", background: GOLD,
-            color: SURFACE, fontWeight: 700, fontSize: 13.5, cursor: "pointer",
-            fontFamily: "inherit", whiteSpace: "nowrap",
-          }}>
-            + Add holding
-          </button>
-        </div>
+        {holdings.length > 0 && (
+          <div style={{ display: "flex", gap: 10 }}>
+            <button onClick={() => setImporting(true)} type="button" style={{
+              padding: "10px 18px", border: `1px solid ${BORDER}`, background: "transparent",
+              color: TEXT_DIM, fontWeight: 600, fontSize: 13.5, cursor: "pointer",
+              fontFamily: "inherit", whiteSpace: "nowrap",
+            }}>
+              Import PDF
+            </button>
+            <button onClick={() => setModal("add")} type="button" style={{
+              padding: "10px 20px", border: "none", background: GOLD,
+              color: SURFACE, fontWeight: 700, fontSize: 13.5, cursor: "pointer",
+              fontFamily: "inherit", whiteSpace: "nowrap",
+            }}>
+              + Add holding
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ── 3-Box Visual Section ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, marginBottom: 32 }}>
+      {holdings.length > 0 && <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, marginBottom: 32 }}>
 
         {/* Box 1 — Portfolio Overview */}
         <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: 24 }}>
@@ -654,7 +656,7 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
             </div>
           )}
         </div>
-      </div>
+      </div>}
 
       {/* ── Holdings List ── */}
       <div>
