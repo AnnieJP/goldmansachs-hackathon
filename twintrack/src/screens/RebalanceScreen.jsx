@@ -1,68 +1,74 @@
 import { useState, useEffect } from "react";
-import { GOLD, GOLD_BG, GOLD_BORDER, ACCENT, ACCENT_DIM,
-         SURFACE, BG, TEXT, TEXT_DIM, fmt$ } from "../theme.js";
+import { GOLD, GOLD_BG, GOLD_BORDER, BORDER, BORDER_MED,
+         SURFACE, SURFACE_2, BG, TEXT, TEXT_SEC, TEXT_DIM,
+         GREEN, GREEN_BG, GREEN_BORDER, RED, RED_BG, RED_BORDER,
+         FONT_SERIF, fmt$, fmtPct } from "../theme.js";
 import { apiFetch } from "../api.js";
+import { ArrowUpDown, TrendingUp, TrendingDown, CheckCircle2, AlertCircle } from "lucide-react";
 
 /* ─── Drift bar ─────────────────────────────────────────────────── */
 function DriftBar({ current, target, symbol }) {
-  const max   = Math.max(current, target, 1);
-  const over  = current > target;
+  const max  = Math.max(current, target, 1);
+  const over = current > target;
   const drift = Math.abs(current - target).toFixed(1);
+  const barColor = over ? "#f97316" : "#6366F1";
   return (
-    <div style={{ marginBottom: 3 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: TEXT_DIM, marginBottom: 5 }}>
-        <span style={{ fontWeight: 700, color: TEXT }}>{symbol}</span>
-        <span>{over ? `+${drift}% over target` : `-${drift}% under target`}</span>
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+        <span style={{ fontWeight: 700, fontSize: 13, color: TEXT }}>{symbol}</span>
+        <span style={{ fontSize: 11.5, color: over ? "#fb923c" : TEXT_DIM }}>
+          {over ? `+${drift}% over` : `-${drift}% under`} target
+        </span>
       </div>
-      <div style={{ position: "relative", height: 10, borderRadius: 5, background: ACCENT_DIM, overflow: "visible" }}>
-        {/* Target marker */}
-        <div style={{ position: "absolute", left: `${(target / max) * 100}%`, top: -4, width: 2,
-                      height: 18, background: TEXT_DIM, borderRadius: 1, zIndex: 2 }} />
-        {/* Current bar */}
-        <div style={{ position: "absolute", left: 0, height: "100%", borderRadius: 5,
-                      width: `${(current / max) * 100}%`,
-                      background: over ? "#f97316" : "#2A6496", transition: "width 0.6s ease" }} />
+      <div style={{ position: "relative", height: 8, borderRadius: 4,
+                    background: "rgba(255,255,255,0.07)", overflow: "visible" }}>
+        <div style={{ position: "absolute", left: `${(target / max) * 100}%`, top: -3,
+                      width: 2, height: 14, background: TEXT_DIM, borderRadius: 1, zIndex: 2 }} />
+        <div style={{ position: "absolute", left: 0, height: "100%", borderRadius: 4,
+                      width: `${(current / max) * 100}%`, background: barColor,
+                      transition: "width 0.6s ease" }} />
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10.5, marginTop: 4 }}>
-        <span style={{ color: TEXT_DIM }}>Current: <b style={{ color: TEXT }}>{current.toFixed(1)}%</b></span>
-        <span style={{ color: TEXT_DIM }}>Target: <b style={{ color: TEXT }}>{target.toFixed(1)}%</b></span>
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 5, fontSize: 11 }}>
+        <span style={{ color: TEXT_DIM }}>Current <b style={{ color: TEXT }}>{current.toFixed(1)}%</b></span>
+        <span style={{ color: TEXT_DIM }}>Target <b style={{ color: TEXT }}>{target.toFixed(1)}%</b></span>
       </div>
     </div>
   );
 }
 
-/* ─── Trade suggestion card ─────────────────────────────────────── */
-function SuggestionCard({ s, index }) {
+/* ─── Suggestion card ────────────────────────────────────────────── */
+function SuggestionCard({ s }) {
   const isSell = s.action === "sell";
+  const acColor = isSell ? "#f97316" : GREEN;
   return (
-    <div style={{ background: SURFACE, border: `1px solid ${ACCENT_DIM}`, borderRadius: 12,
-                  padding: "18px 20px", marginBottom: 12, display: "flex", gap: 16, alignItems: "flex-start" }}>
-      <div style={{ width: 38, height: 38, borderRadius: "50%", flexShrink: 0,
-                    display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17,
-                    background: isSell ? "#f9731618" : "#22c55e18",
-                    border: `1px solid ${isSell ? "#f9731640" : "#22c55e40"}`,
-                    color: isSell ? "#fb923c" : "#34d399" }}>
-        {isSell ? "↓" : "↑"}
+    <div style={{
+      background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 14,
+      padding: "18px 20px", marginBottom: 10, display: "flex", gap: 14, alignItems: "flex-start",
+      transition: "border-color 0.15s",
+    }}
+    onMouseEnter={(e) => e.currentTarget.style.borderColor = acColor + "40"}
+    onMouseLeave={(e) => e.currentTarget.style.borderColor = BORDER}>
+      <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    background: acColor + "18", border: `1px solid ${acColor}30` }}>
+        {isSell
+          ? <TrendingDown size={16} color={acColor} />
+          : <TrendingUp   size={16} color={acColor} />}
       </div>
       <div style={{ flex: 1 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-          <span style={{ fontWeight: 800, fontSize: 15, color: TEXT }}>{s.symbol}</span>
-          <span style={{ fontSize: 12, fontWeight: 700, color: isSell ? "#fb923c" : "#34d399",
-                         textTransform: "uppercase" }}>{s.action}</span>
-          <span style={{ fontSize: 12, color: TEXT_DIM }}>~{fmt$(s.trade_value)}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4, flexWrap: "wrap" }}>
+          <span style={{ fontWeight: 800, fontSize: 14, color: TEXT }}>{s.symbol}</span>
+          <span style={{ fontSize: 11.5, fontWeight: 700, color: acColor, textTransform: "uppercase",
+                         padding: "2px 8px", borderRadius: 5, background: acColor + "14",
+                         border: `1px solid ${acColor}25` }}>{s.action}</span>
+          <span style={{ fontSize: 12, color: TEXT_DIM }}>≈ {fmt$(s.trade_value)}</span>
         </div>
-        <div style={{ fontSize: 13.5, fontWeight: 600, color: TEXT, marginBottom: 4 }}>{s.plain_action}</div>
-        <div style={{ fontSize: 12.5, color: TEXT_DIM, lineHeight: 1.5 }}>{s.reason}</div>
-        <div style={{ marginTop: 8, display: "flex", gap: 12 }}>
-          <span style={{ fontSize: 11.5, color: TEXT_DIM }}>
-            Current: <b style={{ color: TEXT }}>{s.current_pct}%</b>
-          </span>
-          <span style={{ fontSize: 11.5, color: TEXT_DIM }}>
-            Target: <b style={{ color: TEXT }}>{s.target_pct}%</b>
-          </span>
-          <span style={{ fontSize: 11.5, color: TEXT_DIM }}>
-            Price: <b style={{ color: TEXT }}>{fmt$(s.current_price)}</b>
-          </span>
+        <div style={{ fontSize: 13.5, fontWeight: 600, color: TEXT, marginBottom: 5 }}>{s.plain_action}</div>
+        <div style={{ fontSize: 12.5, color: TEXT_DIM, lineHeight: 1.55 }}>{s.reason}</div>
+        <div style={{ display: "flex", gap: 16, marginTop: 8, flexWrap: "wrap" }}>
+          {[["Current", `${s.current_pct}%`], ["Target", `${s.target_pct}%`], ["Price", fmt$(s.current_price)]].map(([k, v]) => (
+            <span key={k} style={{ fontSize: 11.5, color: TEXT_DIM }}>{k}: <b style={{ color: TEXT }}>{v}</b></span>
+          ))}
         </div>
       </div>
     </div>
@@ -88,57 +94,59 @@ export default function RebalanceScreen({ portfolio, prices }) {
   }, [portfolio, prices]);
 
   if (loading) return <Center>Checking your allocation…</Center>;
-  if (error)   return <Center>Failed to load rebalancing data</Center>;
+  if (error)   return <Center>Could not load rebalancing data</Center>;
   if (!data)   return null;
 
   const allGood = !data.needs_rebalancing;
 
   return (
-    <div style={{ padding: "32px 36px", fontFamily: "'DM Sans','Segoe UI',sans-serif", color: TEXT, maxWidth: 860 }}>
-      <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800, letterSpacing: "-0.03em" }}>Rebalance</h1>
-      <p style={{ margin: "0 0 28px", fontSize: 13, color: TEXT_DIM }}>
-        Keep your portfolio aligned with what you actually want to own.
+    <div style={{ padding: "32px 36px", color: TEXT, maxWidth: 900 }}>
+      <h1 style={{ margin: "0 0 4px", fontSize: 22, fontWeight: 700, letterSpacing: "-0.01em", fontFamily: FONT_SERIF }}>Rebalance</h1>
+      <p style={{ margin: "0 0 26px", fontSize: 13, color: TEXT_DIM }}>
+        Keep your portfolio aligned with your target allocation.
       </p>
 
       {/* Status banner */}
-      <div style={{ padding: "16px 20px", borderRadius: 12, marginBottom: 28,
-                    background: allGood ? "#22c55e14" : "#f9731614",
-                    border: `1px solid ${allGood ? "#22c55e30" : "#f9731630"}`,
+      <div style={{ padding: "16px 20px", borderRadius: 14, marginBottom: 24,
+                    background: allGood ? GREEN_BG : "rgba(249,115,22,0.08)",
+                    border: `1px solid ${allGood ? GREEN_BORDER : "rgba(249,115,22,0.25)"}`,
                     display: "flex", alignItems: "center", gap: 14 }}>
-        <span style={{ fontSize: 26 }}>{allGood ? "✅" : "⚠️"}</span>
+        {allGood
+          ? <CheckCircle2 size={20} color={GREEN} />
+          : <AlertCircle  size={20} color="#fb923c" />}
         <div>
-          <div style={{ fontWeight: 700, fontSize: 15, color: allGood ? "#4ade80" : "#fdba74" }}>
-            {allGood ? "Your portfolio is well balanced" : `${data.suggestion_count} holding${data.suggestion_count !== 1 ? "s" : ""} need${data.suggestion_count === 1 ? "s" : ""} attention`}
-          </div>
-          <div style={{ fontSize: 12.5, color: TEXT_DIM, marginTop: 3 }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: allGood ? GREEN : "#fdba74" }}>
             {allGood
-              ? "All holdings are within 3% of their targets — nothing to do right now."
-              : `Total drift from your target allocation: ${data.total_drift}%. Here's what to adjust.`}
+              ? "Your portfolio is well balanced"
+              : `${data.suggestion_count} holding${data.suggestion_count !== 1 ? "s" : ""} need attention`}
+          </div>
+          <div style={{ fontSize: 12.5, color: TEXT_DIM, marginTop: 2 }}>
+            {allGood
+              ? "All holdings are within 3% of their targets — nothing to do."
+              : `Total drift: ${data.total_drift}% from your target allocation.`}
           </div>
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28, alignItems: "start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, alignItems: "start" }}>
         {/* Allocation snapshot */}
-        <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: TEXT, marginBottom: 14 }}>
-            Current vs target allocation
-          </div>
-          <div style={{ background: SURFACE, border: `1px solid ${ACCENT_DIM}`, borderRadius: 12, padding: "20px 20px" }}>
-            {data.allocation_snapshot.map((s) => (
-              <div key={s.symbol} style={{ marginBottom: 20 }}>
-                <DriftBar current={s.current_pct} target={s.target_pct} symbol={s.symbol} />
-              </div>
-            ))}
-            <div style={{ display: "flex", gap: 20, marginTop: 8, fontSize: 11.5 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <div style={{ width: 24, height: 6, borderRadius: 3, background: ACCENT }} />
-                <span style={{ color: TEXT_DIM }}>Current</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <div style={{ width: 2, height: 14, background: TEXT_DIM }} />
-                <span style={{ color: TEXT_DIM }}>Your target</span>
-              </div>
+        <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 16, padding: "22px 22px",
+                      boxShadow: "0 2px 12px rgba(0,0,0,0.2)" }}>
+          <div style={{ fontSize: 12.5, fontWeight: 700, color: TEXT, marginBottom: 18,
+                        textTransform: "uppercase", letterSpacing: "0.05em" }}>Current vs Target</div>
+          {data.allocation_snapshot.map((s) => (
+            <div key={s.symbol} style={{ marginBottom: 20 }}>
+              <DriftBar current={s.current_pct} target={s.target_pct} symbol={s.symbol} />
+            </div>
+          ))}
+          <div style={{ display: "flex", gap: 20, marginTop: 4, fontSize: 11.5 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <div style={{ width: 20, height: 5, borderRadius: 3, background: "#6366F1" }} />
+              <span style={{ color: TEXT_DIM }}>Current</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <div style={{ width: 2, height: 12, background: TEXT_DIM }} />
+              <span style={{ color: TEXT_DIM }}>Target</span>
             </div>
           </div>
         </div>
@@ -146,27 +154,26 @@ export default function RebalanceScreen({ portfolio, prices }) {
         {/* Suggestions */}
         <div>
           {allGood ? (
-            <div style={{ background: SURFACE, border: `1px solid ${ACCENT_DIM}`, borderRadius: 12, padding: "24px 22px",
-                          textAlign: "center" }}>
-              <div style={{ fontSize: 40, marginBottom: 12 }}>🎯</div>
+            <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 16,
+                          padding: "28px 24px", textAlign: "center",
+                          boxShadow: "0 2px 12px rgba(0,0,0,0.2)" }}>
+              <div style={{ width: 56, height: 56, borderRadius: 16, background: GREEN_BG, border: `1px solid ${GREEN_BORDER}`,
+                            display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                <CheckCircle2 size={26} color={GREEN} />
+              </div>
               <div style={{ fontWeight: 700, fontSize: 15, color: TEXT, marginBottom: 8 }}>All on track</div>
-              <div style={{ fontSize: 13, color: TEXT_DIM, lineHeight: 1.6 }}>
-                Every holding is close to your target. Check back after the next big market move,
-                or whenever you make a new purchase.
+              <div style={{ fontSize: 13, color: TEXT_DIM, lineHeight: 1.65 }}>
+                Every holding is close to your target. Check back after the next market move or new purchase.
               </div>
             </div>
           ) : (
             <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: TEXT, marginBottom: 14 }}>
-                What to do
-              </div>
-              {data.suggestions.map((s, i) => (
-                <SuggestionCard key={s.symbol} s={s} index={i} />
-              ))}
-              <div style={{ marginTop: 8, padding: "14px 16px", borderRadius: 10, fontSize: 12.5,
-                            background: GOLD_BG, border: `1px solid ${GOLD_BORDER}`, color: TEXT_DIM,
-                            lineHeight: 1.6 }}>
-                💡 These are suggestions, not advice. Share with your financial adviser before trading.
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: TEXT_DIM, marginBottom: 14,
+                            textTransform: "uppercase", letterSpacing: "0.05em" }}>Recommended Actions</div>
+              {data.suggestions.map((s) => <SuggestionCard key={s.symbol} s={s} />)}
+              <div style={{ marginTop: 4, padding: "13px 16px", borderRadius: 11, fontSize: 12.5,
+                            background: GOLD_BG, border: `1px solid ${GOLD_BORDER}`, color: TEXT_DIM, lineHeight: 1.6 }}>
+                These are suggestions only — consult a financial adviser before trading.
               </div>
             </div>
           )}
@@ -174,14 +181,13 @@ export default function RebalanceScreen({ portfolio, prices }) {
       </div>
 
       {/* Explainer */}
-      <div style={{ marginTop: 28, padding: "18px 20px", borderRadius: 12,
-                    background: SURFACE, border: `1px solid ${ACCENT_DIM}` }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: TEXT_DIM, marginBottom: 8,
+      <div style={{ marginTop: 24, padding: "18px 22px", borderRadius: 14,
+                    background: SURFACE, border: `1px solid ${BORDER}` }}>
+        <div style={{ fontSize: 11.5, fontWeight: 700, color: TEXT_DIM, marginBottom: 8,
                       textTransform: "uppercase", letterSpacing: "0.06em" }}>What is rebalancing?</div>
-        <p style={{ margin: 0, fontSize: 13, color: TEXT_DIM, lineHeight: 1.7 }}>
-          Over time, some investments grow faster than others, so your portfolio drifts away from your original plan.
-          Rebalancing means selling a little of what grew and buying more of what shrank —
-          so you're always invested the way you intended.
+        <p style={{ margin: 0, fontSize: 13, color: TEXT_DIM, lineHeight: 1.75 }}>
+          Over time, faster-growing assets become a larger share of your portfolio than intended.
+          Rebalancing means trimming what grew and adding to what lagged — keeping your risk profile where you want it.
         </p>
       </div>
     </div>
@@ -189,8 +195,5 @@ export default function RebalanceScreen({ portfolio, prices }) {
 }
 
 function Center({ children }) {
-  return (
-    <div style={{ padding: 60, textAlign: "center", color: TEXT_DIM, fontSize: 14,
-                  fontFamily: "'DM Sans','Segoe UI',sans-serif" }}>{children}</div>
-  );
+  return <div style={{ padding: 60, textAlign: "center", color: TEXT_DIM, fontSize: 14 }}>{children}</div>;
 }
