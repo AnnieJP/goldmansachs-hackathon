@@ -306,10 +306,18 @@ export default function RiskScreen({ portfolio, prices }) {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "rgba(255,255,255,0.02)" }}>
-              {["Holding", "Type", "Weight", "Volatility", "Portfolio Impact"].map((h) => (
-                <th key={h} style={{ padding: "10px 18px", textAlign: "left", fontSize: 11,
+              {[
+                { label: "Holding" },
+                { label: "Type" },
+                { label: "Weight", tip: "Your share of the total portfolio. A 30% weight means $3 of every $10 invested is in this holding." },
+                { label: "Volatility" },
+                { label: "Portfolio Impact", tip: "How much this holding's price swings affect your overall portfolio. High weight combined with high volatility = large impact." },
+              ].map(({ label, tip }) => (
+                <th key={label} style={{ padding: "10px 18px", textAlign: "left", fontSize: 11,
                                       fontWeight: 600, color: TEXT_DIM, textTransform: "uppercase",
-                                      letterSpacing: "0.06em", borderBottom: `1px solid ${BORDER}` }}>{h}</th>
+                                      letterSpacing: "0.06em", borderBottom: `1px solid ${BORDER}` }}>
+                  {label}{tip && <InfoTip title={label}>{tip}</InfoTip>}
+                </th>
               ))}
             </tr>
           </thead>

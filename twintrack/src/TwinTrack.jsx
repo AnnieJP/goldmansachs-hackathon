@@ -188,7 +188,7 @@ function HubScreen({ enriched, setScreen, currentUser, onLogout }) {
 
   const features = [
     { id: "portfolio", Icon: BarChart3,     title: "My Holdings",  desc: "Live prices, cost basis, gain & loss per position.", color: "#F59E0B" },
-    { id: "risk",      Icon: ShieldCheck,   title: "Risk Check",   desc: "Beta analysis and plain-English risk rating.",        color: "#10B981" },
+    { id: "risk",      Icon: ShieldCheck,   title: "Risk Check",   desc: "Plain-English risk rating for your portfolio.",      color: "#10B981" },
     { id: "rebalance", Icon: ArrowUpDown,   title: "Rebalance",    desc: "Drift from targets — exactly what to buy or sell.",  color: "#6366F1" },
     { id: "askfolio",  Icon: MessageSquare, title: "Ask Meridian", desc: "Describe a scenario and get a full rebalance plan.", color: "#0891B2" },
   ];

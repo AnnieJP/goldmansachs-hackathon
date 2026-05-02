@@ -674,11 +674,17 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: SURFACE_2 }}>
-                {["Name","Type","Shares","Avg Cost","Current Price","Value","Gain / Loss","Allocation",""].map((h) => (
-                  <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontSize: 11,
+                {[
+                  { label: "Name" }, { label: "Type" }, { label: "Shares" },
+                  { label: "Avg Cost", tip: "The average price you paid per share. Your total gain or loss is calculated from this number." },
+                  { label: "Current Price" }, { label: "Value" }, { label: "Gain / Loss" }, { label: "Allocation" }, { label: "" },
+                ].map(({ label, tip }) => (
+                  <th key={label} style={{ padding: "12px 16px", textAlign: "left", fontSize: 11,
                                        fontWeight: 600, color: TEXT_DIM, textTransform: "uppercase",
                                        letterSpacing: "0.06em", whiteSpace: "nowrap",
-                                       borderBottom: `1px solid ${BORDER}` }}>{h}</th>
+                                       borderBottom: `1px solid ${BORDER}` }}>
+                    {label}{tip && <InfoTip title={label}>{tip}</InfoTip>}
+                  </th>
                 ))}
               </tr>
             </thead>
