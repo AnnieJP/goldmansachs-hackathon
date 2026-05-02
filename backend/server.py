@@ -21,10 +21,14 @@ POST /api/scenario               {portfolio, prices, scenario_id}  → sim
 from __future__ import annotations
 
 import base64
+import hashlib
 import io
 import json
 import os
 import re
+import secrets
+import threading
+import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
@@ -34,9 +38,15 @@ from urllib.parse import urlparse
 from dotenv import load_dotenv
 load_dotenv()
 
-BACKEND       = Path(__file__).resolve().parent
-DATA_DIR      = BACKEND / "data"
-PORTFOLIO_FILE = DATA_DIR / "portfolio.json"
+BACKEND        = Path(__file__).resolve().parent
+DATA_DIR       = BACKEND / "data"
+PORTFOLIO_DIR  = DATA_DIR / "portfolios"
+USERS_FILE     = DATA_DIR / "users.json"
+LEGACY_PORTFOLIO_FILE = DATA_DIR / "portfolio.json"
+
+SESSION_TTL_SECONDS = 60 * 60 * 24 * 7   # 7 days
+PBKDF2_ITERATIONS   = 200_000
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 # ── Default demo portfolio ────────────────────────────────────────────────────
 DEFAULT_PORTFOLIO = {
@@ -103,20 +113,90 @@ PLAIN_ENGLISH = {
     "High":         "Your portfolio is built for maximum growth. Be prepared for large swings — both up and down.",
 }
 
-# ── Portfolio I/O ─────────────────────────────────────────────────────────────
-def load_portfolio() -> dict:
-    if PORTFOLIO_FILE.exists():
+# ── User & auth storage ──────────────────────────────────────────────────────
+_users_lock    = threading.Lock()
+_sessions_lock = threading.Lock()
+_sessions: dict[str, dict] = {}   # token -> {"email", "expires_at"}
+
+def _email_key(email: str) -> str:
+    return hashlib.sha256(email.strip().lower().encode("utf-8")).hexdigest()[:16]
+
+def _hash_password(password: str, salt: bytes | None = None) -> str:
+    salt = salt or secrets.token_bytes(16)
+    digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, PBKDF2_ITERATIONS)
+    return f"pbkdf2_sha256${PBKDF2_ITERATIONS}${salt.hex()}${digest.hex()}"
+
+def _verify_password(password: str, stored: str) -> bool:
+    try:
+        algo, iters, salt_hex, digest_hex = stored.split("$")
+        if algo != "pbkdf2_sha256":
+            return False
+        salt   = bytes.fromhex(salt_hex)
+        target = bytes.fromhex(digest_hex)
+        candidate = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, int(iters))
+        return secrets.compare_digest(candidate, target)
+    except Exception:
+        return False
+
+def load_users() -> dict:
+    if USERS_FILE.exists():
         try:
-            return json.loads(PORTFOLIO_FILE.read_text(encoding="utf-8"))
+            return json.loads(USERS_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    return {}
+
+def save_users(users: dict) -> None:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    USERS_FILE.write_text(json.dumps(users, indent=2), encoding="utf-8")
+
+def create_session(email: str) -> str:
+    token = secrets.token_urlsafe(32)
+    with _sessions_lock:
+        _sessions[token] = {"email": email, "expires_at": time.time() + SESSION_TTL_SECONDS}
+    return token
+
+def session_email(token: str | None) -> str | None:
+    if not token:
+        return None
+    with _sessions_lock:
+        sess = _sessions.get(token)
+        if not sess:
+            return None
+        if sess["expires_at"] < time.time():
+            _sessions.pop(token, None)
+            return None
+        return sess["email"]
+
+def destroy_session(token: str | None) -> None:
+    if not token:
+        return
+    with _sessions_lock:
+        _sessions.pop(token, None)
+
+def public_user(users: dict, email: str) -> dict:
+    u = users.get(email, {})
+    return {"email": email, "displayName": u.get("display_name") or email.split("@")[0]}
+
+# ── Portfolio I/O (per-user) ──────────────────────────────────────────────────
+def _portfolio_path(email: str) -> Path:
+    return PORTFOLIO_DIR / f"{_email_key(email)}.json"
+
+def load_portfolio(email: str) -> dict:
+    path = _portfolio_path(email)
+    if path.exists():
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
         except Exception:
             pass
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    PORTFOLIO_FILE.write_text(json.dumps(DEFAULT_PORTFOLIO, indent=2), encoding="utf-8")
-    return dict(DEFAULT_PORTFOLIO)
+    PORTFOLIO_DIR.mkdir(parents=True, exist_ok=True)
+    seed = json.loads(json.dumps(DEFAULT_PORTFOLIO))   # deep copy
+    path.write_text(json.dumps(seed, indent=2), encoding="utf-8")
+    return seed
 
-def save_portfolio(data: dict) -> None:
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    PORTFOLIO_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
+def save_portfolio(email: str, data: dict) -> None:
+    PORTFOLIO_DIR.mkdir(parents=True, exist_ok=True)
+    _portfolio_path(email).write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 # ── Live price fetching ───────────────────────────────────────────────────────
 _MOCK_PRICES = {
@@ -496,7 +576,7 @@ class Handler(BaseHTTPRequestHandler):
     def _cors(self):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
     def _json(self, data, status=200):
         body = json.dumps(data, default=str).encode("utf-8")
@@ -510,6 +590,20 @@ class Handler(BaseHTTPRequestHandler):
         n = int(self.headers.get("Content-Length", 0))
         return json.loads(self.rfile.read(n)) if n else {}
 
+    def _bearer_token(self) -> str | None:
+        auth = self.headers.get("Authorization", "")
+        if auth.startswith("Bearer "):
+            return auth[7:].strip() or None
+        return None
+
+    def _require_auth(self) -> str | None:
+        """Returns the authenticated email, or None after sending 401."""
+        email = session_email(self._bearer_token())
+        if not email:
+            self._json({"error": "Unauthorized"}, 401)
+            return None
+        return email
+
     def do_OPTIONS(self):
         self.send_response(204)
         self._cors()
@@ -517,13 +611,21 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         p = request_path(self)
-        if p == "/api/portfolio":
-            return self._json(load_portfolio())
+        if p == "/api/health":
+            return self._json({"ok": True, "service": "folio"})
         if p == "/api/scenarios":
             return self._json({k: {"name": v["name"], "icon": v["icon"], "description": v["description"]}
                                 for k, v in SCENARIOS.items()})
-        if p == "/api/health":
-            return self._json({"ok": True, "service": "folio"})
+        if p == "/api/auth/me":
+            email = session_email(self._bearer_token())
+            if not email:
+                return self._json({"error": "Unauthorized"}, 401)
+            with _users_lock:
+                return self._json({"user": public_user(load_users(), email)})
+        if p == "/api/portfolio":
+            email = self._require_auth()
+            if not email: return
+            return self._json(load_portfolio(email))
         self._json({"error": "Not found"}, 404)
 
     def do_POST(self):
@@ -533,30 +635,76 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as e:
             return self._json({"error": f"Invalid JSON: {e}"}, 400)
 
+        # ── Auth endpoints (no token required) ────────────────────────────
+        if p == "/api/auth/signup":
+            email    = (body.get("email") or "").strip().lower()
+            password = body.get("password") or ""
+            display  = (body.get("displayName") or "").strip() or None
+            if not EMAIL_RE.match(email):
+                return self._json({"error": "Please enter a valid email address."}, 400)
+            if len(password) < 6:
+                return self._json({"error": "Password must be at least 6 characters."}, 400)
+            with _users_lock:
+                users = load_users()
+                if email in users:
+                    return self._json({"error": "An account with that email already exists."}, 409)
+                users[email] = {
+                    "email":         email,
+                    "password_hash": _hash_password(password),
+                    "display_name":  display or email.split("@")[0],
+                    "created_at":    int(time.time()),
+                }
+                save_users(users)
+                user_payload = public_user(users, email)
+            load_portfolio(email)   # seed default portfolio file
+            token = create_session(email)
+            return self._json({"token": token, "user": user_payload})
+
+        if p == "/api/auth/login":
+            email    = (body.get("email") or "").strip().lower()
+            password = body.get("password") or ""
+            with _users_lock:
+                users = load_users()
+                u = users.get(email)
+                if not u or not _verify_password(password, u.get("password_hash", "")):
+                    return self._json({"error": "Invalid email or password."}, 401)
+                user_payload = public_user(users, email)
+            token = create_session(email)
+            return self._json({"token": token, "user": user_payload})
+
+        if p == "/api/auth/logout":
+            destroy_session(self._bearer_token())
+            return self._json({"ok": True})
+
+        # ── Authed endpoints ──────────────────────────────────────────────
+        email = self._require_auth()
+        if not email:
+            return
+
         if p == "/api/portfolio":
-            save_portfolio(body)
+            save_portfolio(email, body)
             return self._json({"ok": True})
 
         if p == "/api/portfolio/add":
-            port = load_portfolio()
+            port = load_portfolio(email)
             h = dict(body)
             h["id"] = h.get("id") or f"h{uuid.uuid4().hex[:8]}"
             port["holdings"].append(h)
-            save_portfolio(port)
+            save_portfolio(email, port)
             return self._json({"ok": True, "portfolio": port})
 
         if p == "/api/portfolio/update":
-            port = load_portfolio()
+            port = load_portfolio(email)
             hid  = body.get("id")
             port["holdings"] = [body if h["id"] == hid else h for h in port["holdings"]]
-            save_portfolio(port)
+            save_portfolio(email, port)
             return self._json({"ok": True, "portfolio": port})
 
         if p == "/api/portfolio/remove":
-            port = load_portfolio()
+            port = load_portfolio(email)
             hid  = body.get("id")
             port["holdings"] = [h for h in port["holdings"] if h["id"] != hid]
-            save_portfolio(port)
+            save_portfolio(email, port)
             return self._json({"ok": True, "portfolio": port})
 
         if p == "/api/prices":

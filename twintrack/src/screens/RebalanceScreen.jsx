@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { GOLD, GOLD_BG, GOLD_BORDER, ACCENT, ACCENT_DIM,
          SURFACE, BG, TEXT, TEXT_DIM, fmt$ } from "../theme.js";
+import { apiFetch } from "../api.js";
 
 /* ─── Drift bar ─────────────────────────────────────────────────── */
 function DriftBar({ current, target, symbol }) {
@@ -77,7 +78,7 @@ export default function RebalanceScreen({ portfolio, prices }) {
   useEffect(() => {
     if (!portfolio || !prices) return;
     setLoading(true);
-    fetch("/api/rebalance", {
+    apiFetch("/api/rebalance", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ portfolio, prices }),
     })

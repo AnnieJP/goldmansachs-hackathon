@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { GOLD, GOLD_BG, GOLD_BORDER, GOLD_LIGHT, ACCENT, ACCENT_DIM, ACCENT_SOFT,
          SURFACE, BG, TEXT, TEXT_DIM, HOLDING_COLORS, fmt$, fmtPct } from "../theme.js";
+import { apiFetch } from "../api.js";
 
 /* ─── Donut chart (canvas) ──────────────────────────────────────── */
 function DonutChart({ slices, total }) {
@@ -334,7 +335,7 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
   const saveHolding = async (data) => {
     setSaving(true);
     const endpoint = data.id ? "/api/portfolio/update" : "/api/portfolio/add";
-    await fetch(endpoint, {
+    await apiFetch(endpoint, {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
@@ -345,7 +346,7 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
 
   const removeHolding = async (id) => {
     if (!confirm("Remove this holding?")) return;
-    await fetch("/api/portfolio/remove", {
+    await apiFetch("/api/portfolio/remove", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
     });
