@@ -9,6 +9,7 @@ import {
   fmt$, fmtPct,
 } from "../theme.js";
 import { apiFetch } from "../api.js";
+import InfoTip from "../components/InfoTip.jsx";
 import { Send, Loader2, TrendingUp, TrendingDown, ArrowRight,
          ShieldAlert, CheckCircle2, AlertTriangle, History, RefreshCw } from "lucide-react";
 
@@ -308,6 +309,11 @@ function ResultPanel({ result, onReset }) {
             <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
                            textTransform: "uppercase", color: TEXT_DIM }}>
               Risk Signals ({flags.length + violations.length})
+              <InfoTip title="Risk Signals" placement="top">
+                Violations and conflicts surfaced by the reasoning engine — e.g.
+                selling a holding you don't own, ignoring target allocations, or
+                trading against the scenario's direction. Review before acting.
+              </InfoTip>
             </span>
             <span style={{ fontSize: 11, color: TEXT_DIM }}>{showSignals ? "Hide" : "Show"}</span>
           </button>
@@ -424,6 +430,11 @@ export default function AskFolioScreen({ portfolio, prices, onNavigate, initialR
           <h1 style={{ margin: "0 0 10px", fontSize: 30, fontWeight: 700,
                        letterSpacing: "-0.02em", color: TEXT, fontFamily: FONT_SERIF }}>
             What-If Scenario Planner
+            <InfoTip title="Ask Folio">
+              Describe any market situation in plain English. Folio simulates
+              the impact on your portfolio, produces a full rebalance plan, and
+              gives a verdict: proceed, proceed with caution, or do not proceed.
+            </InfoTip>
           </h1>
           <p style={{ margin: 0, fontSize: 14, color: TEXT_DIM, lineHeight: 1.6 }}>
             Describe any scenario in plain English. Folio will run the math and show you

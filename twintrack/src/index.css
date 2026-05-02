@@ -35,3 +35,5 @@ html, body {
 
 button { font-family: inherit; }
 input, select, textarea { font-family: inherit; }
+
+.info-tip-btn { border-radius: 50% !important; }

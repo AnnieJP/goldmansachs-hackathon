@@ -4,6 +4,7 @@ import { GOLD, GOLD_BG, GOLD_BORDER, BORDER, BORDER_MED,
          GREEN, RED, FONT_SERIF } from "../theme.js";
 import { apiFetch } from "../api.js";
 import { ShieldCheck, AlertTriangle, Activity, BarChart3 } from "lucide-react";
+import InfoTip from "../components/InfoTip.jsx";
 
 /* ─── Modern circular risk meter ────────────────────────────────── */
 function HealthRing({ score }) {
@@ -166,7 +167,15 @@ export default function RiskScreen({ portfolio, prices }) {
 
   return (
 <div style={{ padding: "32px 36px", color: TEXT }}>
-      <h1 style={{ margin: "0 0 4px", fontSize: 22, fontWeight: 700, letterSpacing: "-0.01em", fontFamily: FONT_SERIF }}>Risk Check</h1>
+      <h1 style={{ margin: "0 0 4px", fontSize: 22, fontWeight: 700, letterSpacing: "-0.01em", fontFamily: FONT_SERIF }}>
+        Risk Check
+        <InfoTip title="What is Risk Check?">
+          This page estimates how volatile your portfolio is using each holding's
+          <b> beta</b> (market sensitivity) weighted by position size. It flags
+          concentration risks and tells you, in plain English, what to expect
+          in normal market moves.
+        </InfoTip>
+      </h1>
       <p style={{ margin: "0 0 28px", fontSize: 13, color: TEXT_DIM }}>
         How much volatility is hiding in your portfolio?
       </p>
@@ -189,7 +198,14 @@ export default function RiskScreen({ portfolio, prices }) {
           </div>
           <div style={{ marginTop: 12, textAlign: "center" }}>
             <div style={{ fontSize: 17, fontWeight: 700, color: TEXT, fontFamily: FONT_SERIF }}>{data.risk_score}/10</div>
-            <div style={{ fontSize: 12, color: TEXT_DIM }}>Risk Score</div>
+            <div style={{ fontSize: 12, color: TEXT_DIM }}>
+              Risk Score
+              <InfoTip title="Risk Score (0–10)" placement="top">
+                A blended score derived from your portfolio's beta. 0–3 is
+                conservative, 4–6 is balanced, and 7–10 is aggressive.
+                Higher scores mean larger swings—both up and down.
+              </InfoTip>
+            </div>
           </div>
         </div>
 
@@ -210,7 +226,15 @@ export default function RiskScreen({ portfolio, prices }) {
                               background: GOLD }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{data.portfolio_beta.toFixed(2)}</div>
-                  <div style={{ fontSize: 11, color: TEXT_DIM }}>Market Sensitivity</div>
+                  <div style={{ fontSize: 11, color: TEXT_DIM }}>
+                    Market Sensitivity
+                    <InfoTip title="Portfolio Beta">
+                      Beta measures how your portfolio moves vs. the overall market.
+                      Beta of <b>1.0</b> tracks the market; <b>1.5</b> means 50% more
+                      volatile; <b>0.5</b> means half as volatile. Calculated as a
+                      weighted average of each holding's beta.
+                    </InfoTip>
+                  </div>
                 </div>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8,
@@ -220,7 +244,14 @@ export default function RiskScreen({ portfolio, prices }) {
                               background: GREEN }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{data.diversification_score}/10</div>
-                  <div style={{ fontSize: 11, color: TEXT_DIM }}>Diversification Score</div>
+                  <div style={{ fontSize: 11, color: TEXT_DIM }}>
+                    Diversification Score
+                    <InfoTip title="Diversification Score">
+                      Rewards spreading money across more holdings and more asset
+                      types (stocks, ETFs, bonds, funds). Low scores mean your
+                      portfolio is concentrated and a single bad bet can hurt a lot.
+                    </InfoTip>
+                  </div>
                 </div>
               </div>
               <div style={{ padding: "6px", borderRadius: 6, background: `${riskColor}15` }}>
@@ -301,7 +332,14 @@ export default function RiskScreen({ portfolio, prices }) {
       <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 16, overflow: "hidden",
                     boxShadow: "0 2px 12px rgba(0,0,0,0.2)" }}>
         <div style={{ padding: "16px 20px", borderBottom: `1px solid ${BORDER}` }}>
-          <div style={{ fontSize: 13.5, fontWeight: 700, color: TEXT }}>Per-holding risk breakdown</div>
+          <div style={{ fontSize: 13.5, fontWeight: 700, color: TEXT }}>
+            Per-holding risk breakdown
+            <InfoTip title="Per-holding contribution">
+              Each row shows how much an individual holding contributes to the
+              total portfolio risk. A high-beta holding with a large weight is
+              the biggest driver of volatility.
+            </InfoTip>
+          </div>
           <div style={{ fontSize: 12, color: TEXT_DIM, marginTop: 3 }}>
             Beta &gt; 1.0 means that holding amplifies market moves.
           </div>
