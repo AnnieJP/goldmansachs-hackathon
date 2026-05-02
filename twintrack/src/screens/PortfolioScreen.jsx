@@ -4,6 +4,7 @@ import { GOLD, GOLD_BG, GOLD_BORDER, BORDER, BORDER_MED,
          GREEN, RED, FONT_SERIF, HOLDING_COLORS, fmt$, fmtPct } from "../theme.js";
 import { apiFetch } from "../api.js";
 import InfoTip from "../components/InfoTip.jsx";
+import TypeBadge, { TYPE_COLOR } from "../components/TypeBadge.jsx";
 import { BarChart3, TrendingUp, TrendingDown, Plus, Pencil, Trash2, FileText, Upload, Check, X, ChevronDown, CheckCircle2 } from "lucide-react";
 
 /* ─── Industry Mapping ──────────────────────────────────────────── */
@@ -147,19 +148,6 @@ function HoldingModal({ initial, onSave, onClose, onDelete }) {
         </form>
       </div>
     </div>
-  );
-}
-
-/* ─── Type badge ────────────────────────────────────────────────── */
-const TYPE_COLOR = { stock: "#1E40AF", etf: "#047857", bond: "#7C3AED", fund: "#EA580C" };
-function TypeBadge({ type }) {
-  const color = TYPE_COLOR[type] || TEXT_DIM;
-  return (
-    <span style={{ display: "inline-block", padding: "2px 8px", fontSize: 10.5,
-                   fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em",
-                   background: color + "18", color }}>
-      {type}
-    </span>
   );
 }
 
