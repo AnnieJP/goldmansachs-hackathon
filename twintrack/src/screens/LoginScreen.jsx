@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { GOLD, GOLD_BG, GOLD_BORDER, BORDER, BORDER_MED, SURFACE, SURFACE_2, BG, TEXT, TEXT_SEC, TEXT_DIM, RED } from "../theme.js";
 import { login, signup } from "../api.js";
+import MeridianBrandMark from "../components/MeridianBrandMark.jsx";
 
 export default function LoginScreen({ onLogin }) {
   const [mode, setMode]         = useState("signin");   // "signin" | "signup"
@@ -60,12 +61,8 @@ export default function LoginScreen({ onLogin }) {
         boxShadow: "0 8px 40px rgba(10,22,40,0.10)",
       }}>
         {/* Logo */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
-          <span style={{ fontSize: 30, color: TEXT, lineHeight: 1 }}>◈</span>
-          <div>
-            <div style={{ fontSize: 17, fontWeight: 800, color: TEXT, letterSpacing: "-0.02em" }}>Meridian</div>
-            <div style={{ fontSize: 11, color: TEXT_DIM }}>Your financial north star</div>
-          </div>
+        <div style={{ marginBottom: 28 }}>
+          <MeridianBrandMark />
         </div>
 
         <h1 style={{ fontSize: 22, fontWeight: 800, color: TEXT, margin: "0 0 6px", letterSpacing: "-0.02em" }}>

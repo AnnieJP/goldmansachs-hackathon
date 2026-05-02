@@ -10,6 +10,7 @@ import { BarChart3, ShieldCheck, ArrowUpDown,
          RefreshCw, LogOut, TrendingUp, TrendingDown, MessageSquare, History } from "lucide-react";
 import AskFolioScreen         from "./screens/AskFolioScreen.jsx";
 import ScenariosHistoryScreen from "./screens/ScenariosHistoryScreen.jsx";
+import MeridianBrandMark     from "./components/MeridianBrandMark.jsx";
 
 /* ─── Ambient background canvas ────────────────────────────────── */
 function AmbientCanvas() {
@@ -77,14 +78,8 @@ function Sidebar({ screen, onNavigate, enriched, pricesLoading, onRefresh, curre
       boxShadow: "4px 0 24px rgba(0,0,0,0.2)",
     }}>
       {/* Logo */}
-      <div style={{ padding: "28px 24px 20px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 28, color: TEXT, lineHeight: 1 }}>◈</span>
-          <div>
-            <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-0.01em", color: TEXT, fontFamily: FONT_SERIF }}>Meridian</div>
-            <div style={{ fontSize: 10.5, color: TEXT_DIM, letterSpacing: "0.02em" }}>Your financial north star</div>
-          </div>
-        </div>
+      <div style={{ padding: "20px 14px 16px" }}>
+        <MeridianBrandMark />
       </div>
 
       {/* Portfolio value card */}
