@@ -5,6 +5,7 @@ import PortfolioScreen  from "./screens/PortfolioScreen.jsx";
 import RiskScreen       from "./screens/RiskScreen.jsx";
 import RebalanceScreen  from "./screens/RebalanceScreen.jsx";
 import ScenarioScreen   from "./screens/ScenarioScreen.jsx";
+import { apiFetch }     from "./api.js";
 
 /* ─── Hero canvas (hub background) ─────────────────────────────── */
 function HeroCanvas() {
@@ -104,7 +105,7 @@ const NAV = [
   { id: "scenario",  icon: "◇", label: "What-If"        },
 ];
 
-function Sidebar({ screen, setScreen, enriched, pricesLoading, onRefresh }) {
+function Sidebar({ screen, setScreen, enriched, pricesLoading, onRefresh, currentUser, onLogout }) {
   const gain  = enriched?.gainLoss ?? 0;
   const total = enriched?.totalValue ?? 0;
   return (
@@ -147,18 +148,47 @@ function Sidebar({ screen, setScreen, enriched, pricesLoading, onRefresh }) {
       </nav>
 
       <button onClick={onRefresh} disabled={pricesLoading} type="button" style={{
-        margin: "0 14px 20px", padding: "9px 0", borderRadius: 8,
+        margin: "0 14px 10px", padding: "9px 0", borderRadius: 8,
         border: `1px solid ${ACCENT_DIM}`, background: "transparent", cursor: "pointer",
         color: TEXT_DIM, fontSize: 11.5, fontFamily: "inherit",
       }}>
         {pricesLoading ? "Refreshing…" : "⟳  Refresh prices"}
       </button>
+
+      {currentUser && (
+        <div style={{
+          margin: "0 14px 16px", padding: "10px 12px", borderRadius: 8,
+          border: `1px solid ${ACCENT_DIM}`, background: "rgba(13,31,60,0.6)",
+          display: "flex", alignItems: "center", gap: 10,
+        }}>
+          <div style={{
+            width: 28, height: 28, borderRadius: "50%", background: GOLD_BG,
+            border: `1px solid ${GOLD_BORDER}`, color: GOLD,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontWeight: 700, fontSize: 12, flexShrink: 0,
+          }}>
+            {(currentUser.displayName || currentUser.email || "?").slice(0, 1).toUpperCase()}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: TEXT, lineHeight: 1.2,
+                          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {currentUser.displayName || currentUser.email}
+            </div>
+            <button onClick={onLogout} type="button" style={{
+              background: "none", border: "none", padding: 0, marginTop: 2,
+              color: TEXT_DIM, fontSize: 10.5, cursor: "pointer", fontFamily: "inherit",
+            }}>
+              Sign out
+            </button>
+          </div>
+        </div>
+      )}
     </aside>
   );
 }
 
 /* ─── Hub screen ────────────────────────────────────────────────── */
-function HubScreen({ enriched, setScreen }) {
+function HubScreen({ enriched, setScreen, currentUser, onLogout }) {
   const total   = enriched?.totalValue ?? 0;
   const gain    = enriched?.gainLoss   ?? 0;
   const gainPct = enriched?.gainLossPct ?? 0;
@@ -174,6 +204,36 @@ function HubScreen({ enriched, setScreen }) {
     <div style={{ position: "relative", flex: 1, minHeight: "100vh", display: "flex",
                   alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
       <HeroCanvas />
+
+      {currentUser && (
+        <div style={{
+          position: "absolute", top: 20, right: 24, zIndex: 3,
+          display: "flex", alignItems: "center", gap: 10,
+          padding: "6px 12px 6px 8px", borderRadius: 99,
+          background: "rgba(13,31,60,0.75)", backdropFilter: "blur(12px)",
+          border: `1px solid ${ACCENT_DIM}`,
+        }}>
+          <div style={{
+            width: 24, height: 24, borderRadius: "50%", background: GOLD_BG,
+            border: `1px solid ${GOLD_BORDER}`, color: GOLD,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontWeight: 700, fontSize: 11,
+          }}>
+            {(currentUser.displayName || currentUser.email || "?").slice(0, 1).toUpperCase()}
+          </div>
+          <span style={{ fontSize: 12, color: TEXT, fontWeight: 600 }}>
+            {currentUser.displayName || currentUser.email}
+          </span>
+          <span style={{ width: 1, height: 14, background: ACCENT_DIM }} />
+          <button onClick={onLogout} type="button" style={{
+            background: "none", border: "none", padding: 0,
+            color: TEXT_DIM, fontSize: 11.5, cursor: "pointer", fontFamily: "inherit",
+          }}>
+            Sign out
+          </button>
+        </div>
+      )}
+
       <div style={{ position: "relative", zIndex: 2, textAlign: "center", padding: "0 32px",
                     maxWidth: 620, width: "100%" }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 16px",
@@ -219,7 +279,7 @@ function HubScreen({ enriched, setScreen }) {
 }
 
 /* ─── Main component ────────────────────────────────────────────── */
-export default function TwinTrack() {
+export default function TwinTrack({ currentUser, onLogout }) {
   const [screen,        setScreen]        = useState("hub");
   const [portfolio,     setPortfolio]     = useState(null);
   const [prices,        setPrices]        = useState({});
@@ -233,7 +293,7 @@ export default function TwinTrack() {
 
   const init = async () => {
     try {
-      const p = await fetch("/api/portfolio").then((r) => r.json());
+      const p = await apiFetch("/api/portfolio").then((r) => r.json());
       setPortfolio(p);
       await loadPrices(p);
     } catch (e) {
@@ -248,7 +308,7 @@ export default function TwinTrack() {
     setPricesLoading(true);
     try {
       const syms = (p.holdings || []).map((h) => h.symbol);
-      const res  = await fetch("/api/prices", {
+      const res  = await apiFetch("/api/prices", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ symbols: syms }),
       }).then((r) => r.json());
@@ -258,7 +318,7 @@ export default function TwinTrack() {
   };
 
   const refreshPortfolio = async () => {
-    const p = await fetch("/api/portfolio").then((r) => r.json());
+    const p = await apiFetch("/api/portfolio").then((r) => r.json());
     setPortfolio(p);
     await loadPrices(p);
   };
@@ -282,14 +342,15 @@ export default function TwinTrack() {
 
   if (screen === "hub") return (
     <div style={{ display: "flex", minHeight: "100vh", background: BG }}>
-      <HubScreen enriched={enriched} setScreen={setScreen} />
+      <HubScreen enriched={enriched} setScreen={setScreen} currentUser={currentUser} onLogout={onLogout} />
     </div>
   );
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: BG, fontFamily: "'DM Sans','Segoe UI',sans-serif" }}>
       <Sidebar screen={screen} setScreen={setScreen} enriched={enriched}
-               pricesLoading={pricesLoading} onRefresh={() => loadPrices()} />
+               pricesLoading={pricesLoading} onRefresh={() => loadPrices()}
+               currentUser={currentUser} onLogout={onLogout} />
       <main style={{ flex: 1, overflowY: "auto", minHeight: "100vh" }}>
         {screen === "portfolio" && (
           <PortfolioScreen portfolio={portfolio} prices={prices} enriched={enriched}

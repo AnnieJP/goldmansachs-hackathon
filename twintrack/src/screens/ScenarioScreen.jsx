@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { GOLD, GOLD_BG, GOLD_BORDER, ACCENT, ACCENT_DIM,
          SURFACE, BG, TEXT, TEXT_DIM, fmt$, fmtPct } from "../theme.js";
+import { apiFetch } from "../api.js";
 
 const SCENARIOS = [
   { id: "market_crash",  icon: "📉", label: "Market Crash",         desc: "Sudden sharp drop — like 2008 or early 2020" },
@@ -53,7 +54,7 @@ export default function ScenarioScreen({ portfolio, prices }) {
     if (!portfolio || !prices) return;
     setLoading(true);
     setError(null);
-    fetch("/api/scenario", {
+    apiFetch("/api/scenario", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ portfolio, prices, scenario_id: selected }),
     })

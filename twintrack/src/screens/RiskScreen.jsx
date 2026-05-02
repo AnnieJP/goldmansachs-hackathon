@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { GOLD, GOLD_BG, GOLD_BORDER, ACCENT, ACCENT_DIM, ACCENT_SOFT,
          SURFACE, BG, TEXT, TEXT_DIM } from "../theme.js";
+import { apiFetch } from "../api.js";
 
 /* ─── Semicircle risk gauge (canvas) ───────────────────────────── */
 function RiskGauge({ score, level, label, icon }) {
@@ -112,7 +113,7 @@ export default function RiskScreen({ portfolio, prices }) {
   useEffect(() => {
     if (!portfolio || !prices) return;
     setLoading(true);
-    fetch("/api/risk", {
+    apiFetch("/api/risk", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ portfolio, prices }),
     })
