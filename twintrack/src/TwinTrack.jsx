@@ -63,6 +63,7 @@ const NAV = [
 
 /* ─── Sidebar ───────────────────────────────────────────────────── */
 function Sidebar({ screen, onNavigate, enriched, pricesLoading, onRefresh, currentUser, onLogout }) {
+  const [logoutHovered, setLogoutHovered] = useState(false);
   const gain     = enriched?.gainLoss    ?? 0;
   const total    = enriched?.totalValue  ?? 0;
   const gainPct  = enriched?.gainLossPct ?? 0;
@@ -132,19 +133,6 @@ function Sidebar({ screen, onNavigate, enriched, pricesLoading, onRefresh, curre
         })}
       </nav>
 
-      {/* Refresh */}
-      <button onClick={onRefresh} disabled={pricesLoading} type="button" style={{
-        margin: "0 16px 8px", padding: "9px 0", borderRadius: 9,
-        border: `1px solid ${BORDER}`, background: "transparent", cursor: "pointer",
-        color: TEXT_DIM, fontSize: 12, display: "flex", alignItems: "center",
-        justifyContent: "center", gap: 7, transition: "border-color 0.15s, color 0.15s",
-      }}
-      onMouseEnter={(e) => { e.currentTarget.style.borderColor = BORDER_MED; e.currentTarget.style.color = TEXT; }}
-      onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = TEXT_DIM; }}>
-        <RefreshCw size={13} style={{ animation: pricesLoading ? "spin 1s linear infinite" : "none" }} />
-        {pricesLoading ? "Refreshing…" : "Refresh prices"}
-      </button>
-
       {/* User */}
       {currentUser && (
         <div style={{
@@ -164,15 +152,27 @@ function Sidebar({ screen, onNavigate, enriched, pricesLoading, onRefresh, curre
                         overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, minWidth: 0 }}>
             {currentUser.displayName || currentUser.email}
           </div>
-          <button onClick={onLogout} type="button" style={{
-            background: "none", border: "none", padding: 0,
-            color: TEXT_DIM, cursor: "pointer", display: "flex",
-            alignItems: "center", flexShrink: 0, transition: "color 0.15s",
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.color = RED}
-          onMouseLeave={(e) => e.currentTarget.style.color = TEXT_DIM}>
-            <LogOut size={13} />
-          </button>
+          <div style={{ position: "relative", flexShrink: 0 }}>
+            <button onClick={onLogout} type="button" style={{
+              background: "none", border: "none", padding: 0,
+              color: logoutHovered ? RED : TEXT_DIM, cursor: "pointer",
+              display: "flex", alignItems: "center", transition: "color 0.15s",
+            }}
+            onMouseEnter={() => setLogoutHovered(true)}
+            onMouseLeave={() => setLogoutHovered(false)}>
+              <LogOut size={13} />
+            </button>
+            <span style={{
+              position: "absolute", bottom: "calc(100% + 5px)", left: "50%",
+              transform: "translateX(-50%)",
+              background: TEXT, color: SURFACE,
+              fontSize: 10.5, fontWeight: 600, letterSpacing: "0.02em",
+              padding: "3px 7px", whiteSpace: "nowrap",
+              opacity: logoutHovered ? 1 : 0,
+              transition: "opacity 0.15s",
+              pointerEvents: "none",
+            }}>Logout</span>
+          </div>
         </div>
       )}
     </aside>

@@ -50,7 +50,7 @@ export const QUESTIONS = [
     ],
   },
   {
-    question: "Which sounds most like you?",
+    question: "Which one of these sounds most like you?",
     options: [
       "I want stable and predictable growth",
       "I can handle some ups and downs for better returns",
@@ -317,11 +317,7 @@ function WelcomeSlide({ name }) {
         Welcome, {name}.
       </h1>
       <p style={{ fontSize: 14.5, color: TEXT_DIM, lineHeight: 1.75, margin: 0 }}>
-        Before we show you your portfolio, let's take 60 seconds to understand
-        your goals and how you feel about risk.
-      </p>
-      <p style={{ fontSize: 13.5, color: TEXT_DIM, lineHeight: 1.65, marginTop: 12, marginBottom: 0 }}>
-        We'll use your answers to personalise insights across your entire experience.
+        Tell us a little about your goals and preferences. Let's make this experience uniquely yours!
       </p>
     </>
   );
@@ -385,8 +381,7 @@ function UploadSlide({ onUpload, onSkip }) {
         Import your holdings
       </h2>
       <p style={{ fontSize: 13.5, color: TEXT_DIM, lineHeight: 1.7, margin: "0 0 28px" }}>
-        Upload a brokerage account statement and we'll automatically pull in your
-        holdings — no manual entry needed.
+        Simply upload your brokerage statement and we'll take care of the rest.
       </p>
       <button
         type="button"
@@ -425,8 +420,7 @@ function DoneSlide({ name }) {
         You're all set, {name}!
       </h2>
       <p style={{ fontSize: 14, color: TEXT_DIM, lineHeight: 1.7, margin: 0 }}>
-        Your investor profile has been saved. Head to your overview to start
-        exploring your portfolio.
+        Your profile is now ready!
       </p>
     </>
   );
