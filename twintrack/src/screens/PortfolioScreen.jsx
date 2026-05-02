@@ -3,8 +3,66 @@ import { GOLD, GOLD_BG, GOLD_BORDER, GOLD_LIGHT, ACCENT, ACCENT_DIM, ACCENT_SOFT
          SURFACE, BG, TEXT, TEXT_DIM, HOLDING_COLORS, fmt$, fmtPct } from "../theme.js";
 import { apiFetch } from "../api.js";
 
-/* ─── Donut chart (canvas) ──────────────────────────────────────── */
-function DonutChart({ slices, total }) {
+/* ─── Industry Mapping ─────────────────────────────────────────────────── */
+const INDUSTRY_MAPPING = {
+  // Technology
+  "AAPL": "Technology", "MSFT": "Technology", "GOOGL": "Technology", "META": "Technology",
+  "NVDA": "Technology", "TSLA": "Technology", "AMD": "Technology", "INTC": "Technology",
+  "CSCO": "Technology", "ORCL": "Technology", "CRM": "Technology", "ADBE": "Technology",
+  
+  // Healthcare
+  "JNJ": "Healthcare", "UNH": "Healthcare", "PFE": "Healthcare", "ABBV": "Healthcare",
+  "T": "Healthcare", "DHR": "Healthcare", "ABT": "Healthcare", "MRK": "Healthcare",
+  
+  // Finance
+  "JPM": "Finance", "BAC": "Finance", "WFC": "Finance", "GS": "Finance",
+  "MS": "Finance", "C": "Finance", "AXP": "Finance", "BLK": "Finance",
+  
+  // Consumer Discretionary
+  "AMZN": "Consumer", "TSLA": "Consumer", "HD": "Consumer", "MCD": "Consumer",
+  "NKE": "Consumer", "LOW": "Consumer", "TGT": "Consumer", "SBUX": "Consumer",
+  
+  // Energy
+  "XOM": "Energy", "CVX": "Energy", "COP": "Energy", "EOG": "Energy",
+  "SLB": "Energy", "PSX": "Energy", "VLO": "Energy", "MPC": "Energy",
+  
+  // Industrial
+  "BA": "Industrial", "CAT": "Industrial", "GE": "Industrial", "MMM": "Industrial",
+  "HON": "Industrial", "UPS": "Industrial", "RTX": "Industrial", "LMT": "Industrial",
+  
+  // Utilities
+  "NEE": "Utilities", "DUK": "Utilities", "SO": "Utilities", "AEP": "Utilities",
+  "EXC": "Utilities", "SRE": "Utilities", "PEG": "Utilities", "WEC": "Utilities",
+  
+  // Real Estate
+  "AMT": "Real Estate", "PLD": "Real Estate", "CCI": "Real Estate", "EQIX": "Real Estate",
+  "PSA": "Real Estate", "SPG": "Real Estate", "O": "Real Estate", "DLR": "Real Estate",
+  
+  // Materials
+  "LIN": "Materials", "APD": "Materials", "ECL": "Materials", "DD": "Materials",
+  "DOW": "Materials", "NEM": "Materials", "FCX": "Materials", "BHP": "Materials",
+  
+  // Communication Services
+  "GOOGL": "Communication", "META": "Communication", "NFLX": "Communication",
+  "DIS": "Communication", "CMCSA": "Communication", "T": "Communication", "VZ": "Communication",
+  
+  // Consumer Staples
+  "PG": "Consumer Staples", "KO": "Consumer Staples", "PEP": "Consumer Staples",
+  "WMT": "Consumer Staples", "COST": "Consumer Staples", "CL": "Consumer Staples",
+  
+  // ETFs - categorize by focus
+  "SPY": "Broad Market", "VOO": "Broad Market", "VTI": "Broad Market", "IVV": "Broad Market",
+  "QQQ": "Technology", "VGT": "Technology", "XLK": "Technology", "IYW": "Technology",
+  "BND": "Bonds", "AGG": "Bonds", "TLT": "Bonds", "VBMFX": "Bonds",
+  "GLD": "Commodities", "SLV": "Commodities", "USO": "Commodities",
+};
+
+function getIndustry(symbol) {
+  return INDUSTRY_MAPPING[symbol.toUpperCase()] || "Other";
+}
+
+/* ─── Enhanced Pie Chart Component ─────────────────────────────────── */
+function PieChart({ slices, total, holdings, enriched }) {
   const ref = useRef(null);
   useEffect(() => {
     const canvas = ref.current;
@@ -12,7 +70,7 @@ function DonutChart({ slices, total }) {
     const ctx  = canvas.getContext("2d");
     const W = canvas.width = canvas.offsetWidth;
     const H = canvas.height = canvas.offsetHeight;
-    const cx = W / 2, cy = H / 2, outer = Math.min(W, H) * 0.44, inner = outer * 0.6;
+    const cx = W / 2, cy = H / 2, outer = Math.min(W, H) * 0.42, inner = outer * 0.65;
     ctx.clearRect(0, 0, W, H);
     let angle = -Math.PI / 2;
     slices.forEach((s, i) => {
@@ -31,9 +89,9 @@ function DonutChart({ slices, total }) {
     ctx.fill();
     ctx.textAlign = "center";
     ctx.fillStyle = TEXT;
-    ctx.font = `700 13px 'DM Sans','Segoe UI',sans-serif`;
-    ctx.fillText("Total", cx, cy - 9);
-    ctx.font = `800 15px 'DM Sans','Segoe UI',sans-serif`;
+    ctx.font = `700 14px 'DM Sans','Segoe UI',sans-serif`;
+    ctx.fillText("Total Value", cx, cy - 12);
+    ctx.font = `800 18px 'DM Sans','Segoe UI',sans-serif`;
     ctx.fillText(fmt$(total), cx, cy + 10);
   }, [slices, total]);
   return <canvas ref={ref} style={{ width: "100%", height: "100%", display: "block" }} />;
@@ -332,6 +390,33 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
       color: HOLDING_COLORS[i % HOLDING_COLORS.length],
     })), [holdings]);
 
+  // Industry breakdown data
+  const industryBreakdown = useMemo(() => {
+    const industries = {};
+    holdings.forEach((h) => {
+      const industry = getIndustry(h.symbol);
+      if (!industries[industry]) {
+        industries[industry] = {
+          name: industry,
+          value: 0,
+          pct: 0,
+          holdings: [],
+          color: HOLDING_COLORS[Object.keys(industries).length % HOLDING_COLORS.length]
+        };
+      }
+      industries[industry].value += h.currentValue || 0;
+      industries[industry].holdings.push(h);
+    });
+    
+    // Calculate percentages
+    const total = Object.values(industries).reduce((sum, ind) => sum + ind.value, 0);
+    Object.values(industries).forEach(ind => {
+      ind.pct = total > 0 ? (ind.value / total) * 100 : 0;
+    });
+    
+    return Object.values(industries).sort((a, b) => b.value - a.value);
+  }, [holdings]);
+
   const saveHolding = async (data) => {
     setSaving(true);
     const endpoint = data.id ? "/api/portfolio/update" : "/api/portfolio/add";
@@ -356,16 +441,16 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
   return (
     <div style={{ padding: "32px 36px", fontFamily: "'DM Sans','Segoe UI',sans-serif", color: TEXT }}>
       {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 32 }}>
         <div>
-          <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, letterSpacing: "-0.03em" }}>My Holdings</h1>
+          <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 800, letterSpacing: "-0.03em" }}>My Holdings</h1>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <span style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-0.04em" }}>{fmt$(totalValue)}</span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: gainLoss >= 0 ? "#34d399" : "#f87171" }}>
+            <span style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-0.04em" }}>{fmt$(totalValue)}</span>
+            <span style={{ fontSize: 16, fontWeight: 600, color: gainLoss >= 0 ? "#34d399" : "#f87171" }}>
               {gainLoss >= 0 ? "▲" : "▼"} {fmt$(Math.abs(gainLoss))} ({fmtPct(enriched?.gainLossPct || 0)}) total gain
             </span>
           </div>
-          <div style={{ fontSize: 12, color: TEXT_DIM, marginTop: 4 }}>
+          <div style={{ fontSize: 13, color: TEXT_DIM, marginTop: 6 }}>
             Includes {fmt$(enriched?.cash || 0)} cash · {holdings.length} position{holdings.length !== 1 ? "s" : ""}
           </div>
         </div>
@@ -385,118 +470,216 @@ export default function PortfolioScreen({ portfolio, prices, enriched, onPortfol
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 220px", gap: 24, alignItems: "start" }}>
-        <div>
-          {/* Tabs */}
-          <div style={{ display: "flex", gap: 4, marginBottom: 18 }}>
-            {TABS.map((t) => (
-              <button key={t} onClick={() => setTab(t)} type="button" style={{
-                padding: "6px 14px", borderRadius: 7, border: "none", cursor: "pointer",
-                fontFamily: "inherit", fontSize: 12.5, fontWeight: tab === t ? 700 : 400,
-                background: tab === t ? GOLD_BG : "transparent",
-                color: tab === t ? GOLD : TEXT_DIM,
-                textTransform: "capitalize",
-              }}>{t === "all" ? "All" : t.toUpperCase()}</button>
-            ))}
+      {/* 3-Box Visual Section */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 24, marginBottom: 32 }}>
+        {/* Box 1: Pie Chart */}
+        <div style={{ background: SURFACE, border: `1px solid ${ACCENT_DIM}`, borderRadius: 16, padding: "24px" }}>
+          <h3 style={{ margin: "0 0 12px", fontSize: 16, fontWeight: 700, color: TEXT, textAlign: "center" }}>Portfolio Overview</h3>
+          <div style={{ fontSize: 11, color: TEXT_DIM, textAlign: "center", marginBottom: 16, lineHeight: 1.4 }}>
+            Visual breakdown of your holdings by allocation percentage
           </div>
-
-          {/* Holdings table */}
-          <div style={{ border: `1px solid ${ACCENT_DIM}`, borderRadius: 12, overflow: "hidden" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ background: SURFACE }}>
-                  {["Name", "Type", "Shares", "Avg cost", "Current price", "Value", "Gain / Loss", "Your slice", ""].map((h) => (
-                    <th key={h} style={{ padding: "11px 14px", textAlign: "left", fontSize: 11,
-                                         fontWeight: 600, color: TEXT_DIM, textTransform: "uppercase",
-                                         letterSpacing: "0.06em", whiteSpace: "nowrap" }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.length === 0 && (
-                  <tr><td colSpan={9} style={{ padding: 28, textAlign: "center", color: TEXT_DIM, fontSize: 13 }}>
-                    No holdings in this category yet.
-                  </td></tr>
-                )}
-                {filtered.map((h, i) => {
-                  const gl = h.gainLoss || 0;
-                  const glPct = h.gainLossPct || 0;
-                  return (
-                    <tr key={h.id} style={{ borderTop: `1px solid ${ACCENT_DIM}`,
-                                            background: i % 2 === 0 ? "transparent" : "rgba(42,100,150,0.04)" }}>
-                      <td style={{ padding: "12px 14px" }}>
-                        <div style={{ fontWeight: 700, fontSize: 13.5 }}>{h.symbol}</div>
-                        <div style={{ fontSize: 11, color: TEXT_DIM, marginTop: 2, maxWidth: 160,
-                                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {h.name}
-                        </div>
-                      </td>
-                      <td style={{ padding: "12px 14px" }}><TypeBadge type={h.type} /></td>
-                      <td style={{ padding: "12px 14px", fontSize: 13 }}>{h.shares}</td>
-                      <td style={{ padding: "12px 14px", fontSize: 13 }}>{fmt$(h.avg_cost)}</td>
-                      <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600 }}>{fmt$(h.currentPrice)}</td>
-                      <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700 }}>{fmt$(h.currentValue)}</td>
-                      <td style={{ padding: "12px 14px" }}>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: gl >= 0 ? "#34d399" : "#f87171" }}>
-                          {gl >= 0 ? "+" : ""}{fmt$(gl)}
-                        </div>
-                        <div style={{ fontSize: 11, color: gl >= 0 ? "#34d399" : "#f87171" }}>
-                          {fmtPct(glPct)}
-                        </div>
-                      </td>
-                      <td style={{ padding: "12px 14px" }}>
-                        <div style={{ fontSize: 12.5, color: TEXT_DIM }}>{h.currentPct?.toFixed(1)}%</div>
-                        <div style={{ marginTop: 4, height: 4, borderRadius: 2, background: ACCENT_DIM, width: 60, overflow: "hidden" }}>
-                          <div style={{ height: "100%", borderRadius: 2, background: HOLDING_COLORS[holdings.indexOf(h) % HOLDING_COLORS.length],
-                                        width: `${Math.min(100, h.currentPct || 0)}%` }} />
-                        </div>
-                      </td>
-                      <td style={{ padding: "12px 14px" }}>
-                        <div style={{ display: "flex", gap: 6 }}>
-                          <button onClick={() => setModal(h)} type="button"
-                                  style={{ padding: "4px 10px", borderRadius: 6, border: `1px solid ${ACCENT_DIM}`,
-                                           background: "transparent", color: TEXT_DIM, cursor: "pointer",
-                                           fontSize: 11.5, fontFamily: "inherit" }}>Edit</button>
-                          <button onClick={() => removeHolding(h.id)} type="button"
-                                  style={{ padding: "4px 10px", borderRadius: 6, border: "1px solid #f8717130",
-                                           background: "transparent", color: "#f87171", cursor: "pointer",
-                                           fontSize: 11.5, fontFamily: "inherit" }}>✕</button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          <div style={{ height: 200, display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <div style={{ width: 180, height: 180 }}>
+              <PieChart slices={donutSlices} total={totalValue} holdings={holdings} enriched={enriched} />
+            </div>
+          </div>
+          <div style={{ marginTop: 16, textAlign: "center" }}>
+            <div style={{ fontSize: 18, fontWeight: 800, color: TEXT }}>{fmt$(totalValue)}</div>
+            <div style={{ fontSize: 12, color: TEXT_DIM }}>Total Portfolio Value</div>
+            <div style={{ fontSize: 11, color: TEXT_DIM, marginTop: 4 }}>
+              {holdings.length} holdings • {enriched?.cashPct?.toFixed(1) || 0}% cash
+            </div>
           </div>
         </div>
 
-        {/* Donut chart + legend */}
-        <div>
-          <div style={{ background: SURFACE, border: `1px solid ${ACCENT_DIM}`, borderRadius: 12, padding: 20 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: TEXT_DIM, marginBottom: 14,
-                          textTransform: "uppercase", letterSpacing: "0.06em" }}>Allocation</div>
-            <div style={{ height: 180 }}>
-              <DonutChart slices={donutSlices} total={totalValue} />
-            </div>
-            <div style={{ marginTop: 16 }}>
-              {holdings.map((h, i) => (
-                <div key={h.id} style={{ display: "flex", alignItems: "center", gap: 8,
-                                         marginBottom: 7, fontSize: 12 }}>
-                  <span style={{ width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
-                                 background: HOLDING_COLORS[i % HOLDING_COLORS.length] }} />
-                  <span style={{ flex: 1, color: TEXT_DIM, overflow: "hidden",
-                                 textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{h.symbol}</span>
-                  <span style={{ fontWeight: 600, color: TEXT }}>{h.currentPct?.toFixed(1)}%</span>
+        {/* Box 2: Company Breakdown */}
+        <div style={{ background: SURFACE, border: `1px solid ${ACCENT_DIM}`, borderRadius: 16, padding: "24px" }}>
+          <h3 style={{ margin: "0 0 12px", fontSize: 16, fontWeight: 700, color: TEXT }}>Top Holdings</h3>
+          <div style={{ fontSize: 11, color: TEXT_DIM, marginBottom: 16, lineHeight: 1.4 }}>
+            Your largest positions by portfolio allocation
+          </div>
+          <div style={{ maxHeight: 260, overflowY: "auto" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {holdings.slice(0, 8).map((h, i) => {
+                const gl = h.gainLoss || 0;
+                const glPct = h.gainLossPct || 0;
+                return (
+                  <div key={h.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 6px", borderRadius: 6, background: i % 2 === 0 ? "transparent" : "rgba(42,100,150,0.03)" }}>
+                    <div style={{ 
+                      width: 12, height: 12, borderRadius: "50%", flexShrink: 0,
+                      background: HOLDING_COLORS[i % HOLDING_COLORS.length] 
+                    }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: TEXT, marginBottom: 1 }}>
+                        {h.symbol}
+                      </div>
+                      <div style={{ fontSize: 11, color: TEXT_DIM, overflow: "hidden", 
+                                    textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {h.name}
+                      </div>
+                      <div style={{ fontSize: 10, color: gl >= 0 ? "#34d399" : "#f87171", marginTop: 2 }}>
+                        {gl >= 0 ? "+" : ""}{fmtPct(glPct)} gain/loss
+                      </div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>
+                        {h.currentPct?.toFixed(1)}%
+                      </div>
+                      <div style={{ fontSize: 10, color: TEXT_DIM }}>
+                        {fmt$(h.currentValue)}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              {holdings.length > 8 && (
+                <div style={{ fontSize: 11, color: TEXT_DIM, textAlign: "center", paddingTop: 8, borderTop: `1px solid ${ACCENT_DIM}`, marginTop: 4 }}>
+                  +{holdings.length - 8} more holdings
                 </div>
-              ))}
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7, fontSize: 12 }}>
-                <span style={{ width: 8, height: 8, borderRadius: "50%", flexShrink: 0, background: "#888" }} />
-                <span style={{ flex: 1, color: TEXT_DIM }}>Cash</span>
-                <span style={{ fontWeight: 600, color: TEXT }}>{enriched?.cashPct?.toFixed(1) || 0}%</span>
-              </div>
+              )}
             </div>
           </div>
+        </div>
+
+        {/* Box 3: Industry Breakdown */}
+        <div style={{ background: SURFACE, border: `1px solid ${ACCENT_DIM}`, borderRadius: 16, padding: "24px" }}>
+          <h3 style={{ margin: "0 0 12px", fontSize: 16, fontWeight: 700, color: TEXT }}>Industry Mix</h3>
+          <div style={{ fontSize: 11, color: TEXT_DIM, marginBottom: 16, lineHeight: 1.4 }}>
+            Diversification across economic sectors and asset classes
+          </div>
+          <div style={{ maxHeight: 260, overflowY: "auto" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {industryBreakdown.map((industry, i) => {
+                // Calculate concentration risk for this industry
+                const concentration = industry.pct > 25 ? "High" : industry.pct > 15 ? "Medium" : "Low";
+                const concentrationColor = concentration === "High" ? "#f87171" : concentration === "Medium" ? "#f59e0b" : "#34d399";
+                
+                return (
+                  <div key={industry.name} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 6px", borderRadius: 6, background: i % 2 === 0 ? "transparent" : "rgba(42,100,150,0.03)" }}>
+                    <div style={{ 
+                      width: 12, height: 12, borderRadius: "50%", flexShrink: 0,
+                      background: industry.color 
+                    }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: TEXT, marginBottom: 1 }}>
+                        {industry.name}
+                      </div>
+                      <div style={{ fontSize: 11, color: TEXT_DIM }}>
+                        {industry.holdings.length} position{industry.holdings.length !== 1 ? "s" : ""}
+                      </div>
+                      <div style={{ fontSize: 10, color: concentrationColor, marginTop: 2 }}>
+                        {concentration} concentration
+                      </div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>
+                        {industry.pct.toFixed(1)}%
+                      </div>
+                      <div style={{ fontSize: 10, color: TEXT_DIM }}>
+                        {fmt$(industry.value)}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              {industryBreakdown.length === 0 && (
+                <div style={{ fontSize: 12, color: TEXT_DIM, textAlign: "center", padding: "20px 0" }}>
+                  Add holdings to see industry breakdown
+                </div>
+              )}
+            </div>
+          </div>
+          {industryBreakdown.length > 0 && (
+            <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${ACCENT_DIM}`, fontSize: 10, color: TEXT_DIM, lineHeight: 1.4 }}>
+              <strong>Diversification Tip:</strong> Consider limiting any single industry to 25% or less of your portfolio for balanced risk exposure.
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Holdings List Section */}
+      <div>
+        {/* Tabs */}
+        <div style={{ display: "flex", gap: 4, marginBottom: 18 }}>
+          {TABS.map((t) => (
+            <button key={t} onClick={() => setTab(t)} type="button" style={{
+              padding: "8px 16px", borderRadius: 8, border: "none", cursor: "pointer",
+              fontFamily: "inherit", fontSize: 13, fontWeight: tab === t ? 700 : 500,
+              background: tab === t ? GOLD_BG : "transparent",
+              color: tab === t ? GOLD : TEXT_DIM,
+              textTransform: "capitalize",
+            }}>{t === "all" ? "All Holdings" : t.toUpperCase()}</button>
+          ))}
+        </div>
+
+        {/* Holdings Table */}
+        <div style={{ border: `1px solid ${ACCENT_DIM}`, borderRadius: 12, overflow: "hidden" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ background: SURFACE }}>
+                {["Name", "Type", "Shares", "Avg Cost", "Current Price", "Value", "Gain/Loss", "Allocation", ""].map((h) => (
+                  <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontSize: 11,
+                                       fontWeight: 600, color: TEXT_DIM, textTransform: "uppercase",
+                                       letterSpacing: "0.06em", whiteSpace: "nowrap" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 && (
+                <tr><td colSpan={9} style={{ padding: 32, textAlign: "center", color: TEXT_DIM, fontSize: 14 }}>
+                  No holdings in this category yet.
+                </td></tr>
+              )}
+              {filtered.map((h, i) => {
+                const gl = h.gainLoss || 0;
+                const glPct = h.gainLossPct || 0;
+                return (
+                  <tr key={h.id} style={{ borderTop: `1px solid ${ACCENT_DIM}`,
+                                          background: i % 2 === 0 ? "transparent" : "rgba(42,100,150,0.04)" }}>
+                    <td style={{ padding: "14px 16px" }}>
+                      <div style={{ fontWeight: 700, fontSize: 14 }}>{h.symbol}</div>
+                      <div style={{ fontSize: 12, color: TEXT_DIM, marginTop: 2, maxWidth: 180,
+                                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {h.name}
+                      </div>
+                    </td>
+                    <td style={{ padding: "14px 16px" }}><TypeBadge type={h.type} /></td>
+                    <td style={{ padding: "14px 16px", fontSize: 14 }}>{h.shares}</td>
+                    <td style={{ padding: "14px 16px", fontSize: 14 }}>{fmt$(h.avg_cost)}</td>
+                    <td style={{ padding: "14px 16px", fontSize: 14, fontWeight: 600 }}>{fmt$(h.currentPrice)}</td>
+                    <td style={{ padding: "14px 16px", fontSize: 14, fontWeight: 700 }}>{fmt$(h.currentValue)}</td>
+                    <td style={{ padding: "14px 16px" }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: gl >= 0 ? "#34d399" : "#f87171" }}>
+                        {gl >= 0 ? "+" : ""}{fmt$(gl)}
+                      </div>
+                      <div style={{ fontSize: 12, color: gl >= 0 ? "#34d399" : "#f87171" }}>
+                        {fmtPct(glPct)}
+                      </div>
+                    </td>
+                    <td style={{ padding: "14px 16px" }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{h.currentPct?.toFixed(1)}%</div>
+                      <div style={{ marginTop: 6, height: 4, borderRadius: 2, background: ACCENT_DIM, width: 70, overflow: "hidden" }}>
+                        <div style={{ height: "100%", borderRadius: 2, background: HOLDING_COLORS[holdings.indexOf(h) % HOLDING_COLORS.length],
+                                      width: `${Math.min(100, h.currentPct || 0)}%` }} />
+                      </div>
+                    </td>
+                    <td style={{ padding: "14px 16px" }}>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button onClick={() => setModal(h)} type="button"
+                                style={{ padding: "6px 12px", borderRadius: 6, border: `1px solid ${ACCENT_DIM}`,
+                                         background: "transparent", color: TEXT_DIM, cursor: "pointer",
+                                         fontSize: 12, fontFamily: "inherit" }}>Edit</button>
+                        <button onClick={() => removeHolding(h.id)} type="button"
+                                style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #f8717130",
+                                         background: "transparent", color: "#f87171", cursor: "pointer",
+                                         fontSize: 12, fontFamily: "inherit" }}>✕</button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
 
