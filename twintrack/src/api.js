@@ -58,6 +58,15 @@ export async function logout() {
   }
 }
 
+export async function saveInvestorProfile(profile) {
+  const res = await apiFetch("/api/user/profile", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(profile),
+  });
+  return res.json();
+}
+
 export async function fetchCurrentUser() {
   if (!getToken()) return null;
   const res = await apiFetch("/api/auth/me");
