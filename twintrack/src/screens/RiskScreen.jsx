@@ -5,6 +5,7 @@ import { GOLD, GOLD_BG, GOLD_BORDER, BORDER, BORDER_MED,
 import { apiFetch } from "../api.js";
 import { ShieldCheck, AlertTriangle, Activity, BarChart3, Layers, Shield, Clock } from "lucide-react";
 import InfoTip from "../components/InfoTip.jsx";
+import TypeBadge from "../components/TypeBadge.jsx";
 
 /* ─── Modern circular risk meter ────────────────────────────────── */
 function HealthRing({ score }) {
@@ -366,7 +367,7 @@ export default function RiskScreen({ portfolio, prices }) {
                   <div style={{ fontWeight: 700, fontSize: 13.5 }}>{h.symbol}</div>
                   <div style={{ fontSize: 11, color: TEXT_DIM, marginTop: 2 }}>{h.name}</div>
                 </td>
-                <td style={{ padding: "12px 18px", fontSize: 12, color: TEXT_DIM, textTransform: "uppercase" }}>{h.type}</td>
+                <td style={{ padding: "12px 18px" }}><TypeBadge type={h.type} /></td>
                 <td style={{ padding: "12px 18px", fontSize: 13, fontVariantNumeric: "tabular-nums" }}>{h.weight_pct}%</td>
                 <td style={{ padding: "12px 18px" }}>
                   <BetaBar beta={h.beta} />

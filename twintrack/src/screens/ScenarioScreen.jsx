@@ -5,6 +5,7 @@ import { GOLD, GOLD_BG, GOLD_BORDER, BORDER, BORDER_MED,
          FONT_SERIF, fmt$, fmtPct } from "../theme.js";
 import { apiFetch } from "../api.js";
 import InfoTip from "../components/InfoTip.jsx";
+import TypeBadge from "../components/TypeBadge.jsx";
 import { TrendingUp, TrendingDown, Sparkles, ChevronRight, Zap, Wallet, Landmark, AlertTriangle } from "lucide-react";
 
 const SCENARIOS = [
@@ -156,7 +157,7 @@ export default function ScenarioScreen({ portfolio, prices }) {
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ background: "rgba(255,255,255,0.02)" }}>
-                  {["Holding", "Current Value", "Projected Value", "Impact ($)", "Impact (%)"].map((h) => (
+                  {["Holding", "Type", "Current Value", "Projected Value", "Impact ($)", "Impact (%)"].map((h) => (
                     <th key={h} style={{ padding: "10px 18px", textAlign: "left", fontSize: 11,
                                           fontWeight: 600, color: TEXT_DIM, textTransform: "uppercase",
                                           letterSpacing: "0.06em", borderBottom: `1px solid ${BORDER}` }}>{h}</th>
@@ -175,6 +176,7 @@ export default function ScenarioScreen({ portfolio, prices }) {
                         <div style={{ fontWeight: 700, fontSize: 13.5 }}>{h.symbol}</div>
                         <div style={{ fontSize: 11, color: TEXT_DIM, marginTop: 2 }}>{h.name}</div>
                       </td>
+                      <td style={{ padding: "12px 18px" }}><TypeBadge type={h.type} /></td>
                       <td style={{ padding: "12px 18px", fontSize: 13, fontVariantNumeric: "tabular-nums" }}>{fmt$(h.current_value)}</td>
                       <td style={{ padding: "12px 18px", fontSize: 13, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>{fmt$(h.projected_value)}</td>
                       <td style={{ padding: "12px 18px", fontSize: 13, fontWeight: 600, fontVariantNumeric: "tabular-nums",
