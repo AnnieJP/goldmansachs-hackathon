@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import TwinTrack from "./TwinTrack.jsx";
 import LoginScreen from "./screens/LoginScreen.jsx";
+import OnboardingScreen from "./screens/OnboardingScreen.jsx";
 import { fetchCurrentUser, logout, setUnauthorizedHandler } from "./api.js";
 import { BG, TEXT_DIM } from "./theme.js";
 
 export default function App() {
-  const [user, setUser]       = useState(null);
-  const [checking, setChecking] = useState(true);
+  const [user,         setUser]         = useState(null);
+  const [checking,     setChecking]     = useState(true);
+  const [onboarding,   setOnboarding]   = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -22,9 +24,15 @@ export default function App() {
     return () => setUnauthorizedHandler(null);
   }, []);
 
+  const handleLogin = useCallback((user, isNew = false) => {
+    setUser(user);
+    if (isNew) setOnboarding(true);
+  }, []);
+
   const handleLogout = useCallback(async () => {
     await logout();
     setUser(null);
+    setOnboarding(false);
   }, []);
 
   if (checking) {
@@ -40,6 +48,7 @@ export default function App() {
     );
   }
 
-  if (!user) return <LoginScreen onLogin={setUser} />;
+  if (!user) return <LoginScreen onLogin={handleLogin} />;
+  if (onboarding) return <OnboardingScreen currentUser={user} onComplete={() => setOnboarding(false)} />;
   return <TwinTrack currentUser={user} onLogout={handleLogout} />;
 }

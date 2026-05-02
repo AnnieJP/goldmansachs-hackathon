@@ -117,7 +117,7 @@ function TypeBadge({ type }) {
 /* ─── PDF import modal ─────────────────────────────────────────── */
 const TYPE_LABELS = { stock: "Stock", etf: "ETF", bond: "Bond", fund: "Fund" };
 
-function ImportModal({ onImport, onClose }) {
+export function ImportModal({ onImport, onClose }) {
   const [stage,    setStage]    = useState("idle"); // idle | parsing | preview | importing | done
   const [parsed,   setParsed]   = useState([]);
   const [selected, setSelected] = useState(new Set());

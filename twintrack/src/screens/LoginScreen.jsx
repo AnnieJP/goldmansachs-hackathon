@@ -27,7 +27,7 @@ export default function LoginScreen({ onLogin }) {
       const user = isSignup
         ? await signup({ email: email.trim(), password, displayName: displayName.trim() })
         : await login({ email: email.trim(), password });
-      onLogin(user);
+      onLogin(user, isSignup);
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");
       setSubmitting(false);
